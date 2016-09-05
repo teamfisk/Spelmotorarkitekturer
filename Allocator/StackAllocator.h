@@ -10,14 +10,14 @@ public:
 		unsigned int blockSize;
 	};
 
-	// Marks the boundry between two stack allocations.
-	typedef unsigned int StackMarker;
+	// A Marker marks the boundry between two stack allocations.
+	typedef unsigned int Marker;
 
 	// The current mem adress of the top portion of the stack.
-	StackMarker stackTop;
+	Marker stackTop;
 
 	StackAllocator(unsigned int n)
-	{
+	{				
 		mem = malloc(n);
 		if (mem == nullptr)
 		{						
@@ -48,9 +48,21 @@ public:
 		return block;
 	}
 
-	void deallocate(StackMarker marker) 
+	// Frees all the memory above this marker.
+	void freeToMarker(Marker marker) 
 	{
-		stackTop -= marker;
+		stackTop = marker;
+	}
+
+	// Returns a marker to the current stack top.
+	Marker getMarker()
+	{
+		return stackTop;
+	}
+
+	unsigned int getAvailableSpace()
+	{
+		return memSize - stackTop;
 	}
 
 	void clear()
