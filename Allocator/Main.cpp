@@ -2,16 +2,27 @@
 #include <vector>
 #include <iostream>
 
+struct GameObjectFoo
+{
+	int data;
+	int health;
+	int ammo;
+	int swagLevel;
+};
+
 void main()
 {
 	StackAllocator stackAllocator(1e6);
 
-	StackAllocator::MemBlock block1 = stackAllocator.allocate(2000);
+	void* block1 = stackAllocator.allocate(2000);
 	//StackAllocator::Marker marker = stackAllocator.getMarker();
 	auto marker = stackAllocator.getMarker();
 	
 	auto block2 = stackAllocator.allocate(5000);
 	auto block3 = stackAllocator.allocate(10000);
+
+	GameObjectFoo* gobj = (GameObjectFoo*)stackAllocator.allocate(sizeof(GameObjectFoo));
+	gobj->swagLevel = 420;
 
 	// Try allocating more memory than exists in the allocator. 
 	try

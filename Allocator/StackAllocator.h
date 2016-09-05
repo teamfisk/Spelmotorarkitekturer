@@ -20,11 +20,6 @@ class StackAllocator
 		}
 	};
 public:	
-	struct MemBlock
-	{
-		void* blockAddress;
-		unsigned int blockSize;
-	};
 	// The current mem adress of the top portion of the stack.
 	Marker stackTop;
 
@@ -43,21 +38,17 @@ public:
 		clear();
 	}
 
-	MemBlock allocate(unsigned int n)
+	void* allocate(unsigned int n)
 	{
 		unsigned int nextTop = stackTop + n;
 		if (nextTop > memSize)
 		{			
 			throw "Stop trying to allocate more memory than exists!! :(";
 		}
-
-		MemBlock block;
-		block.blockAddress = (void*)stackTop.marker;
-		block.blockSize = n;
-
+		
 		stackTop = nextTop;
 
-		return block;
+		return (void*)stackTop.marker;
 	}
 
 	// Frees all the memory above this marker.
