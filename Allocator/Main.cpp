@@ -2,6 +2,19 @@
 #include <vector>
 #include <iostream>
 
+// Replace the default new with another version. Note: replaced globally.
+//void* operator new(std::size_t sz){
+//	std::printf("global op new called, size = %zu\n",sz);
+//return std::malloc(sz);
+//}
+
+StackAllocator gStackAllocator(10'000'000);
+
+void* operator new(std::size_t sz)
+{
+	return gStackAllocator.allocate(sz);
+}
+
 struct GameObjectFoo
 {
 	int data;
@@ -12,6 +25,10 @@ struct GameObjectFoo
 
 void main()
 {
+	auto g = new int;
+
+	auto foo = new GameObjectFoo();
+
 	StackAllocator stackAllocator(1e6);
 
 	void* block1 = stackAllocator.allocate(2000);
