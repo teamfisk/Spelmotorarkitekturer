@@ -3,16 +3,28 @@
 
 class StackAllocator	
 {
+	// A Marker marks the boundry between two stack allocations.
+	// It should be created from .getMarker() and used with .freeToMarker(Marker marker);
+	class Marker
+	{
+		friend class StackAllocator;
+
+		unsigned int marker;
+		operator unsigned int()
+		{
+			return marker;
+		}
+		void operator =(unsigned int x)
+		{
+			marker = x;
+		}
+	};
 public:	
 	struct MemBlock
 	{
 		void* blockAddress;
 		unsigned int blockSize;
 	};
-
-	// A Marker marks the boundry between two stack allocations.
-	typedef unsigned int Marker;
-
 	// The current mem adress of the top portion of the stack.
 	Marker stackTop;
 
@@ -40,7 +52,7 @@ public:
 		}
 
 		MemBlock block;
-		block.blockAddress = (void*)stackTop;
+		block.blockAddress = (void*)stackTop.marker;
 		block.blockSize = n;
 
 		stackTop = nextTop;

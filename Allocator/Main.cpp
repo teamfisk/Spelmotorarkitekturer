@@ -5,8 +5,11 @@
 void main()
 {
 	StackAllocator stackAllocator(1e6);
+
 	StackAllocator::MemBlock block1 = stackAllocator.allocate(2000);
-	StackAllocator::Marker marker = stackAllocator.getMarker();
+	//StackAllocator::Marker marker = stackAllocator.getMarker();
+	auto marker = stackAllocator.getMarker();
+	
 	auto block2 = stackAllocator.allocate(5000);
 	auto block3 = stackAllocator.allocate(10000);
 
