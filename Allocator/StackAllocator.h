@@ -46,9 +46,11 @@ public:
 			throw "Stop trying to allocate more memory than exists!! :(";
 		}
 		
-		stackTop = nextTop;
+		void* ptr = (void*)(stackTop.marker + (unsigned int)mem);
 
-		return (void*)stackTop.marker;
+		stackTop = nextTop;
+		
+		return ptr;
 	}
 
 	// Frees all the memory above this marker.
