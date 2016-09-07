@@ -10,11 +10,6 @@
 
 StackAllocator gStackAllocator(10'000'000);
 
-void* operator new(std::size_t sz)
-{
-	return gStackAllocator.allocate(sz);
-}
-
 struct GameObjectFoo
 {
 	int data;
@@ -24,7 +19,7 @@ struct GameObjectFoo
 };
 
 void main()
-{
+{	
 	auto g = new int;
 
 	auto foo = new GameObjectFoo();
