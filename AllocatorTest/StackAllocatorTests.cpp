@@ -10,7 +10,9 @@ namespace AllocatorTest
 {	
 	void ThreadFunction(StackAllocator & stackAllocator)
 	{
-		stackAllocator.allocate(1000);
+		auto sleepDuration = rand() % 5;
+		std::this_thread::sleep_for(std::chrono::milliseconds(sleepDuration));
+		stackAllocator.allocate(1000);		
 	}
 
 	TEST_CLASS(StackAllocatorTests)
@@ -20,7 +22,7 @@ namespace AllocatorTest
 			StackAllocator stackAllocator(1'000'000);
 			auto marker = stackAllocator.getMarker();
 
-			const int numThreads = 50;
+			const int numThreads = 500;
 			std::vector<std::thread> threads;
 
 			for (int i = 0; i < numThreads; i++)
@@ -33,11 +35,16 @@ namespace AllocatorTest
 				threads[i].join();
 			}
 
-			Assert::IsTrue(stackAllocator.getMarker() == numThreads * 1000);
+			std::wstring s;
 
+			auto expected = numThreads * 1000;
+			s = L"StackAllocator.getMarker() was " + std::to_wstring(stackAllocator.getMarker()) + L" expected " + std::to_wstring(expected);
+			Assert::IsTrue(stackAllocator.getMarker() == expected, s.c_str());
+			
 			stackAllocator.freeToMarker(marker);
 
-			Assert::IsTrue(stackAllocator.getMarker() == marker);
+			s = L"StackAllocator.getMarker() was " + std::to_wstring(stackAllocator.getMarker()) + L" expected " + std::to_wstring(marker);
+			Assert::IsTrue(stackAllocator.getMarker() == marker, s.c_str());			
 		}
 	};
 }

@@ -49,16 +49,17 @@ public:
 	}
 
 	void* allocate(unsigned int n)
-	{		
+	{	
+		stackTopLock.lock();
 		unsigned int nextTop = stackTop + n;
 		if (nextTop > memSize)
-		{			
+		{	
+			stackTopLock.unlock();
 			throw "Stop trying to allocate more memory than exists!! :(";			
 		}
 		
 		void* ptr = (void*)(stackTop.marker + (unsigned int)mem);
 
-		stackTopLock.lock();
 		stackTop = nextTop;
 		stackTopLock.unlock();
 
@@ -76,12 +77,17 @@ public:
 	// Returns a marker to the current stack top.
 	Marker getMarker()
 	{
+		stackTopLock.lock();
 		return stackTop;
+		stackTopLock.unlock();
 	}
 
 	unsigned int getAvailableSpace()
 	{
-		return memSize - stackTop;
+		stackTopLock.lock();
+		auto ret = memSize - stackTop;
+		stackTopLock.unlock();
+		return ret;
 	}
 
 	// Clears the entire stack
