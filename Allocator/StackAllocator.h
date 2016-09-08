@@ -48,6 +48,14 @@ public:
 		mem = nullptr;
 	}
 
+	template <typename T>
+	T* allocate()
+	{
+		T* t = static_cast<T*>(allocate(sizeof(T)));
+		//T* t2 = new(t)T; // Calls the default constructor. Possible to call another constructor somehow?
+		return t;
+	}
+
 	void* allocate(unsigned int n)
 	{	
 		stackTopLock.lock();
