@@ -9,16 +9,20 @@ class PoolAllocator
 public:
 
 	//Allocates memory with "totalBlocks" amout of blocks with a stride of "stride" bytes.
-
-	PoolAllocator(size_t totalBlocks)
+	PoolAllocator(std::size_t totalBlocks)
 		: m_StartAdress(new char[totalBlocks*sizeof(T)]) //TODO: Kolla upp om vi skall använda malloc ist för new
 		, m_BlockOccupied(totalBlocks, false)
 		, m_Stride(sizeof(T))
 		, m_TotalBlocks(totalBlocks)
 	{}
 
-	~Poolallocator()
-	{}
+	~PoolAllocator()
+	{
+	
+	}
+
+
+
 	template<typename... Arguments>
 	T* Allocate(Arguments... args)
 	{
@@ -34,13 +38,12 @@ public:
 		}
 	}
 
-	template<typename T>
 	void Free(T* obj)
 	{
 		obj->~T();
 		--m_NumOccupiedBlocks;
-		const size_t freeSlot = (reinterpret_cast<char*>(obj) - m_StartAdress) / m_Stride;
-		m_BlockOccupied = false;
+		const std::size_t freeSlot = (reinterpret_cast<char*>(obj) - m_StartAdress) / m_Stride;
+		m_BlockOccupied[m_FirstFreeBlock] = false;
 		if (freeSlot < m_FirstFreeBlock)
 			m_FirstFreeBlock = freeSlot;
 
@@ -49,10 +52,10 @@ public:
 private:
 	char* m_StartAdress;
 	std::vector<bool> m_BlockOccupied;
-	size_t m_Stride;
-	size_t m_TotalBlocks;
-	size_t m_FirstFreeBlock;
-	size_t m_NumOccupiedBlocks;
+	std::size_t m_Stride;
+	std::size_t m_TotalBlocks;
+	std::size_t m_FirstFreeBlock;
+	std::size_t m_NumOccupiedBlocks;
 };
 
 #endif
