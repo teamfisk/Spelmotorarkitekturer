@@ -1,83 +1,58 @@
-#pragma once
-#include <malloc.h>
+#ifndef PoolAllocator_h
+#define PoolAllocator_h
+#include <vector>
 
-class StackAllocator	
+
+template <typename T>
+class PoolAllocator
 {
-	// A Marker marks the boundry between two stack allocations.
-	// It should be created from .getMarker() and used with .freeToMarker(Marker marker);
-	class Marker
-	{
-		friend class StackAllocator;
+public:
 
-		unsigned int marker;
-		operator unsigned int()
+	//Allocates memory with "totalBlocks" amout of blocks with a stride of "stride" bytes.
+
+	PoolAllocator(size_t totalBlocks)
+		: m_StartAdress(new char[totalBlocks*sizeof(T)]) //TODO: Kolla upp om vi skall använda malloc ist för new
+		, m_BlockOccupied(totalBlocks, false)
+		, m_Stride(sizeof(T))
+		, m_TotalBlocks(totalBlocks)
+	{}
+
+	~Poolallocator()
+	{}
+	template<typename... Arguments>
+	T* Allocate(Arguments... args)
+	{
+		for (; m_FirstFreeBlock < m_TotalBlocks && m_BlockOccupied[m_FirstFreeBlock]; ++m_FirstFreeBlock);
+		if (m_FirstFreeBlock < m_TotalBlocks) {
+			m_BlockOccupied[m_FirstFreeBlock] = true;
+			m_NumOccupiedBlocks++;
+			return new (m_StartAdress + m_Stride*m_FirstFreeBlock++) T(args...);
+		}
+		else
 		{
-			return marker;
+			//TODO: Outside memory pool, deal with it.
 		}
-		void operator =(unsigned int x)
-		{
-			marker = x;
-		}
-	};
-public:	
-	// The current mem adress of the top portion of the stack.
-	Marker stackTop;
-
-	StackAllocator(unsigned int n)
-	{				
-		mem = malloc(n);
-		if (mem == nullptr)
-		{						
-			throw "StackAllocator unable to allocate memory.";
-		}
-		memSize = n;
 	}
 
-	~StackAllocator() 
+	template<typename T>
+	void Free(T* obj)
 	{
-		clear();
+		obj->~T();
+		--m_NumOccupiedBlocks;
+		const size_t freeSlot = (reinterpret_cast<char*>(obj) - m_StartAdress) / m_Stride;
+		m_BlockOccupied = false;
+		if (freeSlot < m_FirstFreeBlock)
+			m_FirstFreeBlock = freeSlot;
+
 	}
 
-	void* allocate(unsigned int n)
-	{
-		unsigned int nextTop = stackTop + n;
-		if (nextTop > memSize)
-		{			
-			throw "Stop trying to allocate more memory than exists!! :(";
-		}
-		
-		void* ptr = (void*)(stackTop.marker + (unsigned int)mem);
-
-		stackTop = nextTop;
-		
-		return ptr;
-	}
-
-	// Frees all the memory above this marker.
-	void freeToMarker(Marker marker) 
-	{
-		stackTop = marker;
-	}
-
-	// Returns a marker to the current stack top.
-	Marker getMarker()
-	{
-		return stackTop;
-	}
-
-	unsigned int getAvailableSpace()
-	{
-		return memSize - stackTop;
-	}
-
-	void clear()
-	{
-		free(mem);
-		mem = nullptr;
-		stackTop = 0;
-	}
-
-private:	
-	void* mem = nullptr;
-	unsigned int memSize = 0;
+private:
+	char* m_StartAdress;
+	std::vector<bool> m_BlockOccupied;
+	size_t m_Stride;
+	size_t m_TotalBlocks;
+	size_t m_FirstFreeBlock;
+	size_t m_NumOccupiedBlocks;
 };
+
+#endif
