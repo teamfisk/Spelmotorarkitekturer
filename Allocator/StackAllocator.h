@@ -115,3 +115,8 @@ private:
 
 	std::mutex stackTopLock;
 };
+
+void* operator new (std::size_t size, StackAllocator& stackAllocator)
+{
+	return stackAllocator.allocate(size);
+}

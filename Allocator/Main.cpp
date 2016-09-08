@@ -35,8 +35,8 @@ void main()
 	GameObjectFoo* gobj = (GameObjectFoo*)stackAllocator.allocate(sizeof(GameObjectFoo));   // Version 2
 	
 	// Call the constructor without allocating memory (a.k.a. "placement new")
-	foo = new(foo)GameObjectFoo(420);
-	gobj->swagLevel = 420;
+	foo = new(foo)GameObjectFoo(420);									// Version 1: using the memory from a pointer	
+	GameObjectFoo* bestFoo = new (stackAllocator) GameObjectFoo(420);	// Version 2: allocating from the stackAllocator
 
 	void* block1 = stackAllocator.allocate(2000);
 	//StackAllocator::Marker marker = stackAllocator.getMarker();
