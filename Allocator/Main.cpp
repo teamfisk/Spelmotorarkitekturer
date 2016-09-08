@@ -38,27 +38,6 @@ void main()
 	foo = new(foo)GameObjectFoo(420);									// Version 1: using the memory from a pointer	
 	GameObjectFoo* bestFoo = new (stackAllocator) GameObjectFoo(420);	// Version 2: allocating from the stackAllocator
 
-	void* block1 = stackAllocator.allocate(2000);
-	//StackAllocator::Marker marker = stackAllocator.getMarker();
-	auto marker = stackAllocator.getMarker();
-	
-	auto block2 = stackAllocator.allocate(5000);
-	auto block3 = stackAllocator.allocate(10000);
-
-	// Try allocating more memory than exists in the allocator. 
-	try
-	{
-		auto block4 = stackAllocator.allocate(10e7);
-	}
-	catch (const char* c)
-	{
-		std::cerr << c << std::endl;
-	}
-
-	unsigned int spaceBeforeFree = stackAllocator.getAvailableSpace();
-	stackAllocator.freeToMarker(marker);
-	unsigned int spaceAfterFree = stackAllocator.getAvailableSpace();
-
 	// Needs a bit more stuff before it can be used as an std::allocator ...
 	// http://www.open-std.org/jtc1/sc22/wg21/docs/papers/2007/n2271.html#std_allocator
 	//std::vector<float, StackAllocator<float>> v;

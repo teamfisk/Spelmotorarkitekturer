@@ -18,7 +18,7 @@ namespace AllocatorTest
 	TEST_CLASS(StackAllocatorTests)
 	{
 		TEST_METHOD(MultithreadAllocationTest)
-		{							
+		{												
 			StackAllocator stackAllocator(1'000'000);
 			auto marker = stackAllocator.getMarker();
 
@@ -32,7 +32,7 @@ namespace AllocatorTest
 
 			for (int i = 0; i < numThreads; i++)
 			{
-				threads[i].join();
+				threads[i].join(); // Something weird is happening here. It never returns.
 			}
 
 			std::wstring s;
@@ -40,11 +40,49 @@ namespace AllocatorTest
 			auto expected = numThreads * 1000;
 			s = L"StackAllocator.getMarker() was " + std::to_wstring(stackAllocator.getMarker()) + L" expected " + std::to_wstring(expected);
 			Assert::IsTrue(stackAllocator.getMarker() == expected, s.c_str());
-			
+
 			stackAllocator.freeToMarker(marker);
 
 			s = L"StackAllocator.getMarker() was " + std::to_wstring(stackAllocator.getMarker()) + L" expected " + std::to_wstring(marker);
 			Assert::IsTrue(stackAllocator.getMarker() == marker, s.c_str());			
+		}
+
+		TEST_METHOD(AllocationExceptionTest)
+		{
+			StackAllocator stackAllocator(1e6);
+
+			// Try allocating more memory than exists in the allocator. 
+			bool exceptionCaught = false;
+			try
+			{
+				auto block = stackAllocator.allocate(10e7);
+			}
+			catch (const char* c)
+			{
+				exceptionCaught = true;
+			}
+
+			Assert::IsTrue(exceptionCaught);
+		}
+
+		TEST_METHOD(FreeTest)
+		{
+			StackAllocator stackAllocator(1e6);
+
+			void* block1 = stackAllocator.allocate(2000);
+			//StackAllocator::Marker marker = stackAllocator.getMarker();
+			auto marker = stackAllocator.getMarker();
+
+			auto block2 = stackAllocator.allocate(5000); // crash here, wtf
+			auto block3 = stackAllocator.allocate(10000);
+
+			
+			unsigned int spaceBeforeFree = stackAllocator.getAvailableSpace();
+			Assert::IsTrue(spaceBeforeFree == 2000 + 5000 + 10000);
+
+			stackAllocator.freeToMarker(marker);
+			unsigned int spaceAfterFree = stackAllocator.getAvailableSpace();
+			Assert::IsTrue(spaceAfterFree == 2000);
 		}
 	};
 }

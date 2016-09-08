@@ -66,7 +66,7 @@ public:
 			throw "Stop trying to allocate more memory than exists!! :(";			
 		}
 		
-		void* ptr = (void*)(stackTop.marker + (unsigned int)mem);
+		void* ptr = (void*)(stackTop + (unsigned int)mem);
 
 		stackTop = nextTop;
 		stackTopLock.unlock();
