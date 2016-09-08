@@ -10,13 +10,16 @@
 
 StackAllocator gStackAllocator(10'000'000);
 
-void* operator new(std::size_t sz)
-{
-	return gStackAllocator.allocate(sz);
-}
-
 struct GameObjectFoo
 {
+	GameObjectFoo()
+	{
+		this->swagLevel = -1;
+	}
+	GameObjectFoo(int swagLevel)
+	{
+		this->swagLevel = swagLevel;
+	}
 	int data;
 	int health;
 	int ammo;
@@ -24,12 +27,16 @@ struct GameObjectFoo
 };
 
 void main()
-{
-	auto g = new int;
-
-	auto foo = new GameObjectFoo();
-
+{	
 	StackAllocator stackAllocator(1e6);
+
+	// Allocate memory for a object
+	GameObjectFoo* foo = stackAllocator.allocate<GameObjectFoo>();							// Version 1
+	GameObjectFoo* gobj = (GameObjectFoo*)stackAllocator.allocate(sizeof(GameObjectFoo));   // Version 2
+	
+	// Call the constructor without allocating memory (a.k.a. "placement new")
+	foo = new(foo)GameObjectFoo(420);
+	gobj->swagLevel = 420;
 
 	void* block1 = stackAllocator.allocate(2000);
 	//StackAllocator::Marker marker = stackAllocator.getMarker();
@@ -37,9 +44,6 @@ void main()
 	
 	auto block2 = stackAllocator.allocate(5000);
 	auto block3 = stackAllocator.allocate(10000);
-
-	GameObjectFoo* gobj = (GameObjectFoo*)stackAllocator.allocate(sizeof(GameObjectFoo));
-	gobj->swagLevel = 420;
 
 	// Try allocating more memory than exists in the allocator. 
 	try
