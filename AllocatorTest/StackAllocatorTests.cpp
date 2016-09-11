@@ -67,22 +67,29 @@ namespace AllocatorTest
 
 		TEST_METHOD(FreeTest)
 		{
-			StackAllocator stackAllocator(1e6);
+			unsigned int allocatedSpace = 1e6;
+			StackAllocator stackAllocator(allocatedSpace);
 
 			void* block1 = stackAllocator.allocate(2000);
 			//StackAllocator::Marker marker = stackAllocator.getMarker();
 			auto marker = stackAllocator.getMarker();
 
-			auto block2 = stackAllocator.allocate(5000); // crash here, wtf
+			auto block2 = stackAllocator.allocate(5000); 
 			auto block3 = stackAllocator.allocate(10000);
 
 			
 			unsigned int spaceBeforeFree = stackAllocator.getAvailableSpace();
-			Assert::IsTrue(spaceBeforeFree == 2000 + 5000 + 10000);
+
+			unsigned int expected = allocatedSpace - (2000 + 5000 + 10000);
+			std::wstring s = L"spaceBeforeFree was " + std::to_wstring(spaceBeforeFree) + L" expected " + std::to_wstring(expected);
+			Assert::IsTrue(spaceBeforeFree == expected, s.c_str());
 
 			stackAllocator.freeToMarker(marker);
+
 			unsigned int spaceAfterFree = stackAllocator.getAvailableSpace();
-			Assert::IsTrue(spaceAfterFree == 2000);
+			expected = allocatedSpace - 2000;
+			s = L"spaceAfterFree was " + std::to_wstring(spaceAfterFree) + L" expected " + std::to_wstring(expected);
+			Assert::IsTrue(spaceAfterFree == expected);
 		}
 	};
 }

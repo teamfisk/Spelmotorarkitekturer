@@ -85,9 +85,8 @@ public:
 	// Returns a marker to the current stack top.
 	Marker getMarker()
 	{
-		stackTopLock.lock();
-		return stackTop;
-		stackTopLock.unlock();
+		std::lock_guard<std::mutex> lock(stackTopLock);		
+		return stackTop;		
 	}
 
 	unsigned int getAvailableSpace()
