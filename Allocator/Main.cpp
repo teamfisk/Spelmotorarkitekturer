@@ -30,11 +30,11 @@ void main()
 {	
 	StackAllocator stackAllocator(1e6);
 
-	// Allocate memory for a object
+	// Allocates memory for a object, doesn't initialize the object
 	GameObjectFoo* foo = stackAllocator.allocate<GameObjectFoo>();							// Version 1
 	GameObjectFoo* gobj = (GameObjectFoo*)stackAllocator.allocate(sizeof(GameObjectFoo));   // Version 2
-	
-	// Call the constructor without allocating memory (a.k.a. "placement new")
+		
+	// Using placement new
 	foo = new(foo)GameObjectFoo(420);									// Version 1: using the memory from a pointer	
 	GameObjectFoo* bestFoo = new (stackAllocator) GameObjectFoo(420);	// Version 2: allocating from the stackAllocator
 
