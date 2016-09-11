@@ -32,7 +32,7 @@ namespace AllocatorTest
 
 			for (int i = 0; i < numThreads; i++)
 			{
-				threads[i].join(); // Something weird is happening here. It never returns.
+				threads[i].join();
 			}
 
 			std::wstring s;
