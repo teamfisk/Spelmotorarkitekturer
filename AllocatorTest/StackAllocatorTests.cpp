@@ -120,6 +120,27 @@ namespace AllocatorTest
 			expected = allocatedSpace - 2000;
 			s = L"spaceAfterFree was " + std::to_wstring(spaceAfterFree) + L" expected " + std::to_wstring(expected);
 			Assert::IsTrue(spaceAfterFree == expected);
-		}		
+		}
+
+		TEST_METHOD(MixedSizeAllocationComparison)
+		{
+#ifdef STACK_ALLOCATOR
+			unsigned int allocatedSpace = 1e8;
+			StackAllocator stackAllocator(allocatedSpace);
+#endif						
+			const int numBlocks = 5000;
+			
+			for (int i = 0; i < numBlocks; i++)
+			{
+				// Allocate blocks between 1000 and 5000 byte large.
+				int blockSize = (1 + rand() % 5) * 1000;
+#ifdef STACK_ALLOCATOR
+				void* block = stackAllocator.allocate(blockSize);
+#else
+				void* block = new char[blockSize];
+#endif
+				memset(block, 123, blockSize);
+			}						
+		}
 	};
 }
