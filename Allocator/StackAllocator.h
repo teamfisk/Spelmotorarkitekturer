@@ -11,7 +11,7 @@ class StackAllocator
 		friend class StackAllocator;
 		friend class Marker;
 
-		unsigned int marker;		
+		uintptr_t marker;
 
 		void operator =(unsigned int x)
 		{
@@ -19,7 +19,7 @@ class StackAllocator
 		}
 
 	public:
-		operator unsigned int()
+		operator uintptr_t()
 		{
 			return marker;
 		}
@@ -54,18 +54,17 @@ public:
 		return static_cast<T*>(allocate(sizeof(T)));		
 	}
 
-	void* allocate(unsigned int n)
+	void* allocate(uintptr_t n)
 	{	
 		std::lock_guard<std::mutex> lockGuard(stackTopLock);
 		
-		unsigned int nextTop = stackTop + n;
+		uintptr_t nextTop = stackTop + n;
 		if (nextTop > memSize)
 		{	
-
 			throw "Stop trying to allocate more memory than exists!! :(";			
 		}
 		
-		void* ptr = (void*)(stackTop + (unsigned int)mem);
+		void* ptr = (void*)(stackTop + (uintptr_t)mem);
 
 		stackTop = nextTop;
 
@@ -103,7 +102,7 @@ public:
 
 private:	
 	void* mem = nullptr;
-	unsigned int memSize = 0;
+	uintptr_t memSize = 0;
 
 	// The current mem adress of the top portion of the stack.
 	Marker stackTop;
