@@ -87,7 +87,7 @@ namespace AllocatorTest
 			{
 				auto block = stackAllocator.allocate(10e7);
 			}
-			catch (const char* c)
+			catch (...)
 			{
 				exceptionCaught = true;
 			}
@@ -108,15 +108,15 @@ namespace AllocatorTest
 			auto block3 = stackAllocator.allocate(10000);
 
 			
-			unsigned int spaceBeforeFree = stackAllocator.getAvailableSpace();
+			auto spaceBeforeFree = stackAllocator.getAvailableSpace();
 
-			unsigned int expected = allocatedSpace - (2000 + 5000 + 10000);
+			auto expected = allocatedSpace - (2000 + 5000 + 10000);
 			std::wstring s = L"spaceBeforeFree was " + std::to_wstring(spaceBeforeFree) + L" expected " + std::to_wstring(expected);
 			Assert::IsTrue(spaceBeforeFree == expected, s.c_str());
 
 			stackAllocator.freeToMarker(marker);
 
-			unsigned int spaceAfterFree = stackAllocator.getAvailableSpace();
+			auto spaceAfterFree = stackAllocator.getAvailableSpace();
 			expected = allocatedSpace - 2000;
 			s = L"spaceAfterFree was " + std::to_wstring(spaceAfterFree) + L" expected " + std::to_wstring(expected);
 			Assert::IsTrue(spaceAfterFree == expected);
