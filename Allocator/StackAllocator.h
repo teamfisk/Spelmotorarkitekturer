@@ -51,25 +51,23 @@ public:
 	template <typename T>
 	T* allocate()
 	{
-		T* t = static_cast<T*>(allocate(sizeof(T)));
-		//T* t2 = new(t)T; // Calls the default constructor. Possible to call another constructor somehow?
-		return t;
+		return static_cast<T*>(allocate(sizeof(T)));		
 	}
 
 	void* allocate(unsigned int n)
 	{	
-		stackTopLock.lock();
+		std::lock_guard<std::mutex> lockGuard(stackTopLock);
+		
 		unsigned int nextTop = stackTop + n;
 		if (nextTop > memSize)
 		{	
-			stackTopLock.unlock();
+
 			throw "Stop trying to allocate more memory than exists!! :(";			
 		}
 		
 		void* ptr = (void*)(stackTop + (unsigned int)mem);
 
 		stackTop = nextTop;
-		stackTopLock.unlock();
 
 		return ptr;
 	}
@@ -91,10 +89,8 @@ public:
 
 	unsigned int getAvailableSpace()
 	{
-		stackTopLock.lock();
-		auto ret = memSize - stackTop;
-		stackTopLock.unlock();
-		return ret;
+		std::lock_guard<std::mutex> lockGuard(stackTopLock);						
+		return memSize - stackTop;
 	}
 
 	// Clears the entire stack
