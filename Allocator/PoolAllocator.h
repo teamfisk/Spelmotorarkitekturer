@@ -2,7 +2,6 @@
 #define PoolAllocator_h
 #include <vector>
 
-
 template <typename T>
 class PoolAllocator
 {
@@ -20,8 +19,6 @@ public:
 	{
 	
 	}
-
-
 
 	template<typename... Arguments>
 	T* Allocate(Arguments... args)
