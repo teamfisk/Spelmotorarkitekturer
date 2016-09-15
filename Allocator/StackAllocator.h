@@ -104,7 +104,7 @@ private:
 	void* mem = nullptr;
 	uintptr_t memSize = 0;
 
-	// The current mem adress of the top portion of the stack.
+	// The current mem address offset to the top portion of the stack.
 	Marker stackTop;
 
 	std::mutex stackTopLock;
