@@ -119,7 +119,37 @@ namespace AllocatorTest
 			auto spaceAfterFree = stackAllocator.getAvailableSpace();
 			expected = allocatedSpace - 2000;
 			s = L"spaceAfterFree was " + std::to_wstring(spaceAfterFree) + L" expected " + std::to_wstring(expected);
-			Assert::IsTrue(spaceAfterFree == expected);
+			Assert::IsTrue(spaceAfterFree == expected, s.c_str());
+		}
+
+		void AssertMemSet(void* mem, char val, size_t numBytes)
+		{			
+			int iteration = 0;
+
+			for (char* ch = static_cast<char*>(mem); ch < ch + numBytes; ch++)
+			{				
+				std::wstring s = L"ch pointed at " + std::to_wstring((uintptr_t)ch) + L", *ch was " + std::to_wstring(*ch) + L" val was " + std::to_wstring(val) + L" iteration " + std::to_wstring(iteration);
+				Assert::IsTrue(*ch == val, s.c_str());
+				iteration++;
+			}
+		}
+
+		TEST_METHOD(RepeatedFreeTest)
+		{
+			unsigned int allocatedSpace = 1'000'000;
+			StackAllocator stackAllocator(allocatedSpace);
+
+			auto marker = stackAllocator.getMarker();
+
+			for(int i = 0; i < 5; i++)
+			{
+				size_t blockSize = 100'000;
+				void* block = stackAllocator.allocate(blockSize);
+				memset(block, 123 + i, blockSize);
+				AssertMemSet(block, 123 + i, blockSize);
+
+				stackAllocator.freeToMarker(marker);
+			}			
 		}
 
 		TEST_METHOD(MixedSizeAllocationComparison)
