@@ -11,7 +11,7 @@ class StackAllocator
 		friend class StackAllocator;
 		friend class Marker;
 
-		unsigned int marker;		
+		uintptr_t marker;
 
 		void operator =(unsigned int x)
 		{
@@ -19,7 +19,7 @@ class StackAllocator
 		}
 
 	public:
-		operator unsigned int()
+		operator uintptr_t()
 		{
 			return marker;
 		}
@@ -51,25 +51,22 @@ public:
 	template <typename T>
 	T* allocate()
 	{
-		T* t = static_cast<T*>(allocate(sizeof(T)));
-		//T* t2 = new(t)T; // Calls the default constructor. Possible to call another constructor somehow?
-		return t;
+		return static_cast<T*>(allocate(sizeof(T)));		
 	}
 
-	void* allocate(unsigned int n)
+	void* allocate(uintptr_t n)
 	{	
-		stackTopLock.lock();
-		unsigned int nextTop = stackTop + n;
+		std::lock_guard<std::mutex> lockGuard(stackTopLock);
+		
+		uintptr_t nextTop = stackTop + n;
 		if (nextTop > memSize)
 		{	
-			stackTopLock.unlock();
 			throw "Stop trying to allocate more memory than exists!! :(";			
 		}
 		
-		void* ptr = (void*)(stackTop.marker + (unsigned int)mem);
+		void* ptr = (void*)(stackTop + (uintptr_t)mem);
 
 		stackTop = nextTop;
-		stackTopLock.unlock();
 
 		return ptr;
 	}
@@ -85,17 +82,14 @@ public:
 	// Returns a marker to the current stack top.
 	Marker getMarker()
 	{
-		stackTopLock.lock();
-		return stackTop;
-		stackTopLock.unlock();
+		std::lock_guard<std::mutex> lock(stackTopLock);		
+		return stackTop;		
 	}
 
 	unsigned int getAvailableSpace()
 	{
-		stackTopLock.lock();
-		auto ret = memSize - stackTop;
-		stackTopLock.unlock();
-		return ret;
+		std::lock_guard<std::mutex> lockGuard(stackTopLock);						
+		return memSize - stackTop;
 	}
 
 	// Clears the entire stack
@@ -108,10 +102,15 @@ public:
 
 private:	
 	void* mem = nullptr;
-	unsigned int memSize = 0;
+	uintptr_t memSize = 0;
 
 	// The current mem adress of the top portion of the stack.
 	Marker stackTop;
 
 	std::mutex stackTopLock;
 };
+
+void* operator new (std::size_t size, StackAllocator& stackAllocator)
+{
+	return stackAllocator.allocate(size);
+}
