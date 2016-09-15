@@ -13,7 +13,7 @@ class StackAllocator
 
 		uintptr_t marker;
 
-		void operator =(unsigned int x)
+		void operator =(uintptr_t x)
 		{
 			marker = x;
 		}
@@ -30,7 +30,7 @@ class StackAllocator
 		}
 	};
 public:	
-	StackAllocator(unsigned int n)
+	StackAllocator(size_t n)
 	{				
 		mem = malloc(n);
 		if (mem == nullptr)
@@ -86,7 +86,7 @@ public:
 		return stackTop;		
 	}
 
-	unsigned int getAvailableSpace()
+	uintptr_t getAvailableSpace()
 	{
 		std::lock_guard<std::mutex> lockGuard(stackTopLock);						
 		return memSize - stackTop;
@@ -104,7 +104,7 @@ private:
 	void* mem = nullptr;
 	uintptr_t memSize = 0;
 
-	// The current mem adress of the top portion of the stack.
+	// The current mem address offset to the top portion of the stack.
 	Marker stackTop;
 
 	std::mutex stackTopLock;
