@@ -17,7 +17,7 @@ public:
 
 	~PoolAllocator()
 	{
-	
+		delete[] m_StartAdress;
 	}
 
 	template<typename... Arguments>
