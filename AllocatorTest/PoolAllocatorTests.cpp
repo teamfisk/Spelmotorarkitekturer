@@ -33,12 +33,15 @@ namespace AllocatorTest
 
 		}
 
-		//Test using more memory than we have allocated.
+		//Test using more memory than we have allocated and see that it is 
+		//handled correctly.
 		TEST_METHOD(Boundries)
 		{
 
 		}
 
+		//Check the available space left in the memory pool
+		//to make sure it's calculated correctly.
 		TEST_METHOD(AvailableSpace)
 		{
 
