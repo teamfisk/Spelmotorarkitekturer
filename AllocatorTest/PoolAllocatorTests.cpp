@@ -1,3 +1,4 @@
+#include "stdafx.h"
 #include <CppUnitTest.h>
 #include <thread>
 #include <vector>
@@ -46,7 +47,7 @@ namespace AllocatorTest
 		{
 
 		}
-	}
+	};
 }
 
 
