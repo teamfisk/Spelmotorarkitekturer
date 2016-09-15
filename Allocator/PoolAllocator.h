@@ -7,9 +7,9 @@ class PoolAllocator
 {
 public:
 
-	//Allocates memory with "totalBlocks" amout of blocks with a stride of "stride" bytes.
+	//Allocates memory with "totalBlocks" amount of blocks with a stride of "stride" bytes.
 	PoolAllocator(std::size_t totalBlocks)
-		: m_StartAdress(new char[totalBlocks*sizeof(T)]) //TODO: Kolla upp om vi skall använda malloc ist för new
+		: m_StartAdress(new char[totalBlocks*sizeof(T)]) 
 		, m_BlockOccupied(totalBlocks, false)
 		, m_Stride(sizeof(T))
 		, m_TotalBlocks(totalBlocks)
@@ -20,6 +20,8 @@ public:
 		delete[] m_StartAdress;
 	}
 
+
+	//Allocate memory for one T object and return the memory address.
 	template<typename... Arguments>
 	T* Allocate(Arguments... args)
 	{
