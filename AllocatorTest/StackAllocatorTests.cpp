@@ -123,14 +123,15 @@ namespace AllocatorTest
 		}
 
 		void AssertMemSet(void* mem, char val, size_t numBytes)
-		{			
-			int iteration = 0;
-
-			for (char* ch = static_cast<char*>(mem); ch < ch + numBytes; ch++)
+		{						
+			char* ch = static_cast<char*>(mem);
+			for (int iteration = 0; iteration < numBytes; iteration++)
 			{				
-				std::wstring s = L"ch pointed at " + std::to_wstring((uintptr_t)ch) + L", *ch was " + std::to_wstring(*ch) + L" val was " + std::to_wstring(val) + L" iteration " + std::to_wstring(iteration);
-				Assert::IsTrue(*ch == val, s.c_str());
-				iteration++;
+				// Fuck this extremely slow shit.
+				//std::wstring s = L"ch pointed at " + std::to_wstring((uintptr_t)ch) + L", *ch was " + std::to_wstring(*ch) + L" val was " + std::to_wstring(val) + L" iteration " + std::to_wstring(iteration);
+				//Assert::IsTrue(*ch == val, s.c_str());				
+
+				Assert::IsTrue(*ch == val);
 			}
 		}
 
