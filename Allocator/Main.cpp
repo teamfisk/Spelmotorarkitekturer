@@ -26,13 +26,13 @@ struct GameObjectFoo
 	int swagLevel;
 };
 
-void main()
+int main()
 {	
 	StackAllocator stackAllocator(1e6);
 
 	// Allocates memory for a object, doesn't initialize the object
-	GameObjectFoo* foo = stackAllocator.allocate<GameObjectFoo>();							// Version 1
-	GameObjectFoo* gobj = (GameObjectFoo*)stackAllocator.allocate(sizeof(GameObjectFoo));   // Version 2
+	GameObjectFoo* foo = stackAllocator.Allocate<GameObjectFoo>();							// Version 1
+	GameObjectFoo* gobj = (GameObjectFoo*) stackAllocator.Allocate(sizeof(GameObjectFoo));   // Version 2
 		
 	// Using placement new
 	foo = new(foo)GameObjectFoo(420);									// Version 1: using the memory from a pointer	
@@ -41,5 +41,7 @@ void main()
 	// Needs a bit more stuff before it can be used as an std::allocator ...
 	// http://www.open-std.org/jtc1/sc22/wg21/docs/papers/2007/n2271.html#std_allocator
 	//std::vector<float, StackAllocator<float>> v;
-	//v.reserve(100);	
+	//v.reserve(100);
+
+	return 0;
 }
