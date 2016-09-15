@@ -18,7 +18,7 @@ public:
 
 	~PoolAllocator()
 	{
-	
+		delete[] m_StartAdress;
 	}
 
 
