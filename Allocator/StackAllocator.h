@@ -4,113 +4,112 @@
 
 class StackAllocator	
 {
-	// A Marker marks the boundry between two stack allocations.
-	// It should be created from .getMarker() and used with .freeToMarker(Marker marker);
+	// A Marker marks the boundary between two stack allocations.
+	// It should be created from .GetMarker() and used with .FreeToMarker(Marker m_Marker);
 	class Marker
 	{
 		friend class StackAllocator;
 		friend class Marker;
 
-		uintptr_t marker;
+		std::size_t m_Marker;
 
-		void operator =(uintptr_t x)
+		void operator = (std::size_t x)
 		{
-			marker = x;
+			m_Marker = x;
 		}
 
 	public:
-		operator uintptr_t()
+		operator std::size_t()
 		{
-			return marker;
+			return m_Marker;
 		}
 
 		bool operator == (Marker m)
 		{
-			return marker == m.marker;
+			return m_Marker == m.m_Marker;
 		}
 	};
+
 public:	
-	StackAllocator(size_t n)
+	StackAllocator(std::size_t n)
 	{				
-		mem = malloc(n);
-		if (mem == nullptr)
-		{						
-			throw "StackAllocator unable to allocate memory.";
+		m_Memory = malloc(n);
+		if (m_Memory == nullptr) {
+			throw std::runtime_error("StackAllocator unable to Allocate memory.");
 		}
-		memSize = n;
-		stackTop = 0;
+		m_Size = n;
+		m_StackTop = 0;
 	}
 
 	~StackAllocator() 
 	{
-		clear();
-		free(mem);
-		mem = nullptr;
+		Clear();
+		free(m_Memory);
+		m_Memory = nullptr;
 	}
 
 	template <typename T>
-	T* allocate()
+	T* Allocate()
 	{
-		return static_cast<T*>(allocate(sizeof(T)));		
+		return static_cast<T*>(Allocate(sizeof(T)));		
 	}
 
-	void* allocate(uintptr_t n)
+	void* Allocate(std::size_t n)
 	{	
-		std::lock_guard<std::mutex> lockGuard(stackTopLock);
+		std::lock_guard<std::mutex> lockGuard(m_StackTopLock);
 		
-		uintptr_t nextTop = stackTop + n;
-		if (nextTop > memSize)
-		{	
-			throw "Stop trying to allocate more memory than exists!! :(";			
+		std::size_t nextTop = m_StackTop + n;
+		if (nextTop > m_Size) {
+			throw std::overflow_error("Stop trying to Allocate more memory than exists!! :(");
 		}
 		
-		void* ptr = (void*)(stackTop + (uintptr_t)mem);
+		void* ptr = (void*)(m_StackTop + (std::size_t)m_Memory);
 
-		stackTop = nextTop;
+		m_StackTop = nextTop;
 
 		return ptr;
 	}
 
-	// Frees all the memory above this marker.
-	void freeToMarker(Marker marker) 
+	// Frees all the memory above this m_Marker.
+	void FreeToMarker(Marker marker) 
 	{
-		stackTopLock.lock();
-		stackTop = marker;
-		stackTopLock.unlock();
+		m_StackTopLock.lock();
+		m_StackTop = marker;
+		m_StackTopLock.unlock();
 	}
 
-	// Returns a marker to the current stack top.
-	Marker getMarker()
+	// Returns a m_Marker to the current stack top.
+	Marker GetMarker()
 	{
-		std::lock_guard<std::mutex> lock(stackTopLock);		
-		return stackTop;		
+		std::lock_guard<std::mutex> lock(m_StackTopLock);
+		return m_StackTop;
 	}
 
-	uintptr_t getAvailableSpace()
+	std::size_t GetAvailableSpace()
 	{
-		std::lock_guard<std::mutex> lockGuard(stackTopLock);						
-		return memSize - stackTop;
+		std::lock_guard<std::mutex> lockGuard(m_StackTopLock);
+		return m_Size - m_StackTop;
 	}
 
 	// Clears the entire stack
-	void clear()
+	void Clear()
 	{
-		stackTopLock.lock();		
-		stackTop = 0;
-		stackTopLock.unlock();
+		m_StackTopLock.lock();
+		m_StackTop = 0;
+		m_StackTopLock.unlock();
 	}
 
 private:	
-	void* mem = nullptr;
-	uintptr_t memSize = 0;
+	void* m_Memory = nullptr;
+	std::size_t m_Size = 0;
 
 	// The current mem address offset to the top portion of the stack.
-	Marker stackTop;
+	Marker m_StackTop;
 
-	std::mutex stackTopLock;
+	std::mutex m_StackTopLock;
 };
 
 void* operator new (std::size_t size, StackAllocator& stackAllocator)
 {
-	return stackAllocator.allocate(size);
+	return stackAllocator.Allocate(size);
 }
