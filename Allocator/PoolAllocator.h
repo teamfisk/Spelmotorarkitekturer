@@ -2,10 +2,28 @@
 #define PoolAllocator_h
 #include <vector>
 
+
+//Iterator class
+//Is used by our Pool Allocator to iterate through the memory.
+template<typename T>
+class MemoryPoolIterator;
+
+//Pool allocator class that handles our custom pool memory allocator.
 template <typename T>
 class PoolAllocator
 {
+	template <typename T>
+	friend class MemoryPoolIterator;
 public:
+	//These typedefs are needed for the compilator to compile the iterator.
+	typedef MemoryPoolIterator<T> iterator;
+	typedef ptrdiff_t difference_type;
+	typedef size_t size_type;
+	typedef T value_type;
+	typedef T* pointer;
+	typedef T& reference;
+
+
 
 	//Allocates memory with "totalBlocks" amount of blocks with a stride of "stride" bytes.
 	PoolAllocator(std::size_t totalBlocks)
@@ -17,9 +35,12 @@ public:
 
 	~PoolAllocator()
 	{
-		delete[] m_StartAdress;
+		if (m_StartAdress != nullptr) {
+			delete[] m_StartAdress;
+			m_StartAdress = nullptr;
+		}
+		
 	}
-
 
 	//Allocate memory for one T object and return the memory address.
 	template<typename... Arguments>
@@ -55,6 +76,14 @@ private:
 	std::size_t m_TotalBlocks;
 	std::size_t m_FirstFreeBlock;
 	std::size_t m_NumOccupiedBlocks;
+};
+
+
+template <typename T>
+class MemoryPoolIterator 
+	:public std::iterator<std::forward_iterator_tag, T>
+{
+
 };
 
 #endif
