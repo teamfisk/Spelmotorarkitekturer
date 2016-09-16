@@ -9,7 +9,6 @@ class StackAllocator
 	class Marker
 	{
 		friend class StackAllocator;
-		friend class Marker;
 
 		std::size_t m_Marker;
 
@@ -51,7 +50,7 @@ public:
 	template <typename T>
 	T* Allocate()
 	{
-		return static_cast<T*>(Allocate(sizeof(T)));		
+		return static_cast<T*>(Allocate(sizeof(T)));
 	}
 
 	void* Allocate(std::size_t n)
@@ -109,7 +108,4 @@ private:
 	std::mutex m_StackTopLock;
 };
 
-void* operator new (std::size_t size, StackAllocator& stackAllocator)
-{
-	return stackAllocator.Allocate(size);
-}
+void* operator new (unsigned long size, StackAllocator& stackAllocator);
