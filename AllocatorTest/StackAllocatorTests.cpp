@@ -1,7 +1,6 @@
 #include <thread>
 #include <vector>
 #include <cstdlib>
-
 #include <gtest/gtest.h>
 
 #include "../Allocator/StackAllocator.h"

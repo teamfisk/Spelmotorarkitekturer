@@ -34,9 +34,9 @@ namespace AllocatorTest
 			int allocationVolume = 100'000'000;
 			PoolAllocator<int> pool(allocationVolume);
 
-			for (int i = 0; i < allocationVolume) {
+			/*for (int i = 0; i < allocationVolume) {
 				pool.Allocate(i);
-			}
+			}*/
 		}
 
 		//Test a simple case of freeing memory.
