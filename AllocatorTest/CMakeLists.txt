@@ -6,16 +6,17 @@ include_directories(
     ${GTEST_INCLUDE}
 )
 
-file(GLOB SOURCE_FILES
-    "*.h"
-    "*.cpp"
-    "../Allocator/*.h"
-    "../Allocator/*.cpp"
-)
+#file(GLOB SOURCE_FILES
+#    "*.h"
+#    "*.cpp"
+#    "../Allocator/*.h"
+#    "../Allocator/*.cpp"
+#)
 
 set(SOURCE_FILES
-        "StackAllocatorTests.cpp"
-        )
+	"StackAllocatorTests.cpp"
+	"PoolAllocatorTests.cpp"
+)
 
 set(LIBRARIES
     ${GTEST_LIBRARIES}
