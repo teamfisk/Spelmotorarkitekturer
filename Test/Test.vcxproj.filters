@@ -23,7 +23,7 @@
     <ClCompile Include="TestMain.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="PoolAllocatorTests.cpp">
+    <ClCompile Include="StackAllocatorTests.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
