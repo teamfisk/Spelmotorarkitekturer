@@ -2,7 +2,7 @@
 #include "catch.hpp"
 
 // Put tests in other files, to avoid having to recompile catch every time!
-
+/*
 unsigned int Factorial(unsigned int number) {
 	return number <= 1 ? number : Factorial(number - 1)*number;
 }
@@ -18,3 +18,5 @@ TEST_CASE("tasdfadsf")
 {
 	REQUIRE(1 == 2);
 }
+
+*/
