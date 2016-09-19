@@ -108,4 +108,4 @@ private:
 	std::mutex m_StackTopLock;
 };
 
-void* operator new (unsigned long size, StackAllocator& stackAllocator);
+//void* operator new (std::size_t size, StackAllocator& stackAllocator);
