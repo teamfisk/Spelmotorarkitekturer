@@ -63,19 +63,19 @@ public:
 	}
 
 	iterator begin() const {
-		return m_FirstBlock;
+		return iterator(this, m_FirstBlock);
 	}
 
 	iterator end() const {
-
+		return iterator(this, m_TotalBlocks);
 	}
 
 	iterator empty() const {
-
+		return m_FirstBlock == m_NumOccupiedBlocks;
 	}
 
 	size_t size() const {
-
+		return m_NumOccupiedBlocks;
 	}
 
 private:
@@ -111,6 +111,8 @@ public:
 
 	MemoryPoolIterator(PoolAllocator<T>&& pool) = default
 
+	//Operators override the custom operators and make the iterator function.
+
 	//Iterate to the next non empty block.
 	//Pre
 	iterator operator++() { 
@@ -126,7 +128,7 @@ public:
 		return cpyIt;
 	}
 
-	//Return a reference to the MemoryPoolIterator.
+	//Return a reference to the MemoryPoolIterator. 
 	reference operator*() {
 		return *this->operator->();
 	}
