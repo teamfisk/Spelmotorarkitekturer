@@ -23,7 +23,7 @@ void ThreadFunction2(char *& ptr)
 	ptr = new char[allocationSize];
 }
 
-TEST_CASE("MultithreadAllocation", "[StackAllocator]")
+TEST_CASE("STACK_MultithreadAllocation", "[StackAllocator]")
 {
 	const int numThreads = 500;
 #ifdef STACK_ALLOCATOR
@@ -65,7 +65,7 @@ TEST_CASE("MultithreadAllocation", "[StackAllocator]")
 #endif
 }
 
-TEST_CASE("AllocationException", "[StackAllocator]")
+TEST_CASE("STACK_AllocationException", "[StackAllocator]")
 {
 	StackAllocator stackAllocator(1e6);
 
@@ -83,8 +83,7 @@ TEST_CASE("AllocationException", "[StackAllocator]")
 	REQUIRE(exceptionCaught);
 }
 
-
-TEST_CASE("StackFree", "[StackAllocator]")
+TEST_CASE("STACK_Free", "[StackAllocator]")
 {
 	unsigned int allocatedSpace = 1e6;
 	StackAllocator stackAllocator(allocatedSpace);

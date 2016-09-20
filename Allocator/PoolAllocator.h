@@ -15,6 +15,8 @@ class PoolAllocator
 	template <typename T>
 	friend class MemoryPoolIterator;
 public:
+	typedef MemoryPoolIterator<T> iterator;
+
 	//Allocates memory with "totalBlocks" amount of blocks with a stride of "stride" bytes.
 	PoolAllocator(std::size_t totalBlocks)
 		: m_StartAdress(new char[totalBlocks*sizeof(T)]) 
@@ -28,7 +30,6 @@ public:
 			delete[] m_StartAdress;
 			m_StartAdress = nullptr;
 		}
-		
 	}
 
 	//Allocate memory for one T object and return the memory address.
@@ -95,7 +96,6 @@ class MemoryPoolIterator
 	:public std::iterator<std::forward_iterator_tag, T>
 {
 public: 
-	typedef MemoryPoolIterator<T> iterator;
 	//These Typedefs are needed for the iterator to work.
 	typedef ptrdiff_t difference_type;
 	typedef size_t size_type;
@@ -109,7 +109,7 @@ public:
 	{ }
 
 
-	MemoryPoolIterator(PoolAllocator<T>&& pool) = default
+	//MemoryPoolIterator(PoolAllocator<T>&& pool) = default
 
 	//Operators override the custom operators and make the iterator function.
 
