@@ -156,12 +156,12 @@ void AllocateBlocks(int numBlocks, int minBlockSize)
 #ifdef STACK_ALLOCATOR
 		void* block = stackAllocator.Allocate(blockSize);
 #else
-		void* block = new char[blockSize];
+		void* block = malloc(sizeof(char) * blockSize);
 #endif
 		memset(block, 123, blockSize);
 
 #ifndef STACK_ALLOCATOR
-		delete[] block;
+		free(block);
 #endif
 	}
 }
