@@ -147,6 +147,7 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="Main.cpp" />
+    <ClCompile Include="StackAllocator.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="PoolAllocator.h" />

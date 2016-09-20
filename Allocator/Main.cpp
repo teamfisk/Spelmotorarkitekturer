@@ -36,7 +36,7 @@ int main()
 		
 	// Using placement new
 	foo = new(foo)GameObjectFoo(420);									// Version 1: using the memory from a pointer	
-//	GameObjectFoo* bestFoo = new (stackAllocator) GameObjectFoo(420);	// Version 2: allocating from the stackAllocator
+	GameObjectFoo* bestFoo = new (stackAllocator) GameObjectFoo(420);	// Version 2: allocating from the stackAllocator
 
 	// Needs a bit more stuff before it can be used as an std::allocator ...
 	// http://www.open-std.org/jtc1/sc22/wg21/docs/papers/2007/n2271.html#std_allocator

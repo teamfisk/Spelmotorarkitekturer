@@ -1,6 +1,7 @@
 #pragma once
 #include <malloc.h>
 #include <mutex>
+#include <ostream>
 
 class StackAllocator	
 {
@@ -27,11 +28,13 @@ class StackAllocator
 		{
 			return m_Marker == m.m_Marker;
 		}
+
+		std::ostream& operator <<(std::ostream& os) const;
 	};
 
 public:	
 	StackAllocator(std::size_t n)
-	{				
+	{	
 		m_Memory = malloc(n);
 		if (m_Memory == nullptr) {
 			throw std::runtime_error("StackAllocator unable to Allocate memory.");
@@ -108,4 +111,4 @@ private:
 	std::mutex m_StackTopLock;
 };
 
-//void* operator new (std::size_t size, StackAllocator& stackAllocator);
+void* operator new (std::size_t size, StackAllocator& stackAllocator);
