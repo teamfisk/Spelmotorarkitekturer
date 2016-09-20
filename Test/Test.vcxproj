@@ -145,6 +145,7 @@
     <ClInclude Include="catch.hpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="PoolAllocatorTests.cpp" />
     <ClCompile Include="StackAllocatorTests.cpp" />
     <ClCompile Include="TestMain.cpp" />
   </ItemGroup>
