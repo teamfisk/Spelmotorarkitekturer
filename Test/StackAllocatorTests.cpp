@@ -6,7 +6,7 @@
 #include "../Allocator/StackAllocator.h"
 
 // Undef to switch to regular memory allocator
-#define STACK_ALLOCATOR
+//#define STACK_ALLOCATOR
 
 const unsigned int allocationSize = 1000;
 
@@ -84,7 +84,7 @@ TEST_CASE("AllocationException", "[StackAllocator]")
 }
 
 
-TEST_CASE("Free", "[StackAllocator]")
+TEST_CASE("StackFree", "[StackAllocator]")
 {
 	unsigned int allocatedSpace = 1e6;
 	StackAllocator stackAllocator(allocatedSpace);
@@ -141,22 +141,37 @@ TEST_CASE("RepeatedFree", "[StackAllocator]")
 	}
 }
 */
-TEST_CASE("MixedSizeAllocationComparison", "[StackAllocator]")
+
+void AllocateBlocks(int numBlocks, int minBlockSize)
 {
 #ifdef STACK_ALLOCATOR
 	unsigned int allocatedSpace = 1e8;
 	StackAllocator stackAllocator(allocatedSpace);
 #endif
-	const int numBlocks = 5000;
 
-	for (int i = 0; i < numBlocks; i++) {
+	for (int i = 0; i < numBlocks; i++)
+	{
 		// Allocate blocks between 1000 and 5000 byte large.
-		int blockSize = (1 + std::rand() % 5) * 1000;
+		int blockSize = (1 + std::rand() % 5) * minBlockSize;
 #ifdef STACK_ALLOCATOR
 		void* block = stackAllocator.Allocate(blockSize);
 #else
 		void* block = new char[blockSize];
 #endif
 		memset(block, 123, blockSize);
+
+#ifndef STACK_ALLOCATOR
+		delete[] block;
+#endif
 	}
+}
+
+TEST_CASE("MixedSizeAllocationComparison", "[StackAllocator]")
+{
+	AllocateBlocks(5000, 1000);
+}
+
+TEST_CASE("SmallAllocationComparison", "[StackAllocator]")
+{
+	AllocateBlocks(5000, 5);
 }
