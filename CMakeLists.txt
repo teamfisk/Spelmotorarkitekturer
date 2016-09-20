@@ -27,3 +27,5 @@ include_directories(${PROJECT_SOURCE_DIR}/include)
 
 add_subdirectory(Allocator)
 add_subdirectory(ResourceManager)
+add_subdirectory(Test)
+
