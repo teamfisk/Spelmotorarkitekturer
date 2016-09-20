@@ -6,7 +6,7 @@
 #include "../Allocator/StackAllocator.h"
 
 // Undef to switch to regular memory allocator
-//#define STACK_ALLOCATOR
+#define STACK_ALLOCATOR
 
 const unsigned int allocationSize = 1000;
 
@@ -142,17 +142,15 @@ TEST_CASE("RepeatedFree", "[StackAllocator]")
 }
 */
 
-void AllocateBlocks(int numBlocks, int minBlockSize)
+void AllocateBlocks(int numBlocks, int blockSize)
 {
-#ifdef STACK_ALLOCATOR
-	unsigned int allocatedSpace = 1e8;
-	StackAllocator stackAllocator(allocatedSpace);
+#ifdef STACK_ALLOCATOR	
+	StackAllocator stackAllocator(numBlocks * blockSize); 
 #endif
 
 	for (int i = 0; i < numBlocks; i++)
-	{
-		// Allocate blocks between 1000 and 5000 byte large.
-		int blockSize = (1 + std::rand() % 5) * minBlockSize;
+	{	
+		//int blockSize = (1 + std::rand() % 5) * minBlockSize;
 #ifdef STACK_ALLOCATOR
 		void* block = stackAllocator.Allocate(blockSize);
 #else
