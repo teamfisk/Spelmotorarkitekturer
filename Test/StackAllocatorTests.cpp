@@ -145,6 +145,8 @@ void AllocateBlocks(int numBlocks, int blockSize)
 {
 #ifdef STACK_ALLOCATOR	
 	StackAllocator stackAllocator(numBlocks * blockSize); 
+	//StackAllocator stackAllocator(1e8); // 100 mille, slow!
+	//StackAllocator stackAllocator(100'000'000); // also slow!
 #endif
 
 	for (int i = 0; i < numBlocks; i++)
