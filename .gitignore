@@ -6,3 +6,4 @@ lib/
 *.orig
 
 .idea/
+CMakeFiles/
