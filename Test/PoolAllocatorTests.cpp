@@ -206,7 +206,7 @@ TEST_CASE("POOL_LargeDataRead", "[PoolAllocator][Perf]")
 }
 
 // Allocate 100 000 ints and read them using the standard OS allocator.
-TEST_CASE("MALLOC_AllocateLarge", "[StandardAllocator][Perf]")
+TEST_CASE("MALLOC_LargeDataRead", "[StandardAllocator][Perf]")
 {
 	unsigned int amount = 100'000;
 	int* arr = new int[amount];
