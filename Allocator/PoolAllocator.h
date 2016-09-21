@@ -2,7 +2,6 @@
 #define PoolAllocator_h
 #include <vector>
 
-
 //Iterator class
 //Is used by our Pool Allocator to iterate through the memory.
 template<typename T>
@@ -23,7 +22,7 @@ public:
 	typedef T* pointer;
 	typedef T& reference;
 
-	//Allocates memory with "totalBlocks" amount of blocks with a stride of "stride" bytes.
+	// Allocates memory with "totalBlocks" amount of blocks with a stride of "stride" bytes.
 	PoolAllocator(std::size_t totalBlocks)
 		: m_StartAdress(new char[totalBlocks * sizeof(T)])
 		, m_BlockOccupied(totalBlocks, false)

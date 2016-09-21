@@ -1,15 +1,14 @@
 #include <thread>
 #include <vector>
 #include <iostream>
+#include <stdlib.h>
 
 #include "catch.hpp"
 #include "../Allocator/PoolAllocator.h"
 
-// Undefine to use normal memory allocator
-#define POOL_ALLOCATOR
 
 // Test a simple case of allocating memory.
-TEST_CASE("POOL_Allocate", "[PoolAllocator]")
+TEST_CASE("POOL_Allocate", "[PoolAllocator][Func]")
 {
 	unsigned int amount = 50;
 
@@ -29,7 +28,7 @@ TEST_CASE("POOL_Allocate", "[PoolAllocator]")
 }
 
 // Test a simple case of freeing memory.
-TEST_CASE("POOL_Free", "[PoolAllocator]")
+TEST_CASE("POOL_Free", "[PoolAllocator][Func]")
 {
 	unsigned int amount = 10;
 
@@ -55,7 +54,7 @@ TEST_CASE("POOL_Free", "[PoolAllocator]")
 
 // Test several continuous allocations and free's to see if the
 // memory stays intact without errors or diskfragmentation.
-TEST_CASE("POOL_ContinuousAllocationAndFree", "[PoolAllocator]")
+TEST_CASE("POOL_ContinuousAllocationAndFree", "[PoolAllocator][Func]")
 {
 	unsigned int amount = 10;
 
@@ -108,7 +107,7 @@ TEST_CASE("POOL_ContinuousAllocationAndFree", "[PoolAllocator]")
 
 // Check the available space left in the memory pool
 // to make sure it's calculated correctly.
-TEST_CASE("POOL_AvailableSpace", "[PoolAllocator]")
+TEST_CASE("POOL_AvailableSpace", "[PoolAllocator][Func]")
 {
 	unsigned int amount = 10;
 
@@ -129,6 +128,98 @@ TEST_CASE("POOL_AvailableSpace", "[PoolAllocator]")
 	
 	REQUIRE(intPool.SizeFree() == 5 * sizeof(int));
 	REQUIRE(floatPool.SizeFree() == 5 * sizeof(float));
+}
+
+
+
+//------------------------------------------
+// Performance tests
+// These are tests that are designed to try
+// the difference in performance between
+// the standard OS allocator and our 
+// custom made pool allocator.
+//------------------------------------------
+
+// Create 5 pools with 2MB of allocated memory for each using 
+// our custom pool allocator.
+TEST_CASE("POOL_2MBAlloc", "[PoolAllocator][Perf]") 
+{
+	unsigned int amount = 2 * 1024 * 1024;
+	void* charArr[5];
+	for (int i = 0; i < 5; i++)
+	{
+		charArr[i] = new PoolAllocator<char>(amount);
+	}
+}
+
+// Create 5 pools with 2MB of allocated memory for each using 
+// standard OS allocator
+TEST_CASE("MALLOC_2MBAlloc", "[StandardAllocator][Perf]")
+{
+	unsigned int amount = 2 * 1024 * 1024;
+	void* charArr[5];
+	for (int i = 0; i < 5; i++) {
+		charArr[i] = malloc(amount * sizeof(char));
+	}
+}
+
+// Create 5 pools with 200MB of allocated memory for each using 
+// our custom pool allocator.
+TEST_CASE("POOL_200MBAlloc", "[PoolAllocator][Perf]")
+{
+	unsigned int amount = 200 * 1024 * 1024;
+	void* charArr[5];
+	for (int i = 0; i < 5; i++)
+	{
+		charArr[i] = new PoolAllocator<char>(amount);
+	}
+}
+
+// Create 5 pools with 200MB of allocated memory for each using 
+// standard OS allocator
+TEST_CASE("MALLOC_200MBAlloc", "[StandardAllocator][Perf]")
+{
+	unsigned int amount = 200 * 1024 * 1024;
+	void* charArr[5];
+	for (int i = 0; i < 5; i++) {
+		charArr[i] = malloc(amount * sizeof(char));
+	}
+}
+
+// Allocate 100 000 ints and read them using our custom pool allocator.
+// I'm printing every 1000th int in the hope that no unwanted optimizing will occur.
+TEST_CASE("POOL_LargeDataRead", "[PoolAllocator][Perf]")
+{
+	unsigned int amount = 100'000;
+	PoolAllocator<int> pool(amount);
+	
+	for (int i = 0; i < amount; i++) {
+		pool.Allocate(i);
+	}
+
+	for (auto p : pool) {
+		if (p%1000 == 0) {
+			p += 1;
+		}
+	}
+	std::cout << std::endl;
+}
+
+// Allocate 100 000 ints and read them using the standard OS allocator.
+TEST_CASE("MALLOC_AllocateLarge", "[StandardAllocator][Perf]")
+{
+	unsigned int amount = 100'000;
+	int* arr = new int[amount];
+	for (int i = 0; i < amount; i++) {
+		arr[i] = i;
+	}
+
+	for (int i = 0; i < amount; i++) {
+		if (arr[i]%1000 == 0) {
+			arr[i] += 1;
+		}
+	}
+	std::cout << std::endl;
 }
 
 
