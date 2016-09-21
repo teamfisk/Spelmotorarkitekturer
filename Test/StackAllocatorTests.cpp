@@ -1,6 +1,7 @@
 #include <thread>
 #include <vector>
 #include <cstdlib>
+#include <cstring>
 
 #include "catch.hpp"
 #include "../Allocator/StackAllocator.h"
