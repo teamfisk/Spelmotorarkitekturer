@@ -16,6 +16,12 @@ class PoolAllocator
 	friend class MemoryPoolIterator;
 public:
 	typedef MemoryPoolIterator<T> iterator;
+	//These Typedefs are needed for the iterator to work.
+	typedef ptrdiff_t difference_type;
+	typedef size_t size_type;
+	typedef T value_type;
+	typedef T* pointer;
+	typedef T& reference;
 
 	//Allocates memory with "totalBlocks" amount of blocks with a stride of "stride" bytes.
 	PoolAllocator(std::size_t totalBlocks)
@@ -71,11 +77,24 @@ public:
 		return iterator(this, m_TotalBlocks);
 	}
 
-	iterator empty() const {
+	iterator Empty() const {
 		return m_FirstBlock == m_NumOccupiedBlocks;
 	}
 
-	size_t size() const {
+	// Return the size of the memory in bytes.
+	size_t Size() const {
+		return m_TotalBlocks * sizeof(T);
+	}
+
+	// Return how many blocks this memory has.
+	// If you allocated memory for 50 ints, it will return 50, not 50*sizeof(int).
+	size_t SizeInBlocks() const {
+		return m_TotalBlocks;
+	}
+
+	// Return how many blocks are occupied.
+	// Each block is the size of the Type allocated in memory.
+	size_t OccupiedBlocks() const{
 		return m_NumOccupiedBlocks;
 	}
 
@@ -93,56 +112,45 @@ private:
 //If you implement dynamic memory this will need to be changed to handle that.
 template <typename T>
 class MemoryPoolIterator
-	:public std::iterator<std::forward_iterator_tag, T>
+	: public std::iterator<std::forward_iterator_tag, T>
 {
 public: 
-	//These Typedefs are needed for the iterator to work.
-	typedef ptrdiff_t difference_type;
-	typedef size_t size_type;
-	typedef T value_type;
-	typedef T* pointer;
-	typedef T& reference;
-
 	MemoryPoolIterator(const PoolAllocator<T>* pool, size_t pos) 
-		: m_Pool(pool),
-		:m_Pos(pos)
+		: m_Pool(pool)
+		, m_Pos(pos)
 	{ }
-
-
-	//MemoryPoolIterator(PoolAllocator<T>&& pool) = default
-
 	//Operators override the custom operators and make the iterator function.
-
+	
 	//Iterate to the next non empty block.
 	//Pre
-	iterator operator++() { 
-		while (++m_Pos < m_Pool->m_TotalBlocks && m_Pool->m_BlockOccupied[m_Pos]);
+	MemoryPoolIterator<T> operator++() {
+		while (++m_Pos < m_Pool->m_TotalBlocks && !m_Pool->m_BlockOccupied[m_Pos]);
 		return *this;
 	}
 
 	//Iterate to the next non empty block
 	//Post
-	iterator operator++(int) {
-		iterator cpyIt = iterator(*this);
-		while (++m_Pos < m_Pool->m_TotalBlocks && m_Pool->m_BlockOccupied[m_Pos]);
+	MemoryPoolIterator<T> operator++(int) {
+		auto cpyIt = MemoryPoolIterator(*this);
+		while (++m_Pos < m_Pool->m_TotalBlocks && !m_Pool->m_BlockOccupied[m_Pos]);
 		return cpyIt;
 	}
 
 	//Return a reference to the MemoryPoolIterator. 
-	reference operator*() {
+	T& operator*() {
 		return *this->operator->();
 	}
 	
 	//Return a pointer to the block at m_Pos.
-	pointer operator->() {
+	T* operator->() {
 		return reinterpret_cast<T*>(m_Pool->m_StartAdress + m_Pool->m_Stride * m_Pos);
 	}
 
-	bool operator==(const iterator& it) { return m_Pos == it.m_Pos; }
-	bool operator!=(const iterator& it) { return m_Pos != it->m_Pos; }
+	bool operator==(const MemoryPoolIterator<T>& it) { return m_Pos == it.m_Pos; }
+	bool operator!=(const MemoryPoolIterator<T>& it) { return m_Pos != it.m_Pos; }
 private:
-	PoolAllocator* m_Pool;
-	size_t m_Pos;
+	const PoolAllocator<T>* m_Pool;
+	std::size_t m_Pos;
 };
 
 #endif
