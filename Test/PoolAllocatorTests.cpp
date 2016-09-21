@@ -16,6 +16,9 @@ TEST_CASE("POOL_Allocate", "[PoolAllocator]")
     // Allocate memory with the size of [amount] ints.
     PoolAllocator<int> pool(amount);
 
+	// Make sure the right amount of bytes are allocated
+	REQUIRE(pool.Size() == amount * sizeof(int));
+
 	// Fill the pool with data
 	for (int i = 0; i < amount; i++) {
         pool.Allocate(i);
@@ -45,32 +48,87 @@ TEST_CASE("POOL_Free", "[PoolAllocator]")
 	fBlock++;
 	fBlock++;
 	pool.Free(&(*fBlock));
-	std::cout << "Free block " << *fBlock+1 << std::endl;
 	
 	//Check to see if we have one less block used.
 	REQUIRE(pool.OccupiedBlocks() == amount - 1);
-
 }
 
 // Test several continuous allocations and free's to see if the
 // memory stays intact without errors or diskfragmentation.
 TEST_CASE("POOL_ContinuousAllocationAndFree", "[PoolAllocator]")
 {
+	unsigned int amount = 10;
 
-}
+	PoolAllocator<int> pool(amount);
 
-// Test using more memory than we have allocated and see that it is
-// handled correctly.
-TEST_CASE("POOL_Boundaries", "[PoolAllocator]")
-{
+	// Fill the pool with 7 elements
+	for (int i = amount*0.7; i > 0; i--) {
+		pool.Allocate(i);
+	}
 
+	// Free the first block.
+	auto fBlock = pool.begin();
+	pool.Free(&(*fBlock));
+
+	// Free the new first block, should be the second block in memory.
+	auto fBlock2 = pool.begin();
+	pool.Free(&(*fBlock2));
+
+
+	// Allocate 3 more blocks
+	for (int i = 3; i > 0; i--) {
+		pool.Allocate(i*10);
+	}
+
+	// Free the fifth block
+	auto p = pool.begin();
+	for (int i = 1; i < 5; i++) {
+		p++;
+	}
+	pool.Free(&(*p));
+
+	// Allocate 6 ints, 3 more than we can fit.
+	for (int i = 1; i < 7; i++) {
+		pool.Allocate(i * 100);
+	}
+
+	//Simple loop to check if our memory is the same as what our answer.
+	int Answer[10] = { 30, 20, 5, 4, 100, 2, 1, 10, 200, 300 };
+	int i = 0;
+	bool Same = true;
+	for (auto p : pool) {
+		if (Answer[i] != p) {
+			Same = false;
+			break;
+		}
+		i++;
+	}
+	REQUIRE(Same);
 }
 
 // Check the available space left in the memory pool
 // to make sure it's calculated correctly.
 TEST_CASE("POOL_AvailableSpace", "[PoolAllocator]")
 {
+	unsigned int amount = 10;
 
+	PoolAllocator<int> intPool(amount);
+	PoolAllocator<float> floatPool(amount);
+
+	REQUIRE(intPool.Size() == amount * sizeof(int));
+	REQUIRE(floatPool.Size() == amount * sizeof(float));
+
+	float f = 0.f;
+	int i = 0;
+	while (i < 5) {
+		intPool.Allocate(i);
+		floatPool.Allocate(f);
+		i++;
+		f += 1.f;
+	}
+	
+	REQUIRE(intPool.SizeFree() == 5 * sizeof(int));
+	REQUIRE(floatPool.SizeFree() == 5 * sizeof(float));
 }
 
 

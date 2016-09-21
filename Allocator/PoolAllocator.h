@@ -25,10 +25,13 @@ public:
 
 	//Allocates memory with "totalBlocks" amount of blocks with a stride of "stride" bytes.
 	PoolAllocator(std::size_t totalBlocks)
-		: m_StartAdress(new char[totalBlocks*sizeof(T)]) 
+		: m_StartAdress(new char[totalBlocks * sizeof(T)])
 		, m_BlockOccupied(totalBlocks, false)
 		, m_Stride(sizeof(T))
 		, m_TotalBlocks(totalBlocks)
+		, m_FirstFreeBlock(0)
+		, m_NumOccupiedBlocks(0)
+		, m_FirstBlock(m_TotalBlocks)
 	{}
 
 	~PoolAllocator() {
@@ -50,7 +53,7 @@ public:
 		}
 		else
 		{
-			//TODO: Outside memory pool, deal with it.
+			//TODO: Outside memory pool, deal with it if you want.
 		}
 	}
 
@@ -63,7 +66,7 @@ public:
 		m_BlockOccupied[freeSlot] = false;
 		m_FirstFreeBlock = freeSlot < m_FirstFreeBlock ? freeSlot : m_FirstFreeBlock;
 		if (freeSlot == m_FirstBlock) {
-			while (m_FirstBlock != m_TotalBlocks && m_BlockOccupied[m_FirstBlock]) {
+			while (m_FirstBlock != m_TotalBlocks && !m_BlockOccupied[m_FirstBlock]) {
 				m_FirstBlock++;
 			}
 		}
@@ -90,6 +93,16 @@ public:
 	// If you allocated memory for 50 ints, it will return 50, not 50*sizeof(int).
 	size_t SizeInBlocks() const {
 		return m_TotalBlocks;
+	}
+
+	//Return the amount of free memory in bytes.
+	size_t SizeFree() const {
+		return FreeBlocks() * sizeof(T);
+	}
+
+	//Return the amount of free blocks.
+	size_t FreeBlocks() const {
+		return m_TotalBlocks - m_NumOccupiedBlocks;
 	}
 
 	// Return how many blocks are occupied.
