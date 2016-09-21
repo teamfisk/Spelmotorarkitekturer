@@ -12,7 +12,7 @@ class MemoryPoolIterator;
 template <typename T>
 class PoolAllocator
 {
-	template <typename T>
+	template <typename T2>
 	friend class MemoryPoolIterator;
 public:
 	typedef MemoryPoolIterator<T> iterator;
