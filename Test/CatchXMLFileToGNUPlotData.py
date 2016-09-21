@@ -3,7 +3,13 @@
 #  2. Name of output file
 
 # this generates data
+# run it inside the python script?
 #Test.exe SmallAllocationComparison  -n StackPerf-release -r xml -d "yes" -o StackAllocatorPerfData.xml
+
+# run test once
+# -> transform xml data into gnuplot data
+# -> append to output text file
+# rerun until enough test runs have run
 
 import xml.etree.ElementTree as etree
 import sys
@@ -29,8 +35,13 @@ testgroup = root.getchildren()[0]
 testcases = testgroup.findall("TestCase")
 
 #outputfile = "StackAllocatorPerfData.txt"
-with open(outfile, 'w') as f:
-    testrun = 1
+
+# figure out how many lines already exist in this file, so that the next line is
+# appened with the next linenumber
+with open(outfile) as f:
+    testrun = len(f.readlines())
+
+with open(outfile, 'a') as f:
     for test in testcases:
         result = test.find("OverallResult")
         dur = result.attrib["durationInSeconds"]
