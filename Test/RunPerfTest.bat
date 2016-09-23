@@ -1,3 +1,3 @@
-"../bin/Test.exe" SmallAllocationComparison -o SmallAllocationComparison.xml -d "yes" -r xml
-py .\CatchXMLFileToGNUPlotData.py "SmallAllocationComparison.xml" "SmallAllocationComparison.txt"
+"../bin/Test.exe" %1 -o %1.xml -d "yes" -r xml
+py .\CatchXMLFileToGNUPlotData.py "%1.xml" "%1.txt"
 
