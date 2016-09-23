@@ -17,8 +17,8 @@ import sys
 
 if(len(sys.argv) != 3):
     print("Usage: arg1 [arg2]\n")
-    print("arg1 is the patch to the XML file created by catch.")
-    print("arg2 is name of the ouput file, defaults to arg1 with xml file ending.")
+    print("arg1 is the path to the XML file created by catch.")
+    print("arg2 is the path of the ouput file.")
     sys.exit(0)
 
 
@@ -28,13 +28,10 @@ if(len(sys.argv) == 3):
 #else:
     #outfile =
 
-#infile = "../bin/StackAllocatorPerfData.xml"
 tree = etree.parse(infile)
 root = tree.getroot()
 testgroup = root.getchildren()[0]
 testcases = testgroup.findall("TestCase")
-
-#outputfile = "StackAllocatorPerfData.txt"
 
 # figure out how many lines already exist in this file, so that the next line is
 # appened with the next linenumber
@@ -43,7 +40,7 @@ try:
 		testrun = len(f.readlines())
 except FileNotFoundError:
 		testrun = 1
-	
+
 with open(outfile, 'a') as f:
     for test in testcases:
         result = test.find("OverallResult")
