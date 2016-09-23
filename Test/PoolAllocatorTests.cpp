@@ -7,6 +7,13 @@
 #include "../Allocator/PoolAllocator.h"
 
 
+struct dataStruct {
+	int Int = -1;			//
+	float Float = 157.f;	//
+	double Double = 156.0;	//
+
+};
+
 // Test a simple case of allocating memory.
 TEST_CASE("POOL_Allocate", "[PoolAllocator][Func]")
 {
@@ -186,38 +193,49 @@ TEST_CASE("MALLOC_200MBAlloc", "[StandardAllocator][Perf]")
 	}
 }
 
-// Allocate 100 000 ints and read them using our custom pool allocator.
-// I'm printing every 1000th int in the hope that no unwanted optimizing will occur.
+// Allocate 100 000 ints and read 1 000 random ones.
+// I'm printing every 100th int in the hope that no unwanted optimizing will occur.
 TEST_CASE("POOL_LargeDataRead", "[PoolAllocator][Perf]")
 {
-	unsigned int amount = 100'000;
+	unsigned int amount = 1'000'000;
 	PoolAllocator<int> pool(amount);
-	
+	int* randElements = new int[1000];
+	int rE = 0;
+
 	for (int i = 0; i < amount; i++) {
-		pool.Allocate(i);
+		if (rand() % 1'000 == 1 && rE < 1000) {
+			randElements[rE] = *pool.Allocate(i);
+			rE++;
+		}
+		else {
+			pool.Allocate(i);
+		}
 	}
 
-	for (auto p : pool) {
-		if (p%1000 == 0) {
-			p += 1;
-		}
+	for (int i = 0; i < rE; i++) {
+		//std::cout << randElements[i] << ", ";
 	}
 	std::cout << std::endl;
 }
 
-// Allocate 100 000 ints and read them using the standard OS allocator.
-TEST_CASE("MALLOC_AllocateLarge", "[StandardAllocator][Perf]")
+// Allocate 100 000 ints and read 1 000 random ones.
+TEST_CASE("MALLOC_LargeDataRead", "[StandardAllocator][Perf]")
 {
-	unsigned int amount = 100'000;
+	unsigned int amount = 1'000'000;
 	int* arr = new int[amount];
-	for (int i = 0; i < amount; i++) {
-		arr[i] = i;
-	}
+	int* randElements = new int[1000];
+	int rE = 0;
 
 	for (int i = 0; i < amount; i++) {
-		if (arr[i]%1000 == 0) {
-			arr[i] += 1;
+		arr[i] = i;
+		if (rand() % 1'000 == 1 && rE < 1000) {
+			randElements[rE] = arr[i];
+			rE++;
 		}
+	}
+
+	for (int i = 0; i < rE; i++) {
+		//std::cout << randElements[i] << ", ";
 	}
 	std::cout << std::endl;
 }
