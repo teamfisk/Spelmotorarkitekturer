@@ -38,9 +38,12 @@ testcases = testgroup.findall("TestCase")
 
 # figure out how many lines already exist in this file, so that the next line is
 # appened with the next linenumber
-with open(outfile) as f:
-    testrun = len(f.readlines())
-
+try:
+	with open(outfile) as f:
+		testrun = len(f.readlines())
+except FileNotFoundError:
+		testrun = 1
+	
 with open(outfile, 'a') as f:
     for test in testcases:
         result = test.find("OverallResult")
