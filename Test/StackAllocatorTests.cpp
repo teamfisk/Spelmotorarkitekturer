@@ -142,36 +142,50 @@ TEST_CASE("RepeatedFree", "[StackAllocator]")
 }
 */
 
-void AllocateBlocks(int numBlocks, int blockSize)
+//StackAllocator stackAllocator(5000 * 1000); // Use this to make it really fast!
+void StackAllocateBlocks(int numBlocks, int blockSize)
 {
-#ifdef STACK_ALLOCATOR	
-	StackAllocator stackAllocator(numBlocks * blockSize); 
+	StackAllocator stackAllocator(numBlocks * blockSize);
 	//StackAllocator stackAllocator(1e8); // 100 mille, slow!
 	//StackAllocator stackAllocator(100'000'000); // also slow!
-#endif
 
 	for (int i = 0; i < numBlocks; i++)
 	{	
 		//int blockSize = (1 + std::rand() % 5) * minBlockSize;
-#ifdef STACK_ALLOCATOR
 		void* block = stackAllocator.Allocate(blockSize);
-#else
-		void* block = malloc(sizeof(char) * blockSize);
-#endif
-		memset(block, 123, blockSize);
 
-#ifndef STACK_ALLOCATOR
-		free(block);
-#endif
+		memset(block, 123, blockSize);
 	}
 }
 
-TEST_CASE("MixedSizeAllocationComparison", "[StackAllocator]")
+void MallocAllocateBlocks(int numBlocks, int blockSize)
 {
-	AllocateBlocks(5000, 1000);
+	for (int i = 0; i < numBlocks; i++)
+	{
+		//int blockSize = (1 + std::rand() % 5) * minBlockSize;
+		void* block = malloc(sizeof(char) * blockSize);
+		memset(block, 123, blockSize);
+
+		free(block);
+	}
 }
 
-TEST_CASE("SmallAllocationComparison", "[StackAllocator]")
+TEST_CASE("STACK_MixedSizeAllocationComparison", "[StackAllocator]")
 {
-	AllocateBlocks(5000, 5);
+	StackAllocateBlocks(5000, 1000);
+}
+
+TEST_CASE("STACK_SmallAllocationComparison", "[StackAllocator]")
+{
+	StackAllocateBlocks(5000, 5);
+}
+
+TEST_CASE("MALLOC_MixedSizeAllocationComparison", "[StackAllocator]")
+{
+	MallocAllocateBlocks(5000, 1000);
+}
+
+TEST_CASE("MALLOC_SmallAllocationComparison", "[StackAllocator]")
+{
+	MallocAllocateBlocks(5000, 5);
 }

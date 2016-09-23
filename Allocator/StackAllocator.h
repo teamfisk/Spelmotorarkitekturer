@@ -58,7 +58,7 @@ public:
 
 	void* Allocate(std::size_t n)
 	{	
-		std::lock_guard<std::mutex> lockGuard(m_StackTopLock);
+		std::lock_guard<std::mutex> lockGuard(m_StackTopLock); // ~50% of cpu time in this function is acquiring & releasing this lock...!
 		
 		std::size_t nextTop = m_StackTop + n;
 		if (nextTop > m_Size) {
