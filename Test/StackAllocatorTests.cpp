@@ -142,9 +142,10 @@ TEST_CASE("RepeatedFree", "[StackAllocator]")
 }
 */
 
+//StackAllocator stackAllocator(5000 * 1000); // Use this to make it really fast!
 void StackAllocateBlocks(int numBlocks, int blockSize)
 {
-	StackAllocator stackAllocator(numBlocks * blockSize); 
+	StackAllocator stackAllocator(numBlocks * blockSize);
 	//StackAllocator stackAllocator(1e8); // 100 mille, slow!
 	//StackAllocator stackAllocator(100'000'000); // also slow!
 
