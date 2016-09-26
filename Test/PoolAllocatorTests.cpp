@@ -7,11 +7,9 @@
 #include "../Allocator/PoolAllocator.h"
 
 
+template <int SIZE>
 struct dataStruct {
-	int Int = -1;			//
-	float Float = 157.f;	//
-	double Double = 156.0;	//
-
+	char data[SIZE];
 };
 
 // Test a simple case of allocating memory.
@@ -192,6 +190,44 @@ TEST_CASE("MALLOC_200MBAlloc", "[StandardAllocator][Perf]")
 		charArr[i] = malloc(amount * sizeof(char));
 	}
 }
+
+//Allocate and fill memory for the tests.
+dataStruct<1024*1024>* standMem[1000];						//1000 * 1MB
+PoolAllocator<dataStruct<1024*1024>> poolMem(1000);			//1000 * 1MB
+
+
+
+TEST_CASE("POOL_LinearAllocate", "[PoolAllocator][Perf][Linear][Allocate][Access]")
+{
+	for (int i = 0; i < 1000; i++) {
+		poolMem.Allocate();
+	}
+}
+
+TEST_CASE("MALLOC_LinearAllocate", "[StandardAllocator][Perf][Linear][Allocate][Access]")
+{
+	
+	for (int i = 0; i < 1000; i++) {
+		standMem[i] = new dataStruct<1024 * 1024>();
+	}
+	
+}
+
+dataStruct<1024 * 1024> d;
+TEST_CASE("POOL_LinearAccess", "[PoolAllocator][Perf][Linear][Access]")
+{
+	for (auto& it : poolMem) {
+		it = d;
+	}
+}
+
+TEST_CASE("MALLOC_LinearAcess", "[StandardAllocator][Perf][Linear][Access]")
+{
+	for (int i = 0; i < 1000; ++i) {
+		*standMem[i] = d;
+	}
+}
+
 
 // Allocate 100 000 ints and read 1 000 random ones.
 // I'm printing every 100th int in the hope that no unwanted optimizing will occur.
