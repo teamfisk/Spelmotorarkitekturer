@@ -144,7 +144,7 @@ TEST_CASE("RepeatedFree", "[StackAllocator]")
 
 //StackAllocator stackAllocator(5000 * 1000); // Use this to make it really fast!
 void StackAllocateBlocks(int numBlocks, int blockSize)
-{
+{	
 	StackAllocator stackAllocator(numBlocks * blockSize);
 	//StackAllocator stackAllocator(1e8); // 100 mille, slow!
 	//StackAllocator stackAllocator(100'000'000); // also slow!
@@ -170,22 +170,33 @@ void MallocAllocateBlocks(int numBlocks, int blockSize)
 	}
 }
 
-TEST_CASE("STACK_MixedSizeAllocationComparison", "[StackAllocator]")
-{
-	StackAllocateBlocks(5000, 1000);
-}
-
-TEST_CASE("STACK_SmallAllocationComparison", "[StackAllocator]")
+TEST_CASE("STACK_SmallAllocComp", "[StackAllocator]")
 {
 	StackAllocateBlocks(5000, 5);
 }
 
-TEST_CASE("MALLOC_MixedSizeAllocationComparison", "[StackAllocator]")
+TEST_CASE("STACK_MediumAllocComp", "[StackAllocator]")
+{
+	StackAllocateBlocks(5000, 1000);
+}
+
+TEST_CASE("STACK_LargeAllocComp", "[StackAllocator]")
+{
+	StackAllocateBlocks(50, 2'000'000);
+}
+
+
+TEST_CASE("MALLOC_SmallAllocComp", "[StackAllocator]")
+{
+	MallocAllocateBlocks(5000, 5);
+}
+
+TEST_CASE("MALLOC_MediumAllocComp", "[StackAllocator]")
 {
 	MallocAllocateBlocks(5000, 1000);
 }
 
-TEST_CASE("MALLOC_SmallAllocationComparison", "[StackAllocator]")
+TEST_CASE("MALLOC_LargeAllocComp", "[StackAllocator]")
 {
-	MallocAllocateBlocks(5000, 5);
+	MallocAllocateBlocks(50, 2'000'000);
 }

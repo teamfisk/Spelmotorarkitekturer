@@ -198,7 +198,7 @@ TEST_CASE("MALLOC_200MBAlloc", "[StandardAllocator][Perf]")
 TEST_CASE("POOL_LargeDataRead", "[PoolAllocator][Perf]")
 {
 	unsigned int amount = 1'000'000;
-	PoolAllocator<int> pool(amount);
+	PoolAllocator<int> pool(amount); // Note: the pool allocator initialized the values in the vector<bool>. 
 	int* randElements = new int[1000];
 	int rE = 0;
 
@@ -218,11 +218,12 @@ TEST_CASE("POOL_LargeDataRead", "[PoolAllocator][Perf]")
 	std::cout << std::endl;
 }
 
+// Should compare vs many malloc allocations, not one big alloc.
 // Allocate 100 000 ints and read 1 000 random ones.
 TEST_CASE("MALLOC_LargeDataRead", "[StandardAllocator][Perf]")
 {
 	unsigned int amount = 1'000'000;
-	int* arr = new int[amount];
+	int* arr = new int[amount]; // Note: unitialized mem. 
 	int* randElements = new int[1000];
 	int rE = 0;
 
