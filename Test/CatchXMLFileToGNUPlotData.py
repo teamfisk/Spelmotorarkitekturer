@@ -40,13 +40,3 @@ def CatchXMLFileToGNUPlotData(infile):
             f.write(str(dur))
             f.write("\n")
             testrun += 1
-
-# Used when running this script directly form a console
-#
-#if __name__ == __main__:
-#    if(len(sys.argv) != 2):
-#        print("Usage: arg1\n")
-#        print("arg1 is the path to the XML file created by catch.")
-#        sys.exit(0)
-#    else:
-#        CatchXMLFileToGNUPlotData(sys.argv[1])
