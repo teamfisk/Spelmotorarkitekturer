@@ -42,7 +42,7 @@ public:
 
 			PostAlloc = mem.OccupiedBlocks();
 
-			std::cout << "Free'd " << PreFree - PostFree << " Objects and allocated " << PostAlloc - PostFree << " Objects." << std::endl << "New size is: " << PostAlloc << std::endl;
+			//std::cout << "Free'd " << PreFree - PostFree << " Objects and allocated " << PostAlloc - PostFree << " Objects." << std::endl << "New size is: " << PostAlloc << std::endl;
 		}
 
 	}
@@ -297,10 +297,10 @@ TEST_CASE("POOL_LargeDataRead", "[Pool][Perf]")
 		}
 	}
 
-	for (int i = 0; i < rE; i++) {
-		//std::cout << randElements[i] << ", ";
-	}
-	std::cout << std::endl;
+	//for (int i = 0; i < rE; i++) {
+	//	//std::cout << randElements[i] << ", ";
+	//}
+	//std::cout << std::endl;
 }
 
 // Allocate 100 000 ints and read 1 000 random ones.
@@ -319,10 +319,10 @@ TEST_CASE("MALLOC_LargeDataRead", "[Stand][Perf]")
 		}
 	}
 
-	for (int i = 0; i < rE; i++) {
-		//std::cout << randElements[i] << ", ";
-	}
-	std::cout << std::endl;
+	//for (int i = 0; i < rE; i++) {
+	//	//std::cout << randElements[i] << ", ";
+	//}
+	//std::cout << std::endl;
 }
 
 
