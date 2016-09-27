@@ -169,7 +169,7 @@ public:
 private:
 	const PoolAllocator<T>* m_Pool;
 	std::size_t m_Pos;
-    std:mutex m_MutexLock;
+    std::mutex m_MutexLock;
 
 };
 
