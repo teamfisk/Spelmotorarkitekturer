@@ -13,37 +13,40 @@
 
 import xml.etree.ElementTree as etree
 import sys
-#len(sys.argv) != 2 or
 
-if(len(sys.argv) != 2):
-    print("Usage: arg1\n")
-    print("arg1 is the path to the XML file created by catch.")
-    sys.exit(0)
+def CatchXMLFileToGNUPlotData(infile):
+    tree = etree.parse(infile)
+    root = tree.getroot()
 
-infile = sys.argv[1]
+    testgroup = root.getchildren()[0]
+    testcases = testgroup.findall("TestCase")
 
-tree = etree.parse(infile)
-root = tree.getroot()
+    # figure out how many lines already exist in this file, so that the next line is
+    # appened with the next linenumber
+    for test in testcases:
+        outfile = test.attrib["name"] + ".txt"
+        result = test.find("OverallResult")
 
-testgroup = root.getchildren()[0]
-testcases = testgroup.findall("TestCase")
+        try:
+        	with open(outfile) as f:
+        		testrun = len(f.readlines())
+        except FileNotFoundError:
+        		testrun = 1
 
-# figure out how many lines already exist in this file, so that the next line is
-# appened with the next linenumber
-for test in testcases:
-    outfile = test.attrib["name"] + ".txt"
-    result = test.find("OverallResult")
+        with open(outfile, 'a') as f:
+            dur = result.attrib["durationInSeconds"]
+            f.write(str(testrun))
+            f.write(" ")
+            f.write(str(dur))
+            f.write("\n")
+            testrun += 1
 
-    try:
-    	with open(outfile) as f:
-    		testrun = len(f.readlines())
-    except FileNotFoundError:
-    		testrun = 1
-
-    with open(outfile, 'a') as f:
-        dur = result.attrib["durationInSeconds"]
-        f.write(str(testrun))
-        f.write(" ")
-        f.write(str(dur))
-        f.write("\n")
-        testrun += 1
+# Used when running this script directly form a console
+#
+#if __name__ == __main__:
+#    if(len(sys.argv) != 2):
+#        print("Usage: arg1\n")
+#        print("arg1 is the path to the XML file created by catch.")
+#        sys.exit(0)
+#    else:
+#        CatchXMLFileToGNUPlotData(sys.argv[1])
