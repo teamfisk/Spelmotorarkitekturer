@@ -170,6 +170,7 @@ void MallocAllocateBlocks(int numBlocks, int blockSize)
 	}
 }
 
+// Each block size is 200x larger than the last.
 TEST_CASE("STACK_SmallAllocComp", "[StackAllocator]")
 {
 	StackAllocateBlocks(5000, 5);
@@ -182,7 +183,7 @@ TEST_CASE("STACK_MediumAllocComp", "[StackAllocator]")
 
 TEST_CASE("STACK_LargeAllocComp", "[StackAllocator]")
 {
-	StackAllocateBlocks(50, 2'000'000);
+	StackAllocateBlocks(5000, 2'00'000);
 }
 
 
@@ -198,5 +199,5 @@ TEST_CASE("MALLOC_MediumAllocComp", "[StackAllocator]")
 
 TEST_CASE("MALLOC_LargeAllocComp", "[StackAllocator]")
 {
-	MallocAllocateBlocks(50, 2'000'000);
+	MallocAllocateBlocks(50, 2'00'000);
 }
