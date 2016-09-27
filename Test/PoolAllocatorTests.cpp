@@ -195,6 +195,7 @@ TEST_CASE("MALLOC_200MBAlloc", "[StandardAllocator][Perf]")
 // dataStruct<1024*1024>* standMem[1000];						//1000 * 1MB
 // PoolAllocator<dataStruct<1024*1024>> poolMem(1000);			//1000 * 1MB
 
+dataStruct<1024 * 1024> d;
 TEST_CASE("Allocate, access and fragmentation of pool memory.", "[Perf][AIO]") 
 {
 	PoolAllocator<dataStruct<1024 * 1024>> poolMem(1000);			//1000 * 1MB
@@ -205,7 +206,6 @@ TEST_CASE("Allocate, access and fragmentation of pool memory.", "[Perf][AIO]")
 		}
 	}
 	
-	dataStruct<1024 * 1024> d;
 	SECTION("Linear access of all objects in memory pool.") {
 		for (auto& it : poolMem) {
 			it = d;
@@ -248,31 +248,33 @@ TEST_CASE("Allocate, access and fragmentation of pool memory.", "[Perf][AIO]")
 //Iterations are how many time we will free/allocate data in the pool.
 //Every iteration 10 elements are freed then allocated.
 //maxElements are the size of the array you want to fragment.
-void FragmentPool(int iterations, int maxObjects) {
-	int e[10];
 
-	for (int n = 0; n < iterations; n++) {
-
-		// Random 10 objects that will be removed. from 0 to maxObjects (the length of the list most likely)
-		for (int i = 0; i < 10; i++) {
-			e[i] = rand() % maxObjects;
-		}
-		// Loop through our pool and free 10 objects.
-		for (auto ele : e) {
-			int x = 0;
-			PoolAllocator<dataStruct<1024 * 1024>>::iterator it = poolMem->begin();
-			for (; x != ele; x++) {
-				it++; 
-			}
-			poolMem.Free(&(*it));
-		}
-
-		// Allocate 8 new objects.
-		for (int i = 0; i < 8; i++) {
-			poolMem.Allocate();
-		}
-	}
-}
+//template<typename T>
+//void FragmentPool(int iterations, int maxObjects, PoolAllocator<T> poolMem) {
+//	int e[10];
+//
+//	for (int n = 0; n < iterations; n++) {
+//
+//		// Random 10 objects that will be removed. from 0 to maxObjects (the length of the list most likely)
+//		for (int i = 0; i < 10; i++) {
+//			e[i] = rand() % maxObjects;
+//		}
+//		// Loop through our pool and free 10 objects.
+//		for (auto ele : e) {
+//			int x = 0;
+//			PoolAllocator<T>::iterator it = poolMem->begin();
+//			for (; x != ele; x++) {
+//				it++; 
+//			}
+//			poolMem.Free(&(*it));
+//		}
+//
+//		// Allocate 8 new objects.
+//		for (int i = 0; i < 8; i++) {
+//			poolMem.Allocate();
+//		}
+//	}
+//}
 
 
 
