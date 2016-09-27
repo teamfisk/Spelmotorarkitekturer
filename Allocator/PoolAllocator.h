@@ -166,6 +166,8 @@ public:
 
 	bool operator==(const MemoryPoolIterator<T>& it) { return m_Pos >= it.m_Pos; }
 	bool operator!=(const MemoryPoolIterator<T>& it) { return m_Pos != it.m_Pos; }
+
+	int GetPos() { return m_Pos; };
 private:
 	const PoolAllocator<T>* m_Pool;
 	std::size_t m_Pos;

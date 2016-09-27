@@ -12,6 +12,42 @@ struct dataStruct {
 	char data[SIZE];
 };
 
+static class Helper {
+
+public:
+	// Fragment the pools.
+	// Iterations are how many time we will free/allocate data in the pool.
+	// Every iteration some objects are freed then allocated.
+	// chanceInPercent is how many percent of blocks will be freed each iteration.
+	// The number of allocated will be totalblocks * chanceInPercent * 0.75.
+	// This will give us an equilibrium at a 75% full memory.
+	template<typename T>
+	static void FragmentPool(int iterations, int chanceInPercent, PoolAllocator<T>& mem) {
+		int PreFree, PostFree, PostAlloc;
+		for (int n = 0; n < iterations; n++) {
+
+			PreFree = mem.OccupiedBlocks();
+			//Loop through our list and free some objects.
+			for (PoolAllocator<T>::iterator it = mem.begin(); it != mem.end(); ++it) {
+				if (rand() % 100 <= chanceInPercent) {
+					mem.Free(&(*it));
+				}
+			}
+			PostFree = mem.OccupiedBlocks();
+
+			//Allocate some new objects
+			for (int i = 0; i < mem.SizeInBlocks() * chanceInPercent * 0.01 * 0.75; ++i) {
+				mem.Allocate();
+			}
+
+			PostAlloc = mem.OccupiedBlocks();
+
+			std::cout << "Free'd " << PreFree - PostFree << " Objects and allocated " << PostAlloc - PostFree << " Objects." << std::endl << "New size is: " << PostAlloc << std::endl;
+		}
+
+	}
+};
+
 // Test a simple case of allocating memory.
 TEST_CASE("POOL_Allocate", "[Pool][Func]")
 {
@@ -190,59 +226,18 @@ TEST_CASE("Allocate memory of different sizes in standard memory.", "[Stand][Per
 	}
 }
 
-// Create 5 pools with 200MB of allocated memory for each using 
-// our custom pool allocator.
-TEST_CASE("POOL_200MBAlloc", "[Pool][Perf]")
-{
-	unsigned int amount = 200 * 1024 * 1024;
-	void* charArr[5];
-	for (int i = 0; i < 5; i++)
-	{
-		charArr[i] = new PoolAllocator<char>(amount);
-	}
-}
-
-// Create 5 pools with 200MB of allocated memory for each using 
-// standard OS allocator
-TEST_CASE("MALLOC_200MBAlloc", "[Stand][Perf]")
-{
-	unsigned int amount = 200 * 1024 * 1024;
-	void* charArr[5];
-	for (int i = 0; i < 5; i++) {
-		charArr[i] = malloc(amount * sizeof(char));
-	}
-}
-
 //Allocate and fill memory for the tests.
 dataStruct<1024*1024>* standMem[1000];						//1000 * 1MB
 PoolAllocator<dataStruct<1024*1024>> poolMem(1000);			//1000 * 1MB
 
-//TEST_CASE("Allocate, access and fragmentation of pool memory.", "[Perf][AIO]") 
-//{
-//	PoolAllocator<dataStruct<1024 * 1024>> poolMem(1000);			//1000 * 1MB
-//
-//	SECTION("Allocate 1000 objects.") {
-//		for (int i = 0; i < 1000; i++) {
-//			poolMem.Allocate();
-//		}
-//	}
-//	
-//	dataStruct<1024 * 1024> d;
-//	SECTION("Linear access of all objects in memory pool.") {
-//		for (auto& it : poolMem) {
-//			it = d;
-//		}
-//	}
-//}
-
-TEST_CASE("POOL_LinearAllocate", "[Pool][Perf][Linear][Allocate][Access]")
+TEST_CASE("Pool: Linear allocate", "[Pool][Perf][Linear][Allocate][Access]")
 {
 	for (int i = 0; i < 1000; i++) {
 		poolMem.Allocate();
 	}
 }
 
-TEST_CASE("MALLOC_LinearAllocate", "[Stand][Perf][Linear][Allocate][Access]")
+TEST_CASE("Stand: Linear allocate", "[Stand][Perf][Linear][Allocate][Access]")
 {
 	
 	for (int i = 0; i < 1000; i++) {
@@ -252,51 +247,23 @@ TEST_CASE("MALLOC_LinearAllocate", "[Stand][Perf][Linear][Allocate][Access]")
 }
 
 dataStruct<1024 * 1024> d;
-TEST_CASE("POOL_LinearAccess", "[Pool][Perf][Linear][Access]")
+TEST_CASE("Pool: Linear access", "[Pool][Perf][Linear][Access]")
 {
 	for (auto& it : poolMem) {
 		it = d;
 	}
 }
 
-TEST_CASE("MALLOC_LinearAcess", "[Stand][Perf][Linear][Access]")
+TEST_CASE("Stand: Linear access", "[Stand][Perf][Linear][Access]")
 {
 	for (int i = 0; i < 1000; ++i) {
 		*standMem[i] = d;
 	}
 }
 
-//Fragment the pools.
-//Iterations are how many time we will free/allocate data in the pool.
-//Every iteration 10 elements are freed then allocated.
-//maxElements are the size of the array you want to fragment.
-template<typename T>
-void FragmentPool(int iterations, int maxObjects, PoolAllocator<T> poolMem) {
-	int e[10];
-
-	for (int n = 0; n < iterations; n++) {
-
-		// Random 10 objects that will be removed. from 0 to maxObjects (the length of the list most likely)
-		for (int i = 0; i < 10; i++) {
-			e[i] = rand() % maxObjects;
-		}
-		// Loop through our pool and free 10 objects.
-		for (auto ele : e) {
-			int x = 0;
-			PoolAllocator<T>::iterator it = poolMem->begin();
-			for (; x != ele; x++) {
-				it++; 
-			}
-			poolMem.Free(&(*it));
-		}
-
-		// Allocate 8 new objects.
-		for (int i = 0; i < 8; i++) {
-			poolMem.Allocate();
-		}
-	}
+TEST_CASE("Pool: Fragment the memory.", "[Pool][Frag][Perf]") {
+	Helper::FragmentPool(10, 22, poolMem);
 }
-
 
 
 TEST_CASE("POOL_FragmentedAccess", "[Pool][Perf][Frag][Access]")
