@@ -1,6 +1,7 @@
 #ifndef PoolAllocator_h
 #define PoolAllocator_h
 #include <vector>
+#include <mutex>
 
 //Iterator class
 //Is used by our Pool Allocator to iterate through the memory.
