@@ -1,0 +1,3 @@
+# Because the test result exporter and converter creates a bunch of files
+*.txt
+*.xml
