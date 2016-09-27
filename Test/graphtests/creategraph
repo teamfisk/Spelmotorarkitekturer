@@ -1,0 +1,5 @@
+python calcerrorbars.py mallocsmall.dat stacksmall.dat mallocmedium.dat \
+stackmedium.dat malloclarge.dat stacklarge.dat
+
+gnuplot script.gnuplot
+
