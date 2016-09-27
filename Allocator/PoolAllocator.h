@@ -44,7 +44,7 @@ public:
 	//Allocate memory for one T object and return the memory address.
 	template<typename... Arguments>
 	T* Allocate(Arguments... args) {
-        std::lock_guard<std::mutex> lockGuard(m_MutexLock);
+        //std::lock_guard<std::mutex> lockGuard(m_MutexLock);
 		for (; m_FirstFreeBlock < m_TotalBlocks && m_BlockOccupied[m_FirstFreeBlock]; ++m_FirstFreeBlock);
 		if (m_FirstFreeBlock < m_TotalBlocks) {
 			m_FirstBlock = m_FirstFreeBlock < m_FirstBlock ? m_FirstFreeBlock : m_FirstBlock;
@@ -62,7 +62,7 @@ public:
 	// If the first block in memory is freed we set the next block as our first.
 	void Free(T* obj) {
 		obj->~T();
-        m_MutexLock.lock();
+        //m_MutexLock.lock();
 		--m_NumOccupiedBlocks;
 		const std::size_t freeSlot = (reinterpret_cast<char*>(obj) - m_StartAdress) / m_Stride;
 		m_BlockOccupied[freeSlot] = false;
@@ -72,7 +72,7 @@ public:
 				m_FirstBlock++;
 			}
 		}
-        m_MutexLock.unlock();
+        //m_MutexLock.unlock();
 	}
 
 	iterator begin() const {
@@ -170,8 +170,6 @@ public:
 private:
 	const PoolAllocator<T>* m_Pool;
 	std::size_t m_Pos;
-    std::mutex m_MutexLock;
-
 };
 
 #endif
