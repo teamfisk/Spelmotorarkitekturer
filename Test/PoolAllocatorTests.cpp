@@ -6,6 +6,7 @@
 #include "catch.hpp"
 #include "../Allocator/PoolAllocator.h"
 
+//#define PRINT_OUT
 
 template <int SIZE>
 struct dataStruct {
@@ -23,28 +24,62 @@ public:
 	// This will give us an equilibrium at a 75% full memory.
 	template<typename T>
 	static void FragmentPool(int iterations, int chanceInPercent, PoolAllocator<T>& mem) {
-		int PreFree, PostFree, PostAlloc;
-		for (int n = 0; n < iterations; n++) {
 
+#ifdef PRINT_OUT
+		int PreFree, PostFree, PostAlloc;
+#endif // PRINT_OUT
+		for (int n = 0; n < iterations; n++) {
+#ifdef PRINT_OUT
 			PreFree = mem.OccupiedBlocks();
-			//Loop through our list and free some objects.
+#endif // PRINT_OUT
+
+			//Loop through our mem and free some objects.
 			for (PoolAllocator<T>::iterator it = mem.begin(); it != mem.end(); ++it) {
 				if (rand() % 100 <= chanceInPercent) {
 					mem.Free(&(*it));
 				}
 			}
+#ifdef PRINT_OUT
 			PostFree = mem.OccupiedBlocks();
+#endif // PRINT_OUT
 
 			//Allocate some new objects
 			for (int i = 0; i < mem.SizeInBlocks() * chanceInPercent * 0.01 * 0.75; ++i) {
 				mem.Allocate();
 			}
-
+#ifdef PRINT_OUT
 			PostAlloc = mem.OccupiedBlocks();
+			std::cout << "Free'd " << PreFree - PostFree << " Objects and allocated " << PostAlloc - PostFree << " Objects." << std::endl << "New size is: " << PostAlloc << std::endl;
+#endif // PRINT_OUT
 
-			//std::cout << "Free'd " << PreFree - PostFree << " Objects and allocated " << PostAlloc - PostFree << " Objects." << std::endl << "New size is: " << PostAlloc << std::endl;
 		}
 
+	}
+
+	template<typename T>
+	static void FragmentMalloc(int iterations, int chanceInPercent, T* mem, int maxElements)
+	{
+		for (int n = 0; n < iterations; n++) {
+			int d = 0;
+
+			//Loop through our mem and delete some objects.
+			for (int i = 0; i < maxElements; ++i) {
+				if (rand() % 100 == chanceInPercent) {
+					if (mem[i] != NULL) {
+						delete mem[i];
+						mem[i] = NULL;
+					}
+				}
+			}
+
+			//Allocate some new objects
+			for (int i = 0; i < maxElements && d < (maxElements * chanceInPercent * 0.01 * 0.75); ++i) {
+				if (mem[i] == NULL) {
+					mem[i] = new dataStruct<1024 * 1024>();
+					d++;
+				}
+			}
+		}
 	}
 };
 
@@ -226,54 +261,65 @@ TEST_CASE("Allocate memory of different sizes in standard memory.", "[Stand][Per
 	}
 }
 
-//Allocate and fill memory for the tests.
-dataStruct<1024*1024>* standMem[1000];						//1000 * 1MB
-PoolAllocator<dataStruct<1024*1024>> poolMem(1000);			//1000 * 1MB
 
-TEST_CASE("Pool: Linear allocate", "[Pool][Perf][Linear][Allocate][Access]")
+
+//Allocate and fill memory for the tests.
+dataStruct<1024*1024>* standMem[10000];						//1000 * 1MB
+PoolAllocator<dataStruct<1024*1024>> poolMem(10000);			//1000 * 1MB
+
+TEST_CASE("Pool: Linear allocate", "[Pool][Perf][Usefull]")
 {
-	for (int i = 0; i < 1000; i++) {
+	for (int i = 0; i < 10000; i++) {
 		poolMem.Allocate();
 	}
 }
 
-TEST_CASE("Stand: Linear allocate", "[Stand][Perf][Linear][Allocate][Access]")
+TEST_CASE("Stand: Linear allocate", "[Stand][Perf][Usefull]")
 {
 	
-	for (int i = 0; i < 1000; i++) {
+	for (int i = 0; i < 10000; i++) {
 		standMem[i] = new dataStruct<1024 * 1024>();
 	}
 	
 }
 
 dataStruct<1024 * 1024> d;
-TEST_CASE("Pool: Linear access", "[Pool][Perf][Linear][Access]")
+TEST_CASE("Pool: Linear access", "[Pool][Perf][Usefull]")
 {
 	for (auto& it : poolMem) {
 		it = d;
 	}
 }
 
-TEST_CASE("Stand: Linear access", "[Stand][Perf][Linear][Access]")
+TEST_CASE("Stand: Linear access", "[Stand][Perf][Usefull]")
 {
-	for (int i = 0; i < 1000; ++i) {
+	for (int i = 0; i < 10000; ++i) {
 		*standMem[i] = d;
 	}
 }
 
-TEST_CASE("Pool: Fragment the memory.", "[Pool][Frag][Perf]") {
+TEST_CASE("Pool: Fragment the memory", "[Pool][Perf][Usefull]") {
 	Helper::FragmentPool(10, 22, poolMem);
 }
 
 
-TEST_CASE("POOL_FragmentedAccess", "[Pool][Perf][Frag][Access]")
+TEST_CASE("Stand: Fragment the memory", "[Pool][Perf][Usefull]")
 {
-
+	Helper::FragmentMalloc(10, 22, standMem, 10000);
 }
 
-TEST_CASE("MALLOC_FragmentedAccess", "[Stand][Perf][Frag][Access]")
+TEST_CASE("Pool: Fragmented linear access", "[Pool][Perf][Usefull]")
 {
+	for (auto& e : poolMem) {
+		e = d;
+	}
+}
 
+TEST_CASE("Stand: Fragmented linear access", "[Stand][Perf][Usefull]")
+{
+	for (auto& e : standMem) {
+		*e = d;
+	}
 }
 
 
