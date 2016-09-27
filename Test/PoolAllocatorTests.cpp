@@ -192,41 +192,100 @@ TEST_CASE("MALLOC_200MBAlloc", "[StandardAllocator][Perf]")
 }
 
 //Allocate and fill memory for the tests.
-dataStruct<1024*1024>* standMem[1000];						//1000 * 1MB
-PoolAllocator<dataStruct<1024*1024>> poolMem(1000);			//1000 * 1MB
+// dataStruct<1024*1024>* standMem[1000];						//1000 * 1MB
+// PoolAllocator<dataStruct<1024*1024>> poolMem(1000);			//1000 * 1MB
 
-
-
-TEST_CASE("POOL_LinearAllocate", "[PoolAllocator][Perf][Linear][Allocate][Access]")
+TEST_CASE("Allocate, access and fragmentation of pool memory.", "[Perf][AIO]") 
 {
-	for (int i = 0; i < 1000; i++) {
-		poolMem.Allocate();
-	}
-}
+	PoolAllocator<dataStruct<1024 * 1024>> poolMem(1000);			//1000 * 1MB
 
-TEST_CASE("MALLOC_LinearAllocate", "[StandardAllocator][Perf][Linear][Allocate][Access]")
-{
-	
-	for (int i = 0; i < 1000; i++) {
-		standMem[i] = new dataStruct<1024 * 1024>();
+	SECTION("Allocate 1000 objects.") {
+		for (int i = 0; i < 1000; i++) {
+			poolMem.Allocate();
+		}
 	}
 	
-}
-
-dataStruct<1024 * 1024> d;
-TEST_CASE("POOL_LinearAccess", "[PoolAllocator][Perf][Linear][Access]")
-{
-	for (auto& it : poolMem) {
-		it = d;
+	dataStruct<1024 * 1024> d;
+	SECTION("Linear access of all objects in memory pool.") {
+		for (auto& it : poolMem) {
+			it = d;
+		}
 	}
 }
 
-TEST_CASE("MALLOC_LinearAcess", "[StandardAllocator][Perf][Linear][Access]")
-{
-	for (int i = 0; i < 1000; ++i) {
-		*standMem[i] = d;
+//TEST_CASE("POOL_LinearAllocate", "[PoolAllocator][Perf][Linear][Allocate][Access]")
+//{
+//	for (int i = 0; i < 1000; i++) {
+//		poolMem.Allocate();
+//	}
+//}
+//
+//TEST_CASE("MALLOC_LinearAllocate", "[StandardAllocator][Perf][Linear][Allocate][Access]")
+//{
+//	
+//	for (int i = 0; i < 1000; i++) {
+//		standMem[i] = new dataStruct<1024 * 1024>();
+//	}
+//	
+//}
+//
+//dataStruct<1024 * 1024> d;
+//TEST_CASE("POOL_LinearAccess", "[PoolAllocator][Perf][Linear][Access]")
+//{
+//	for (auto& it : poolMem) {
+//		it = d;
+//	}
+//}
+//
+//TEST_CASE("MALLOC_LinearAcess", "[StandardAllocator][Perf][Linear][Access]")
+//{
+//	for (int i = 0; i < 1000; ++i) {
+//		*standMem[i] = d;
+//	}
+//}
+
+//Fragment the pools.
+//Iterations are how many time we will free/allocate data in the pool.
+//Every iteration 10 elements are freed then allocated.
+//maxElements are the size of the array you want to fragment.
+void FragmentPool(int iterations, int maxObjects) {
+	int e[10];
+
+	for (int n = 0; n < iterations; n++) {
+
+		// Random 10 objects that will be removed. from 0 to maxObjects (the length of the list most likely)
+		for (int i = 0; i < 10; i++) {
+			e[i] = rand() % maxObjects;
+		}
+		// Loop through our pool and free 10 objects.
+		for (auto ele : e) {
+			int x = 0;
+			PoolAllocator<dataStruct<1024 * 1024>>::iterator it = poolMem->begin();
+			for (; x != ele; x++) {
+				it++; 
+			}
+			poolMem.Free(&(*it));
+		}
+
+		// Allocate 8 new objects.
+		for (int i = 0; i < 8; i++) {
+			poolMem.Allocate();
+		}
 	}
 }
+
+
+
+TEST_CASE("POOL_FragmentedAccess", "[PoolAllocator][Perf][Frag][Access]")
+{
+
+}
+
+TEST_CASE("MALLOC_FragmentedAccess", "[StandardAllocator][Perf][Frag][Access]")
+{
+
+}
+
 
 
 // Allocate 100 000 ints and read 1 000 random ones.
@@ -234,7 +293,7 @@ TEST_CASE("MALLOC_LinearAcess", "[StandardAllocator][Perf][Linear][Access]")
 TEST_CASE("POOL_LargeDataRead", "[PoolAllocator][Perf]")
 {
 	unsigned int amount = 1'000'000;
-	PoolAllocator<int> pool(amount); // Note: the pool allocator initialized the values in the vector<bool>. 
+	PoolAllocator<int> pool(amount);
 	int* randElements = new int[1000];
 	int rE = 0;
 
@@ -254,12 +313,11 @@ TEST_CASE("POOL_LargeDataRead", "[PoolAllocator][Perf]")
 	std::cout << std::endl;
 }
 
-// Should compare vs many malloc allocations, not one big alloc.
 // Allocate 100 000 ints and read 1 000 random ones.
 TEST_CASE("MALLOC_LargeDataRead", "[StandardAllocator][Perf]")
 {
 	unsigned int amount = 1'000'000;
-	int* arr = new int[amount]; // Note: unitialized mem. 
+	int* arr = new int[amount];
 	int* randElements = new int[1000];
 	int rE = 0;
 
@@ -278,9 +336,4 @@ TEST_CASE("MALLOC_LargeDataRead", "[StandardAllocator][Perf]")
 }
 
 
-TEST_CASE("POOL_ThreadSafety", "[StandardAllocator][Perf]")
-{
 
-
-
-}
