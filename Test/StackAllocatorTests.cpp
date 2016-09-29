@@ -160,6 +160,18 @@ void StackAllocateBlocks(int numBlocks, int blockSize)
 	}
 }
 
+void StackAllocateBlocks(int numBlocks, int minBlockSize, int maxBlockSize)
+{
+	srand(0);
+	for (int i = 0; i < numBlocks; i++)
+	{
+		int blockSize = minBlockSize + (rand() % (maxBlockSize - minBlockSize));		
+		void* block = stackAllocator.Allocate(blockSize);
+
+		memset(block, 123, blockSize);
+	}
+}
+
 void MallocAllocateBlocks(int numBlocks, int blockSize)
 {
 	std::vector<void*> memBlocks(numBlocks);
@@ -178,7 +190,25 @@ void MallocAllocateBlocks(int numBlocks, int blockSize)
 	{
 		free(memBlocks[i]);
 	}
+}
 
+void MallocAllocateBlocks(int numBlocks, int minBlockSize, int maxBlockSize)
+{
+	std::vector<void*> memBlocks(numBlocks);
+
+	srand(0);
+	for (int i = 0; i < numBlocks; i++)
+	{
+		int blockSize = minBlockSize + (rand() % (maxBlockSize - minBlockSize));
+		void* block = malloc(sizeof(char) * blockSize);
+		memset(block, 123, blockSize);
+
+		memBlocks[i] = block;
+	}
+	for (int i = 0; i < numBlocks; i++)
+	{
+		free(memBlocks[i]);
+	}
 }
 
 
@@ -239,29 +269,6 @@ SCENARIO("STACK vs MALLOC FreeComp", "[StackAllocator]")
 	}	
 }
 
-
-TEST_CASE("STACK_FreeComp", " [StackAllocator]")
-{
-	int blockSize = 1000;
-	StackAllocator stackAllocator(numBlocks * blockSize);
-	for (int i = 0; i < numBlocks / 2; i++)
-	{
-		stackAllocator.Allocate(blockSize);
-	}
-	auto marker = stackAllocator.GetMarker();
-
-	for (int i = 0; i < numBlocks / 2; i++)
-	{
-		stackAllocator.Allocate(blockSize);
-	}	
-
-	SECTION("Freeing data from stack")
-	{
-		stackAllocator.FreeToMarker(marker);
-	}
-}
-
-
 TEST_CASE("MALLOC_SmallAllocComp", "[StackAllocator]")
 {
 	MallocAllocateBlocks(numBlocks, 5);
@@ -277,7 +284,12 @@ TEST_CASE("MALLOC_LargeAllocComp", "[StackAllocator]")
 	MallocAllocateBlocks(numBlocks, 200'000);
 }
 
-TEST_CASE("MALLOC_FreeComp", " [StackAllocator]")
-{
+TEST_CASE("MALLOC_RandomAllocComp", "[StackAllocator]")
+{	
+	MallocAllocateBlocks(numBlocks, 5, 1'000'000);
+}
 
+TEST_CASE("STACK_RandomAllocComp", "[StackAllocator]")
+{
+	MallocAllocateBlocks(numBlocks, 5, 1'000'000);
 }
