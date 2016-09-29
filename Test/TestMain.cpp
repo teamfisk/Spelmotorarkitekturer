@@ -59,3 +59,12 @@ TEST_CASE("tasdfadsf")
 //
 //	}
 //}
+
+// Note: this test case takes some time to run, even though it contains no code. The section takes 0s though.
+//TEST_CASE("vectors can be sized and resized", "[vector]") 
+//{	
+//	SECTION("do someting")
+//	{
+//		
+//	}
+//}

@@ -214,7 +214,7 @@ void MallocAllocateBlocks(int numBlocks, int minBlockSize, int maxBlockSize)
 
 // Each block size is 200x larger than the last.
 TEST_CASE("STACK_SmallAllocComp", "[StackAllocator]")
-{
+{	
 	StackAllocateBlocks(numBlocks, 5);
 }
 
@@ -228,6 +228,7 @@ TEST_CASE("STACK_LargeAllocComp", "[StackAllocator]")
 	StackAllocateBlocks(numBlocks, 200'000);
 }
 
+// Note the Catch XML exporter script doesn't handle the data exported from scenarios very well.
 SCENARIO("STACK vs MALLOC FreeComp", "[StackAllocator]")
 {
 	const int blockSize = 1000;
