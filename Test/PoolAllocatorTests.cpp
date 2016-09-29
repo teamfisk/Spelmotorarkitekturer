@@ -59,25 +59,10 @@ public:
 	template<typename T>
 	static void FragmentMalloc(int iterations, int chanceInPercent, T* mem, int maxElements)
 	{
-		for (int n = 0; n < iterations; n++) {
-			int d = 0;
-
-			//Loop through our mem and delete some objects.
-			for (int i = 0; i < maxElements; ++i) {
-				if (rand() % 100 == chanceInPercent) {
-					if (mem[i] != NULL) {
-						delete mem[i];
-						mem[i] = NULL;
-					}
-				}
-			}
-
-			//Allocate some new objects
-			for (int i = 0; i < maxElements && d < (maxElements * chanceInPercent * 0.01 * 0.75); ++i) {
-				if (mem[i] == NULL) {
-					mem[i] = new dataStruct<1024 * 1024>();
-					d++;
-				}
+		for (int i = 0; i < maxElements; i++) {
+			if (rand() % 100 <= chanceInPercent) {
+				delete mem[i];
+				mem[i] = nullptr;
 			}
 		}
 	}
@@ -216,27 +201,26 @@ TEST_CASE("POOL_AvailableSpace", "[Pool][Func]")
 // custom made pool allocator.
 //------------------------------------------
 
+typedef dataStruct<28> dataType;
+
 // Create 5 pools with 2MB of allocated memory for each using 
 // our custom pool allocator.
 TEST_CASE("Allocate memory of different sizes in pool.", "[Pool][Perf][Alloc]") 
 {
 	SECTION("2 MB") {
-		PoolAllocator<dataStruct<1024 * 1024>> p1(2);
+		PoolAllocator<dataType> p1(2);
 	}
 
 	SECTION("8 MB") {
-		PoolAllocator<dataStruct<1024 * 1024>> p3(8);
-
+		PoolAllocator<dataType> p3(8);
 	}
 
 	SECTION("32 MB") {
-		PoolAllocator<dataStruct<1024 * 1024>> p5(32);
-
+		PoolAllocator<dataType> p5(32);
 	}
 
 	SECTION("128 MB") {
-		PoolAllocator<dataStruct<1024 * 1024>> p7(128);
-
+		PoolAllocator<dataType> p7(128);
 	}
 }
 
@@ -245,131 +229,147 @@ TEST_CASE("Allocate memory of different sizes in pool.", "[Pool][Perf][Alloc]")
 TEST_CASE("Allocate memory of different sizes in standard memory.", "[Stand][Perf][Alloc]")
 {
 	SECTION("2 MB") {
-		malloc(2 * sizeof(dataStruct<1024 * 1024>));
+		malloc(2 * sizeof(dataType));
 	}
 
 	SECTION("8 MB") {
-		malloc(8 * sizeof(dataStruct<1024 * 1024>));
+		malloc(8 * sizeof(dataType));
 	}
 
 	SECTION("32 MB") {
-		malloc(32 * sizeof(dataStruct<1024 * 1024>));
+		malloc(32 * sizeof(dataType));
 	}
 
 	SECTION("128 MB") {
-		malloc(128 * sizeof(dataStruct<1024 * 1024>));
+		malloc(128 * sizeof(dataType));
 	}
 }
 
-
+const int blockAmount = 3'000'000;
 
 //Allocate and fill memory for the tests.
-dataStruct<1024*1024>* standMem[10000];						//1000 * 1MB
-PoolAllocator<dataStruct<1024*1024>> poolMem(10000);			//1000 * 1MB
+
+dataType* standMem[blockAmount];						//1000 * 1MB
+PoolAllocator<dataType> poolMem(blockAmount);			//1000 * 1MB
 
 TEST_CASE("Pool: Linear allocate", "[Pool][Perf][Usefull]")
 {
-	for (int i = 0; i < 10000; i++) {
+	for (int i = 0; i < blockAmount; i++) {
 		poolMem.Allocate();
 	}
 }
 
 TEST_CASE("Stand: Linear allocate", "[Stand][Perf][Usefull]")
 {
-	
-	for (int i = 0; i < 10000; i++) {
-		standMem[i] = new dataStruct<1024 * 1024>();
+	dataType** frag = new dataType*[blockAmount];
+
+	//Allocate some new objects
+	for (int i = 0; i < blockAmount; ++i) {
+		standMem[i] = new dataType();
+		memset(standMem[i]->data, rand() % 255, sizeof(dataType));
+		frag[i] = new dataType();
 	}
-	
+
+	for (int i = 0; i < blockAmount; ++i) {
+		delete frag[i];
+	}
+	delete[] frag;
 }
 
-dataStruct<1024 * 1024> d;
+dataType d;
+
 TEST_CASE("Pool: Linear access", "[Pool][Perf][Usefull]")
 {
-	for (auto& it : poolMem) {
-		it = d;
+	for (auto it = poolMem.begin(); it != poolMem.end(); it++) {
+		memcpy(&d.data[0], &it->data[0], sizeof(dataType));
 	}
 }
 
 TEST_CASE("Stand: Linear access", "[Stand][Perf][Usefull]")
 {
-	for (int i = 0; i < 10000; ++i) {
-		*standMem[i] = d;
+	for (int i = 0; i < blockAmount; ++i) {
+		dataType& it = *standMem[i];
+		memcpy(&d.data[0], &it.data[0], sizeof(dataType));
 	}
 }
 
+
 TEST_CASE("Pool: Fragment the memory", "[Pool][Perf][Usefull]") {
-	Helper::FragmentPool(10, 22, poolMem);
+	Helper::FragmentPool(20, 22, poolMem);
 }
 
 
 TEST_CASE("Stand: Fragment the memory", "[Pool][Perf][Usefull]")
 {
-	Helper::FragmentMalloc(10, 22, standMem, 10000);
+	Helper::FragmentMalloc(20, 22, standMem, blockAmount);
 }
 
 TEST_CASE("Pool: Fragmented linear access", "[Pool][Perf][Usefull]")
 {
 	for (auto& e : poolMem) {
-		e = d;
+		if (&e != nullptr) {
+			e = d;
+		}
 	}
 }
 
 TEST_CASE("Stand: Fragmented linear access", "[Stand][Perf][Usefull]")
 {
 	for (auto& e : standMem) {
-		*e = d;
+		if (e != nullptr) {
+			*e = d;
+		}
 	}
 }
 
 
-
-// Allocate 100 000 ints and read 1 000 random ones.
-// I'm printing every 100th int in the hope that no unwanted optimizing will occur.
-TEST_CASE("POOL_LargeDataRead", "[Pool][Perf]")
-{
-	unsigned int amount = 1'000'000;
-	PoolAllocator<int> pool(amount);
-	int* randElements = new int[1000];
-	int rE = 0;
-
-	for (int i = 0; i < amount; i++) {
-		if (rand() % 1'000 == 1 && rE < 1000) {
-			randElements[rE] = *pool.Allocate(i);
-			rE++;
-		}
-		else {
-			pool.Allocate(i);
-		}
-	}
-
-	//for (int i = 0; i < rE; i++) {
-	//	//std::cout << randElements[i] << ", ";
-	//}
-	//std::cout << std::endl;
-}
-
-// Allocate 100 000 ints and read 1 000 random ones.
-TEST_CASE("MALLOC_LargeDataRead", "[Stand][Perf]")
-{
-	unsigned int amount = 1'000'000;
-	int* arr = new int[amount];
-	int* randElements = new int[1000];
-	int rE = 0;
-
-	for (int i = 0; i < amount; i++) {
-		arr[i] = i;
-		if (rand() % 1'000 == 1 && rE < 1000) {
-			randElements[rE] = arr[i];
-			rE++;
-		}
-	}
-
-	//for (int i = 0; i < rE; i++) {
-	//	//std::cout << randElements[i] << ", ";
-	//}
-	//std::cout << std::endl;
-}
+//
+//// Allocate 100 000 ints and read 1 000 random ones.
+//// I'm printing every 100th int in the hope that no unwanted optimizing will occur.
+//TEST_CASE("POOL_LargeDataRead", "[Pool][Perf]")
+//{
+//	unsigned int amount = 1'000'000;
+//	PoolAllocator<int> pool(amount);
+//	int* randElements = new int[1000];
+//	int rE = 0;
+//
+//	for (int i = 0; i < amount; i++) {
+//		if (rand() % 1'000 == 1 && rE < 1000) {
+//			randElements[rE] = *pool.Allocate(i);
+//			rE++;
+//		}
+//		else {
+//			pool.Allocate(i);
+//		}
+//	}
+//
+//	//for (int i = 0; i < rE; i++) {
+//	//	//std::cout << randElements[i] << ", ";
+//	//}
+//	//std::cout << std::endl;
+//}
+//
+//// Allocate 100 000 ints and read 1 000 random ones.
+//TEST_CASE("MALLOC_LargeDataRead", "[Stand][Perf]")
+//{
+//	unsigned int amount = 1'000'000;
+//	int* arr = new int[amount];
+//	int* randElements = new int[1000];
+//	int rE = 0;
+//
+//	for (int i = 0; i < amount; i++) {
+//		arr[i] = i;
+//		if (rand() % 1'000 == 1 && rE < 1000) {
+//			randElements[rE] = arr[i];
+//			rE++;
+//		}
+//	}
+//
+//	//for (int i = 0; i < rE; i++) {
+//	//	//std::cout << randElements[i] << ", ";
+//	//}
+//	//std::cout << std::endl;
+//}
 
 
 
