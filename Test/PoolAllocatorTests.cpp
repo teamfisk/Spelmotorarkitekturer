@@ -201,7 +201,7 @@ TEST_CASE("POOL_AvailableSpace", "[Pool][Func]")
 // custom made pool allocator.
 //------------------------------------------
 
-typedef dataStruct<64> dataType;
+typedef dataStruct<28> dataType;
 
 // Create 5 pools with 2MB of allocated memory for each using 
 // our custom pool allocator.
@@ -249,7 +249,6 @@ const int blockAmount = 3'000'000;
 
 //Allocate and fill memory for the tests.
 
-dataType* standMemFrag[blockAmount];						//1000 * 1MB
 dataType* standMem[blockAmount];						//1000 * 1MB
 PoolAllocator<dataType> poolMem(blockAmount);			//1000 * 1MB
 
@@ -262,28 +261,19 @@ TEST_CASE("Pool: Linear allocate", "[Pool][Perf][Usefull]")
 
 TEST_CASE("Stand: Linear allocate", "[Stand][Perf][Usefull]")
 {
+	dataType** frag = new dataType*[blockAmount];
+
 	//Allocate some new objects
 	for (int i = 0; i < blockAmount; ++i) {
 		standMem[i] = new dataType();
 		memset(standMem[i]->data, rand() % 255, sizeof(dataType));
-	}
-}
-
-TEST_CASE("Stand: Linear allocate fragmented", "[Stand][Perf][Usefull]")
-{
-	char** ch = new char*[blockAmount];
-
-	//Allocate some new objects
-	for (int i = 0; i < blockAmount; ++i) {
-		standMemFrag[i] = new dataType();
-		memset(&standMemFrag[i]->data[0], rand() % 255, sizeof(dataType));
-		ch[i] = new char[rand() % 3333];
+		frag[i] = new dataType();
 	}
 
 	for (int i = 0; i < blockAmount; ++i) {
-		delete ch[i];
+		delete frag[i];
 	}
-	delete[] ch;
+	delete[] frag;
 }
 
 dataType d;
@@ -292,15 +282,6 @@ TEST_CASE("Pool: Linear access", "[Pool][Perf][Usefull]")
 {
 	for (auto it = poolMem.begin(); it != poolMem.end(); it++) {
 		memcpy(&d.data[0], &it->data[0], sizeof(dataType));
-	}
-}
-
-
-TEST_CASE("Stand: Linear access fragment", "[Stand][Perf][Usefull]")
-{
-	for (int i = 0; i < blockAmount; ++i) {
-		dataType& it = *standMemFrag[i];
-		memcpy(&d.data[0], &it.data[0], sizeof(dataType));
 	}
 }
 
