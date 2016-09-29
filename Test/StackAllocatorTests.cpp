@@ -2,6 +2,7 @@
 #include <vector>
 #include <cstdlib>
 #include <cstring>
+#include <array>
 
 #include "catch.hpp"
 #include "../Allocator/StackAllocator.h"
@@ -142,10 +143,11 @@ TEST_CASE("RepeatedFree", "[StackAllocator]")
 }
 */
 
-//StackAllocator stackAllocator(5000 * 1000); // Use this to make it really fast!
+const int numBlocks = 50;
+StackAllocator stackAllocator(numBlocks * 200'000 * 3); // Use this to make it really fast!
 void StackAllocateBlocks(int numBlocks, int blockSize)
 {	
-	StackAllocator stackAllocator(numBlocks * blockSize);
+	//StackAllocator stackAllocator(numBlocks * blockSize);
 	//StackAllocator stackAllocator(1e8); // 100 mille, slow!
 	//StackAllocator stackAllocator(100'000'000); // also slow!
 
@@ -160,44 +162,122 @@ void StackAllocateBlocks(int numBlocks, int blockSize)
 
 void MallocAllocateBlocks(int numBlocks, int blockSize)
 {
+	std::vector<void*> memBlocks(numBlocks);
+
 	for (int i = 0; i < numBlocks; i++)
 	{
 		//int blockSize = (1 + std::rand() % 5) * minBlockSize;
 		void* block = malloc(sizeof(char) * blockSize);
 		memset(block, 123, blockSize);
 
-		free(block);
+		memBlocks[i] = block;
+		//free(block); // Note: freeing inside the loop might make the mem allocar try to reuse the block. Thus, let's free all the blocks after the first loop.
 	}
+
+	for(int i = 0; i < numBlocks; i++)
+	{
+		free(memBlocks[i]);
+	}
+
 }
+
 
 // Each block size is 200x larger than the last.
 TEST_CASE("STACK_SmallAllocComp", "[StackAllocator]")
 {
-	StackAllocateBlocks(5000, 5);
+	StackAllocateBlocks(numBlocks, 5);
 }
 
 TEST_CASE("STACK_MediumAllocComp", "[StackAllocator]")
 {
-	StackAllocateBlocks(5000, 1000);
+	StackAllocateBlocks(numBlocks, 1000);
 }
 
 TEST_CASE("STACK_LargeAllocComp", "[StackAllocator]")
 {
-	StackAllocateBlocks(5000, 2'00'000);
+	StackAllocateBlocks(numBlocks, 200'000);
+}
+
+SCENARIO("STACK vs MALLOC FreeComp", "[StackAllocator]")
+{
+	const int blockSize = 1000;
+	const int numBlocks = 50;
+	GIVEN("A stack filled with some data")
+	{
+		StackAllocator stackAllocator(numBlocks * blockSize);
+		for (int i = 0; i < numBlocks / 2; i++)
+		{
+			stackAllocator.Allocate(blockSize);
+		}
+		auto marker = stackAllocator.GetMarker();
+
+		for (int i = 0; i < numBlocks / 2; i++)
+		{
+			stackAllocator.Allocate(blockSize);
+		}
+
+		WHEN("the stack is freed")
+		{
+			stackAllocator.FreeToMarker(marker);
+		}
+	}
+	
+	GIVEN("Some malloc allocated blocks filled with some data")
+	{
+		std::array<void*, numBlocks> memBlocks;
+		for (int i = 0; i < numBlocks; i++)
+		{
+			memBlocks[i] = malloc(blockSize);
+		}
+		WHEN("the blocks are freed")
+		{
+			for (int i = 0; i < numBlocks / 2; i++)
+			{
+				free(memBlocks[i]);
+			}
+		}
+	}	
+}
+
+
+TEST_CASE("STACK_FreeComp", " [StackAllocator]")
+{
+	int blockSize = 1000;
+	StackAllocator stackAllocator(numBlocks * blockSize);
+	for (int i = 0; i < numBlocks / 2; i++)
+	{
+		stackAllocator.Allocate(blockSize);
+	}
+	auto marker = stackAllocator.GetMarker();
+
+	for (int i = 0; i < numBlocks / 2; i++)
+	{
+		stackAllocator.Allocate(blockSize);
+	}	
+
+	SECTION("Freeing data from stack")
+	{
+		stackAllocator.FreeToMarker(marker);
+	}
 }
 
 
 TEST_CASE("MALLOC_SmallAllocComp", "[StackAllocator]")
 {
-	MallocAllocateBlocks(5000, 5);
+	MallocAllocateBlocks(numBlocks, 5);
 }
 
 TEST_CASE("MALLOC_MediumAllocComp", "[StackAllocator]")
 {
-	MallocAllocateBlocks(5000, 1000);
+	MallocAllocateBlocks(numBlocks, 1000);
 }
 
 TEST_CASE("MALLOC_LargeAllocComp", "[StackAllocator]")
 {
-	MallocAllocateBlocks(50, 2'00'000);
+	MallocAllocateBlocks(numBlocks, 200'000);
+}
+
+TEST_CASE("MALLOC_FreeComp", " [StackAllocator]")
+{
+
 }
