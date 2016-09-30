@@ -143,7 +143,7 @@ TEST_CASE("RepeatedFree", "[StackAllocator]")
 }
 */
 
-const int numBlocks = 50;
+const int numBlocks = 500;
 StackAllocator stackAllocator(numBlocks * 200'000 * 3); // Use this to make it really fast!
 void StackAllocateBlocks(int numBlocks, int blockSize)
 {	
