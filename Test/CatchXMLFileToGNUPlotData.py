@@ -12,7 +12,6 @@
 # rerun until enough test runs have run
 
 import xml.etree.ElementTree as etree
-import sys
 
 def CatchXMLFileToGNUPlotData(infile):
     tree = etree.parse(infile)
@@ -31,7 +30,7 @@ def CatchXMLFileToGNUPlotData(infile):
         	with open(outfile) as f:
         		testrun = len(f.readlines())
         except FileNotFoundError:
-        		testrun = 1
+        		testrun = 0
 
         with open(outfile, 'a') as f:
             dur = result.attrib["durationInSeconds"]

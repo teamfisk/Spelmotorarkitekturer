@@ -2,6 +2,7 @@
 #include <vector>
 #include <iostream>
 #include <stdlib.h>
+#include <cstring>
 
 #include "catch.hpp"
 #include "../Allocator/PoolAllocator.h"
@@ -13,7 +14,7 @@ struct dataStruct {
 	char data[SIZE];
 };
 
-static class Helper {
+class Helper {
 
 public:
 	// Fragment the pools.
@@ -34,7 +35,7 @@ public:
 #endif // PRINT_OUT
 
 			//Loop through our mem and free some objects.
-			for (PoolAllocator<T>::iterator it = mem.begin(); it != mem.end(); ++it) {
+			for (typename PoolAllocator<T>::iterator it = mem.begin(); it != mem.end(); ++it) {
 				if (rand() % 100 <= chanceInPercent) {
 					mem.Free(&(*it));
 				}
