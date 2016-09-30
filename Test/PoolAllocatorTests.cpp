@@ -202,9 +202,9 @@ TEST_CASE("POOL_AvailableSpace", "[Pool][Func]")
 // custom made pool allocator.
 //------------------------------------------
 
-typedef dataStruct<64> dataTypeSmall;
+typedef dataStruct<4> dataTypeSmall;
 typedef dataStruct<64> dataTypeMed;
-typedef dataStruct<64> dataTypeLarge;
+typedef dataStruct<1024> dataTypeLarge;
 
 
 // Create 5 pools with 2MB of allocated memory for each using 
@@ -250,7 +250,7 @@ TEST_CASE("Allocate memory of different sizes in standard memory.", "[Stand][Per
 }
 
 const int blockAmountSmall = 50'000;
-const int blockAmountLarge = 3'000'000;
+const int blockAmountLarge = 500'000;
 
 
 //Allocate and fill memory for the tests.
