@@ -1,6 +1,6 @@
 import subprocess
 import sys
-from CatchXMLFileToGNUPlotData import CatchXMLFileToGNUPlotData
+from Section_CatchXMLFileToGNUPlotData import Section_CatchXMLFileToGNUPlotData
 
 # Used when running this script directly form a console
 if __name__ == "__main__":
@@ -17,7 +17,7 @@ if __name__ == "__main__":
             p = subprocess.Popen(args)
             p.wait()
 
-            CatchXMLFileToGNUPlotData(outputfilepath)
+            Section_CatchXMLFileToGNUPlotData(outputfilepath)
         #input("Program done. Press any key to continue.")
     else:
         print(len(sys.argv))
