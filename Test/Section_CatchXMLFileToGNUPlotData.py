@@ -14,7 +14,7 @@
 import xml.etree.ElementTree as etree
 import sys
 
-def CatchXMLFileToGNUPlotData(infile):
+def Section_CatchXMLFileToGNUPlotData(infile):
     tree = etree.parse(infile)
     root = tree.getroot()
 
