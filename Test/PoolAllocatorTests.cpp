@@ -253,14 +253,14 @@ const int blockAmount = 3'000'000;
 dataType* standMem[blockAmount];						//1000 * 1MB
 PoolAllocator<dataType> poolMem(blockAmount);			//1000 * 1MB
 
-TEST_CASE("Pool: Linear allocate", "[Pool][Perf][Usefull]")
+TEST_CASE("Pool: Linear allocate", "[Pool][Perf][SetupAlloc][Usefull]")
 {
 	for (int i = 0; i < blockAmount; i++) {
 		poolMem.Allocate();
 	}
 }
 
-TEST_CASE("Stand: Linear allocate", "[Stand][Perf][Usefull]")
+TEST_CASE("Stand: Linear allocate", "[Stand][Perf][SetupAlloc][Usefull]")
 {
 	dataType** frag = new dataType*[blockAmount];
 
@@ -295,12 +295,12 @@ TEST_CASE("Stand: Linear access", "[Stand][Perf][Usefull]")
 }
 
 
-TEST_CASE("Pool: Fragment the memory", "[Pool][Perf][Usefull]") {
+TEST_CASE("Pool: Fragment the memory", "[Pool][Perf][SetupFrag][Usefull]") {
 	Helper::FragmentPool(20, 22, poolMem);
 }
 
 
-TEST_CASE("Stand: Fragment the memory", "[Pool][Perf][Usefull]")
+TEST_CASE("Stand: Fragment the memory", "[Stand][Perf][SetupFrag][Usefull]")
 {
 	Helper::FragmentMalloc(20, 22, standMem, blockAmount);
 }
