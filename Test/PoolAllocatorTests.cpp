@@ -202,123 +202,357 @@ TEST_CASE("POOL_AvailableSpace", "[Pool][Func]")
 // custom made pool allocator.
 //------------------------------------------
 
-typedef dataStruct<28> dataType;
+typedef dataStruct<64> dataTypeSmall;
+typedef dataStruct<64> dataTypeMed;
+typedef dataStruct<64> dataTypeLarge;
 
-// Create 5 pools with 2MB of allocated memory for each using 
-// our custom pool allocator.
-TEST_CASE("Allocate memory of different sizes in pool.", "[Pool][Perf][Alloc]") 
-{
-	SECTION("2 MB") {
-		PoolAllocator<dataType> p1(2);
-	}
-
-	SECTION("8 MB") {
-		PoolAllocator<dataType> p3(8);
-	}
-
-	SECTION("32 MB") {
-		PoolAllocator<dataType> p5(32);
-	}
-
-	SECTION("128 MB") {
-		PoolAllocator<dataType> p7(128);
-	}
-}
-
-// Create 5 pools with 2MB of allocated memory for each using 
-// standard OS allocator
-TEST_CASE("Allocate memory of different sizes in standard memory.", "[Stand][Perf][Alloc]")
-{
-	SECTION("2 MB") {
-		malloc(2 * sizeof(dataType));
-	}
-
-	SECTION("8 MB") {
-		malloc(8 * sizeof(dataType));
-	}
-
-	SECTION("32 MB") {
-		malloc(32 * sizeof(dataType));
-	}
-
-	SECTION("128 MB") {
-		malloc(128 * sizeof(dataType));
-	}
-}
-
-const int blockAmount = 3'000'000;
+const int blockAmountSmall = 50'000;
+const int blockAmountLarge = 3'000'000;
 
 //Allocate and fill memory for the tests.
+dataTypeSmall* sMem_Small_Small[blockAmountSmall];
+dataTypeSmall* sMem_Small_Large[blockAmountLarge];
+dataTypeMed* sMem_Med_Small[blockAmountSmall];
+dataTypeMed* sMem_Med_Large[blockAmountLarge];
+dataTypeLarge* sMem_Large_Small[blockAmountSmall];
+dataTypeLarge* sMem_Large_Large[blockAmountLarge];
 
-dataType* standMem[blockAmount];						//1000 * 1MB
-PoolAllocator<dataType> poolMem(blockAmount);			//1000 * 1MB
+PoolAllocator<dataTypeSmall> pMem_Small_Small(blockAmountSmall);
+PoolAllocator<dataTypeSmall> pMem_Small_Large(blockAmountLarge);
+PoolAllocator<dataTypeMed> pMem_Med_Small(blockAmountSmall);
+PoolAllocator<dataTypeMed> pMem_Med_Large(blockAmountLarge);
+PoolAllocator<dataTypeLarge> pMem_Large_Small(blockAmountSmall);
+PoolAllocator<dataTypeLarge> pMem_Large_Large(blockAmountLarge);
 
-TEST_CASE("Pool: Linear allocate", "[Pool][Perf][SetupAlloc][Usefull]")
+TEST_CASE("Pool- Linear allocate", "[Pool][Perf][SetupAlloc][Usefull]")
 {
-	for (int i = 0; i < blockAmount; i++) {
-		poolMem.Allocate();
+	SECTION("SS") {
+		for (int i = 0; i < blockAmountSmall; i++) {
+			pMem_Small_Small.Allocate();
+		}
 	}
-}
-
-TEST_CASE("Stand: Linear allocate", "[Stand][Perf][SetupAlloc][Usefull]")
-{
-	dataType** frag = new dataType*[blockAmount];
-
-	//Allocate some new objects
-	for (int i = 0; i < blockAmount; ++i) {
-		standMem[i] = new dataType();
-		memset(standMem[i]->data, rand() % 255, sizeof(dataType));
-		frag[i] = new dataType();
+	SECTION("SL") {
+		for (int i = 0; i < blockAmountLarge; i++) {
+			pMem_Small_Large.Allocate();
+		}
 	}
-
-	for (int i = 0; i < blockAmount; ++i) {
-		delete frag[i];
+	SECTION("MS") {
+		for (int i = 0; i < blockAmountSmall; i++) {
+			pMem_Med_Small.Allocate();
+		}
 	}
-	delete[] frag;
-}
-
-dataType d;
-
-TEST_CASE("Pool: Linear access", "[Pool][Perf][Usefull]")
-{
-	for (auto it = poolMem.begin(); it != poolMem.end(); it++) {
-		memcpy(&d.data[0], &it->data[0], sizeof(dataType));
+	SECTION("ML") {
+		for (int i = 0; i < blockAmountLarge; i++) {
+			pMem_Med_Large.Allocate();
+		}
 	}
-}
-
-TEST_CASE("Stand: Linear access", "[Stand][Perf][Usefull]")
-{
-	for (int i = 0; i < blockAmount; ++i) {
-		dataType& it = *standMem[i];
-		memcpy(&d.data[0], &it.data[0], sizeof(dataType));
+	SECTION("LS") {
+		for (int i = 0; i < blockAmountSmall; i++) {
+			pMem_Large_Small.Allocate();
+		}
 	}
-}
-
-
-TEST_CASE("Pool: Fragment the memory", "[Pool][Perf][SetupFrag][Usefull]") {
-	Helper::FragmentPool(20, 22, poolMem);
-}
-
-
-TEST_CASE("Stand: Fragment the memory", "[Stand][Perf][SetupFrag][Usefull]")
-{
-	Helper::FragmentMalloc(20, 22, standMem, blockAmount);
-}
-
-TEST_CASE("Pool: Fragmented linear access", "[Pool][Perf][Usefull]")
-{
-	for (auto& e : poolMem) {
-		if (&e != nullptr) {
-			e = d;
+	SECTION("LL") {
+		for (int i = 0; i < blockAmountLarge; i++) {
+			pMem_Large_Large.Allocate();
 		}
 	}
 }
-
-TEST_CASE("Stand: Fragmented linear access", "[Stand][Perf][Usefull]")
+TEST_CASE("Stand- Linear allocate", "[Stand][Perf][SetupAlloc][Usefull]")
 {
-	for (auto& e : standMem) {
-		if (e != nullptr) {
-			*e = d;
+	SECTION("SS") {
+		dataTypeSmall** frag = new dataTypeSmall*[blockAmountSmall];
+
+		//Allocate some new objects
+		for (int i = 0; i < blockAmountSmall; ++i) {
+			sMem_Small_Small[i] = new dataTypeSmall();
+			memset(sMem_Small_Small[i]->data, rand() % 255, sizeof(dataTypeSmall));
+			frag[i] = new dataTypeSmall();
+		}
+
+		for (int i = 0; i < blockAmountSmall; ++i) {
+			delete frag[i];
+		}
+		delete[] frag;
+	}
+	SECTION("SL") {
+		dataTypeSmall** frag = new dataTypeSmall*[blockAmountLarge];
+
+		//Allocate some new objects
+		for (int i = 0; i < blockAmountLarge; ++i) {
+			sMem_Small_Large[i] = new dataTypeSmall();
+			memset(sMem_Small_Large[i]->data, rand() % 255, sizeof(dataTypeSmall));
+			frag[i] = new dataTypeSmall();
+		}
+
+		for (int i = 0; i < blockAmountLarge; ++i) {
+			delete frag[i];
+		}
+		delete[] frag;
+	}
+	SECTION("MS") {
+		dataTypeMed** frag = new dataTypeMed*[blockAmountSmall];
+
+		//Allocate some new objects
+		for (int i = 0; i < blockAmountSmall; ++i) {
+			sMem_Med_Small[i] = new dataTypeMed();
+			memset(sMem_Med_Small[i]->data, rand() % 255, sizeof(dataTypeMed));
+			frag[i] = new dataTypeMed();
+		}
+
+		for (int i = 0; i < blockAmountSmall; ++i) {
+			delete frag[i];
+		}
+		delete[] frag;
+	}
+	SECTION("ML") {
+		dataTypeMed** frag = new dataTypeMed*[blockAmountLarge];
+
+		//Allocate some new objects
+		for (int i = 0; i < blockAmountLarge; ++i) {
+			sMem_Med_Large[i] = new dataTypeMed();
+			memset(sMem_Med_Large[i]->data, rand() % 255, sizeof(dataTypeMed));
+			frag[i] = new dataTypeMed();
+		}
+
+		for (int i = 0; i < blockAmountLarge; ++i) {
+			delete frag[i];
+		}
+		delete[] frag;
+	}
+	SECTION("LS") {
+		dataTypeLarge** frag = new dataTypeLarge*[blockAmountSmall];
+
+		//Allocate some new objects
+		for (int i = 0; i < blockAmountSmall; ++i) {
+			sMem_Large_Small[i] = new dataTypeLarge();
+			memset(sMem_Large_Small[i]->data, rand() % 255, sizeof(dataTypeLarge));
+			frag[i] = new dataTypeLarge();
+		}
+
+		for (int i = 0; i < blockAmountSmall; ++i) {
+			delete frag[i];
+		}
+		delete[] frag;
+	}
+	SECTION("LL") {
+		dataTypeLarge** frag = new dataTypeLarge*[blockAmountLarge];
+
+		//Allocate some new objects
+		for (int i = 0; i < blockAmountLarge; ++i) {
+			sMem_Large_Large[i] = new dataTypeLarge();
+			memset(sMem_Large_Large[i]->data, rand() % 255, sizeof(dataTypeLarge));
+			frag[i] = new dataTypeLarge();
+		}
+
+		for (int i = 0; i < blockAmountLarge; ++i) {
+			delete frag[i];
+		}
+		delete[] frag;
+	}
+}
+dataTypeSmall ds;
+dataTypeMed dm;
+dataTypeLarge dl;
+TEST_CASE("Pool- Linear access", "[Pool][Perf][Usefull]")
+{
+	SECTION("SS") {
+		for (auto it = pMem_Small_Small.begin(); it != pMem_Small_Small.end(); it++) {
+			memcpy(&ds.data[0], &it->data[0], sizeof(dataTypeSmall));
+		}
+	}
+	SECTION("SL") {
+		for (auto it = pMem_Small_Large.begin(); it != pMem_Small_Large.end(); it++) {
+			memcpy(&ds.data[0], &it->data[0], sizeof(dataTypeSmall));
+		}
+	}
+	SECTION("MS") {
+		for (auto it = pMem_Med_Small.begin(); it != pMem_Med_Small.end(); it++) {
+			memcpy(&dm.data[0], &it->data[0], sizeof(dataTypeMed));
+		}
+	}
+	SECTION("ML") {
+		for (auto it = pMem_Med_Large.begin(); it != pMem_Med_Large.end(); it++) {
+			memcpy(&dm.data[0], &it->data[0], sizeof(dataTypeMed));
+		}
+	}
+	SECTION("LS") {
+		for (auto it = pMem_Large_Small.begin(); it != pMem_Large_Small.end(); it++) {
+			memcpy(&dl.data[0], &it->data[0], sizeof(dataTypeLarge));
+		}
+	}
+	SECTION("LL") {
+		for (auto it = pMem_Large_Large.begin(); it != pMem_Large_Large.end(); it++) {
+			memcpy(&dl.data[0], &it->data[0], sizeof(dataTypeLarge));
+		}
+	}
+}
+TEST_CASE("Stand- Linear access", "[Stand][Perf][Usefull]")
+{
+	SECTION("SS") {
+		for (int i = 0; i < blockAmountSmall; ++i) {
+			dataTypeSmall& it = *sMem_Small_Small[i];
+			memcpy(&ds.data[0], &it.data[0], sizeof(dataTypeSmall));
+		}
+	}
+	SECTION("SL") {
+		for (int i = 0; i < blockAmountLarge; ++i) {
+			dataTypeSmall& it = *sMem_Small_Large[i];
+			memcpy(&ds.data[0], &it.data[0], sizeof(dataTypeSmall));
+		}
+	}
+	SECTION("MS") {
+		for (int i = 0; i < blockAmountSmall; ++i) {
+			dataTypeMed& it = *sMem_Med_Small[i];
+			memcpy(&dm.data[0], &it.data[0], sizeof(dataTypeMed));
+		}
+	}
+	SECTION("ML") {
+		for (int i = 0; i < blockAmountLarge; ++i) {
+			dataTypeMed& it = *sMem_Med_Large[i];
+			memcpy(&dm.data[0], &it.data[0], sizeof(dataTypeMed));
+		}
+	}
+	SECTION("LS") {
+		for (int i = 0; i < blockAmountSmall; ++i) {
+			dataTypeLarge& it = *sMem_Large_Small[i];
+			memcpy(&dl.data[0], &it.data[0], sizeof(dataTypeLarge));
+		}
+	}
+	SECTION("LL") {
+		for (int i = 0; i < blockAmountLarge; ++i) {
+			dataTypeLarge& it = *sMem_Large_Large[i];
+			memcpy(&dl.data[0], &it.data[0], sizeof(dataTypeLarge));
+		}
+	}
+}
+TEST_CASE("Pool- Fragment the memory", "[Pool][Perf][SetupFrag][Usefull]") {
+	SECTION("SS") {
+		Helper::FragmentPool(20, 22, pMem_Small_Small);
+	}
+	SECTION("SL") {
+		Helper::FragmentPool(20, 22, pMem_Small_Large);
+	}
+	SECTION("MS") {
+		Helper::FragmentPool(20, 22, pMem_Med_Small);
+	}
+	SECTION("ML") {
+		Helper::FragmentPool(20, 22, pMem_Med_Large);
+	}
+	SECTION("LS") {
+		Helper::FragmentPool(20, 22, pMem_Large_Small);
+	}
+	SECTION("LL") {
+		Helper::FragmentPool(20, 22, pMem_Large_Large);
+	}
+}
+TEST_CASE("Stand- Fragment the memory", "[Pool][Perf][SetupFrag][Usefull]")
+{
+	SECTION("SS") {
+		Helper::FragmentMalloc(20, 22, sMem_Small_Small, blockAmountSmall);
+	}
+	SECTION("SL") {
+		Helper::FragmentMalloc(20, 22, sMem_Small_Large, blockAmountLarge);
+	}
+	SECTION("MS") {
+		Helper::FragmentMalloc(20, 22, sMem_Med_Small, blockAmountSmall);
+	}
+	SECTION("ML") {
+		Helper::FragmentMalloc(20, 22, sMem_Med_Large, blockAmountLarge);
+	}
+	SECTION("LS") {
+		Helper::FragmentMalloc(20, 22, sMem_Large_Small, blockAmountSmall);
+	}
+	SECTION("LL") {
+		Helper::FragmentMalloc(20, 22, sMem_Large_Large, blockAmountLarge);
+	}
+}
+TEST_CASE("Pool- Fragmented linear access", "[Pool][Perf][Usefull]")
+{
+	SECTION("SS") {
+		for (auto& e : pMem_Small_Small) {
+			if (&e != nullptr) {
+				e = ds;
+			}
+		}
+	}
+	SECTION("SL") {
+		for (auto& e : pMem_Small_Large) {
+			if (&e != nullptr) {
+				e = ds;
+			}
+		}
+	}
+	SECTION("MS") {
+		for (auto& e : pMem_Med_Small) {
+			if (&e != nullptr) {
+				e = dm;
+			}
+		}
+	}
+	SECTION("ML") {
+		for (auto& e : pMem_Med_Large) {
+			if (&e != nullptr) {
+				e = dm;
+			}
+		}
+	}
+	SECTION("LS") {
+		for (auto& e : pMem_Large_Small) {
+			if (&e != nullptr) {
+				e = dl;
+			}
+		}
+	}
+	SECTION("LL") {
+		for (auto& e : pMem_Large_Large) {
+			if (&e != nullptr) {
+				e = dl;
+			}
+		}
+	}
+}
+TEST_CASE("Stand- Fragmented linear access", "[Stand][Perf][Usefull]")
+{
+	SECTION("SS") {
+		for (auto& e : sMem_Small_Small) {
+			if (e != nullptr) {
+				*e = ds;
+			}
+		}
+	}
+	SECTION("SL") {
+		for (auto& e : sMem_Small_Large) {
+			if (e != nullptr) {
+				*e = ds;
+			}
+		}
+	}
+	SECTION("MS") {
+		for (auto& e : sMem_Med_Small) {
+			if (e != nullptr) {
+				*e = dm;
+			}
+		}
+	}
+	SECTION("ML") {
+		for (auto& e : sMem_Med_Large) {
+			if (e != nullptr) {
+				*e = dm;
+			}
+		}
+	}
+	SECTION("LS") {
+		for (auto& e : sMem_Large_Small) {
+			if (e != nullptr) {
+				*e = dl;
+			}
+		}
+	}
+	SECTION("LL") {
+		for (auto& e : sMem_Large_Large) {
+			if (e != nullptr) {
+				*e = dl;
+			}
 		}
 	}
 }
