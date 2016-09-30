@@ -204,8 +204,8 @@ typedef dataStruct<8> dataTypeSmall;
 typedef dataStruct<64> dataTypeMed;
 typedef dataStruct<1024> dataTypeLarge;
 
-const int blockAmountSmall = 1'000;
-const int blockAmountLarge = 5'000;
+const int blockAmountSmall = 10'000;
+const int blockAmountLarge = 500'000;
 
 //Allocate and fill memory for the tests.
 std::vector<dataTypeSmall*> sMem_Small_Small(blockAmountSmall);
