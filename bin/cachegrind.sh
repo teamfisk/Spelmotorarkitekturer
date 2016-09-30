@@ -1,6 +1,6 @@
 #!/bin/bash
 
-cachegrind="valgrind --tool=cachegrind"
+cachegrind="valgrind --tool=cachegrind --main-stacksize=734003200"
 
 rm cachegrind/* -r
 mkdir -p cachegrind
@@ -9,7 +9,7 @@ mkdir -p cachegrind
 ${cachegrind} --log-file="cachegrind/PoolLinBaseline.txt" ./Test "[Pool][SetupAlloc]"
 ${cachegrind} --log-file="cachegrind/StandLinBaseline.txt" ./Test "[Stand][SetupAlloc]"
 ${cachegrind} --log-file="cachegrind/PoolFragBaseline.txt" ./Test "[Pool][SetupAlloc],[Pool][SetupFrag]"
-${cachegrind} --log-file="cachegrind/StandFragBaseline.txt" ./Test "[Stand][SetupAlloc],[Pool][SetupFrag]"
+${cachegrind} --log-file="cachegrind/StandFragBaseline.txt" ./Test "[Stand][SetupAlloc],[Stand][SetupFrag]"
 
 # Measurements
 ${cachegrind} --log-file="cachegrind/PoolLin.txt" ./Test "[Pool][SetupAlloc]", "Pool- Linear access"

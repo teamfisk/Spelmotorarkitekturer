@@ -25,7 +25,7 @@ public:
 	// This will give us an equilibrium at a 75% full memory.
 	template<typename T>
 	static void FragmentPool(int iterations, int chanceInPercent, PoolAllocator<T>& mem) {
-
+		srand(1337);
 #ifdef PRINT_OUT
 		int PreFree, PostFree, PostAlloc;
 #endif // PRINT_OUT
@@ -44,10 +44,6 @@ public:
 			PostFree = mem.OccupiedBlocks();
 #endif // PRINT_OUT
 
-			//Allocate some new objects
-			for (int i = 0; i < mem.SizeInBlocks() * chanceInPercent * 0.01 * 0.75; ++i) {
-				mem.Allocate();
-			}
 #ifdef PRINT_OUT
 			PostAlloc = mem.OccupiedBlocks();
 			std::cout << "Free'd " << PreFree - PostFree << " Objects and allocated " << PostAlloc - PostFree << " Objects." << std::endl << "New size is: " << PostAlloc << std::endl;
@@ -58,8 +54,10 @@ public:
 	}
 
 	template<typename T>
-	static void FragmentMalloc(int iterations, int chanceInPercent, T* mem, int maxElements)
+	static void FragmentMalloc(int iterations, int chanceInPercent, std::vector<T*>& mem, int maxElements)
 	{
+		srand(1337);
+
 		for (int i = 0; i < maxElements; i++) {
 			if (rand() % 100 <= chanceInPercent) {
 				delete mem[i];
@@ -207,15 +205,15 @@ typedef dataStruct<64> dataTypeMed;
 typedef dataStruct<64> dataTypeLarge;
 
 const int blockAmountSmall = 50'000;
-const int blockAmountLarge = 3'000'000;
+const int blockAmountLarge = 500'000;
 
 //Allocate and fill memory for the tests.
-dataTypeSmall* sMem_Small_Small[blockAmountSmall];
-dataTypeSmall* sMem_Small_Large[blockAmountLarge];
-dataTypeMed* sMem_Med_Small[blockAmountSmall];
-dataTypeMed* sMem_Med_Large[blockAmountLarge];
-dataTypeLarge* sMem_Large_Small[blockAmountSmall];
-dataTypeLarge* sMem_Large_Large[blockAmountLarge];
+std::vector<dataTypeSmall*> sMem_Small_Small(blockAmountSmall);
+std::vector<dataTypeSmall*> sMem_Small_Large(blockAmountLarge);
+std::vector<dataTypeMed*> sMem_Med_Small(blockAmountSmall);
+std::vector<dataTypeMed*> sMem_Med_Large(blockAmountLarge);
+std::vector<dataTypeLarge*> sMem_Large_Small(blockAmountSmall);
+std::vector<dataTypeLarge*> sMem_Large_Large(blockAmountLarge);
 
 PoolAllocator<dataTypeSmall> pMem_Small_Small(blockAmountSmall);
 PoolAllocator<dataTypeSmall> pMem_Small_Large(blockAmountLarge);
@@ -427,43 +425,43 @@ TEST_CASE("Stand- Linear access", "[Stand][Perf][Usefull]")
 }
 TEST_CASE("Pool- Fragment the memory", "[Pool][Perf][SetupFrag][Usefull]") {
 	SECTION("SS") {
-		Helper::FragmentPool(20, 22, pMem_Small_Small);
+		Helper::FragmentPool(1, 22, pMem_Small_Small);
 	}
 	SECTION("SL") {
-		Helper::FragmentPool(20, 22, pMem_Small_Large);
+		Helper::FragmentPool(1, 22, pMem_Small_Large);
 	}
 	SECTION("MS") {
-		Helper::FragmentPool(20, 22, pMem_Med_Small);
+		Helper::FragmentPool(1, 22, pMem_Med_Small);
 	}
 	SECTION("ML") {
-		Helper::FragmentPool(20, 22, pMem_Med_Large);
+		Helper::FragmentPool(1, 22, pMem_Med_Large);
 	}
 	SECTION("LS") {
-		Helper::FragmentPool(20, 22, pMem_Large_Small);
+		Helper::FragmentPool(1, 22, pMem_Large_Small);
 	}
 	SECTION("LL") {
-		Helper::FragmentPool(20, 22, pMem_Large_Large);
+		Helper::FragmentPool(1, 22, pMem_Large_Large);
 	}
 }
 TEST_CASE("Stand- Fragment the memory", "[Pool][Perf][SetupFrag][Usefull]")
 {
 	SECTION("SS") {
-		Helper::FragmentMalloc(20, 22, sMem_Small_Small, blockAmountSmall);
+		Helper::FragmentMalloc(1, 22, sMem_Small_Small, blockAmountSmall);
 	}
 	SECTION("SL") {
-		Helper::FragmentMalloc(20, 22, sMem_Small_Large, blockAmountLarge);
+		Helper::FragmentMalloc(1, 22, sMem_Small_Large, blockAmountLarge);
 	}
 	SECTION("MS") {
-		Helper::FragmentMalloc(20, 22, sMem_Med_Small, blockAmountSmall);
+		Helper::FragmentMalloc(1, 22, sMem_Med_Small, blockAmountSmall);
 	}
 	SECTION("ML") {
-		Helper::FragmentMalloc(20, 22, sMem_Med_Large, blockAmountLarge);
+		Helper::FragmentMalloc(1, 22, sMem_Med_Large, blockAmountLarge);
 	}
 	SECTION("LS") {
-		Helper::FragmentMalloc(20, 22, sMem_Large_Small, blockAmountSmall);
+		Helper::FragmentMalloc(1, 22, sMem_Large_Small, blockAmountSmall);
 	}
 	SECTION("LL") {
-		Helper::FragmentMalloc(20, 22, sMem_Large_Large, blockAmountLarge);
+		Helper::FragmentMalloc(1, 22, sMem_Large_Large, blockAmountLarge);
 	}
 }
 TEST_CASE("Pool- Fragmented linear access", "[Pool][Perf][Usefull]")
