@@ -200,12 +200,12 @@ TEST_CASE("POOL_AvailableSpace", "[Pool][Func]")
 // custom made pool allocator.
 //------------------------------------------
 
-typedef dataStruct<4> dataTypeSmall;
+typedef dataStruct<8> dataTypeSmall;
 typedef dataStruct<64> dataTypeMed;
 typedef dataStruct<1024> dataTypeLarge;
 
-const int blockAmountSmall = 50'000;
-const int blockAmountLarge = 500'000;
+const int blockAmountSmall = 1'000;
+const int blockAmountLarge = 5'000;
 
 //Allocate and fill memory for the tests.
 std::vector<dataTypeSmall*> sMem_Small_Small(blockAmountSmall);
@@ -469,42 +469,42 @@ TEST_CASE("Pool- Fragmented linear access", "[Pool][Perf][Usefull]")
 	SECTION("SS") {
 		for (auto& e : pMem_Small_Small) {
 			if (&e != nullptr) {
-				e = ds;
+				memcpy(&ds.data[0], &e.data[0], sizeof(dataTypeSmall));
 			}
 		}
 	}
 	SECTION("SL") {
 		for (auto& e : pMem_Small_Large) {
 			if (&e != nullptr) {
-				e = ds;
+				memcpy(&ds.data[0], &e.data[0], sizeof(dataTypeSmall));
 			}
 		}
 	}
 	SECTION("MS") {
 		for (auto& e : pMem_Med_Small) {
 			if (&e != nullptr) {
-				e = dm;
+				memcpy(&dm.data[0], &e.data[0], sizeof(dataTypeMed));
 			}
 		}
 	}
 	SECTION("ML") {
 		for (auto& e : pMem_Med_Large) {
 			if (&e != nullptr) {
-				e = dm;
+				memcpy(&dm.data[0], &e.data[0], sizeof(dataTypeMed));
 			}
 		}
 	}
 	SECTION("LS") {
 		for (auto& e : pMem_Large_Small) {
 			if (&e != nullptr) {
-				e = dl;
+				memcpy(&dl.data[0], &e.data[0], sizeof(dataTypeLarge));
 			}
 		}
 	}
 	SECTION("LL") {
 		for (auto& e : pMem_Large_Large) {
 			if (&e != nullptr) {
-				e = dl;
+				memcpy(&dl.data[0], &e.data[0], sizeof(dataTypeLarge));
 			}
 		}
 	}
@@ -514,42 +514,42 @@ TEST_CASE("Stand- Fragmented linear access", "[Stand][Perf][Usefull]")
 	SECTION("SS") {
 		for (auto& e : sMem_Small_Small) {
 			if (e != nullptr) {
-				*e = ds;
+				memcpy(&ds.data[0], &e->data[0], sizeof(dataTypeSmall));
 			}
 		}
 	}
 	SECTION("SL") {
 		for (auto& e : sMem_Small_Large) {
 			if (e != nullptr) {
-				*e = ds;
+				memcpy(&ds.data[0], &e->data[0], sizeof(dataTypeSmall));
 			}
 		}
 	}
 	SECTION("MS") {
 		for (auto& e : sMem_Med_Small) {
 			if (e != nullptr) {
-				*e = dm;
+				memcpy(&dm.data[0], &e->data[0], sizeof(dataTypeMed));
 			}
 		}
 	}
 	SECTION("ML") {
 		for (auto& e : sMem_Med_Large) {
 			if (e != nullptr) {
-				*e = dm;
+				memcpy(&dm.data[0], &e->data[0], sizeof(dataTypeMed));
 			}
 		}
 	}
 	SECTION("LS") {
 		for (auto& e : sMem_Large_Small) {
 			if (e != nullptr) {
-				*e = dl;
+				memcpy(&dl.data[0], &e->data[0], sizeof(dataTypeLarge));
 			}
 		}
 	}
 	SECTION("LL") {
 		for (auto& e : sMem_Large_Large) {
 			if (e != nullptr) {
-				*e = dl;
+				memcpy(&dl.data[0], &e->data[0], sizeof(dataTypeLarge));
 			}
 		}
 	}
