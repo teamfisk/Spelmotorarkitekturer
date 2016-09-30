@@ -144,7 +144,7 @@ TEST_CASE("RepeatedFree", "[StackAllocator]")
 */
 
 const int numBlocks = 500;
-StackAllocator stackAllocator(numBlocks * 200'000 * 3); // Use this to make it really fast!
+StackAllocator stackAllocator(numBlocks * 1'000'000 * 3); // Use this to make it really fast!
 void StackAllocateBlocks(int numBlocks, int blockSize)
 {	
 	//StackAllocator stackAllocator(numBlocks * blockSize);
@@ -268,6 +268,17 @@ SCENARIO("STACK vs MALLOC FreeComp", "[StackAllocator]")
 			}
 		}
 	}	
+}
+
+TEST_CASE("STACK_1MBBlocks", "[StackAllocator]")
+{
+	StackAllocateBlocks(1'000'000, 1'000);
+}
+
+// ~50% slower
+TEST_CASE("MALLOC_1MBBlocks", "[StackAllocator]")
+{
+	MallocAllocateBlocks(1'000'000, 1'000);
 }
 
 TEST_CASE("MALLOC_SmallAllocComp", "[StackAllocator]")
