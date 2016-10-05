@@ -57,7 +57,7 @@ public:
 		}
 	}
 
-	std::size_t Read(const std::string& resourcePath, void* destination) {}
+	std::size_t Read(const std::string& resourcePath, void* destination) { return 0; }
 
 private:
 	ResourceTree m_Tree;
