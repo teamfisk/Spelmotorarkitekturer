@@ -1,5 +1,6 @@
 #ifndef Resource_h__
 #define Resource_h__
+#include <exception>
 
 class Resource
 {
@@ -7,7 +8,7 @@ class Resource
 
 protected:
 	Resource() = default;
-	virtual Resource() = default;
+	virtual ~Resource() = default;
 
 public:
 	struct StillLoadingException : std::exception { };

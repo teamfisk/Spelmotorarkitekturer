@@ -92,6 +92,11 @@ int main()
 	}
 #endif // DEBUG
 
+	//Model* model = ResourceMan.Load<Model>("somepathorGUID,maybe");
+	//Renderer render;
+	//render.Render(model);
+
+
 	FILE* file = fopen("bundle.stuff", "w");
 	
 	std::size_t offset = 0;
