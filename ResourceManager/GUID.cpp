@@ -2,7 +2,7 @@
 
 std::unordered_map<int, std::string> GUIDtoAsset 
 { 
-	{0, "blabla"}, 
+	{0, "blabla"}, // string?
 	{42, "assets/cat.png"} 
 };
 
