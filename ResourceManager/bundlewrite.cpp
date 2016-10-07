@@ -95,7 +95,13 @@ int main()
 	//Model* model = ResourceMan.Load<Model>("somepathorGUID,maybe");
 	//Renderer render;
 	//render.Render(model);
+	glBegin(GL_TRIANGLES);
+	glVertex3f(0.0f, 0.0f, 0.0f);
+	glVertex3f(1.0f, 0.0f, 0.0f);
+	glVertex3f(0.0f, 1.0f, 0.0f);
+	glEnd();
 
+	glfwSwapBuffers(window);
 
 	FILE* file = fopen("bundle.stuff", "w");
 	
@@ -127,5 +133,7 @@ int main()
 	std::cout << "Offset: " << entry.Offset << std::endl;
 	std::cout << "Size: " << entry.Size << std::endl;
 
+	char c;
+	std::cin >> c;
 	return 0;
 }
