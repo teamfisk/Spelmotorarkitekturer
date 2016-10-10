@@ -4,9 +4,9 @@
 #include <GL\glew.h>
 #include <string.h>
 
-class VertexFormat
+struct VertexFormat
 {
-	float posX, posY, posZ;
+	float pos[3];
 	float u, v;
 };
 
