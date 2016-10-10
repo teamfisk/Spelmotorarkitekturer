@@ -1,5 +1,6 @@
-#include "STUFF/STUFF.h"
-#include "STUFF/STUFFBundle.h"
+#include "../STUFF/STUFF.h"
+#include "../STUFF/STUFFBundle.h"
+
 /*
 int main()
 {

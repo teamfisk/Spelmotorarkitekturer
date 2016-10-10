@@ -1,6 +1,7 @@
 cmake_minimum_required(VERSION 3.6)
 project(Spelmotorarkitekturer)
 
+set_property(GLOBAL PROPERTY USE_FOLDERS ON)
 set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} ${CMAKE_CURRENT_SOURCE_DIR}/CMake)
 set(CMAKE_INCLUDE_PATH ${CMAKE_INCLUDE_PATH} "${PROJECT_SOURCE_DIR}/deps/include")
 
