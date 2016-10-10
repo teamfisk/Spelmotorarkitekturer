@@ -1,14 +1,11 @@
 #pragma once
-#include "Resource.h"
 #include <vector>
 #include <GL\glew.h>
 #include <string.h>
 
-struct VertexFormat
-{
-	float pos[3];
-	float u, v;
-};
+#include "Resource.h"
+#include "VertexFormat.h"
+
 
 class Model :
 	public Resource
