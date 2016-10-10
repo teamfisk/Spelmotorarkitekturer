@@ -22,6 +22,7 @@ file(GLOB SOURCE_FILES
 	"*.h"
 	"*.cpp"
 )
+source_group("" FILES ${SOURCE_FILES})
 
 add_executable(Renderer ${SOURCE_FILES})
 target_link_libraries(Renderer
