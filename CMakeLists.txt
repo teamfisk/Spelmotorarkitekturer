@@ -25,7 +25,8 @@ set_property(DIRECTORY APPEND PROPERTY COMPILE_DEFINITIONS
 
 include_directories(${PROJECT_SOURCE_DIR}/include)
 
-add_subdirectory(Allocator)
-add_subdirectory(ResourceManager)
-add_subdirectory(Test)
+add_subdirectory(src/Allocator)
+add_subdirectory(src/ResourceManager)
+add_subdirectory(src/Renderer)
+add_subdirectory(src/Test)
 
