@@ -5,4 +5,4 @@ file(GLOB SOURCE_FILES
 	"*.cpp"
 )
 
-add_executable(Allocator ${SOURCE_FILES})
+add_library(Allocator ${SOURCE_FILES})

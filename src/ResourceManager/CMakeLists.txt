@@ -5,4 +5,4 @@ file(GLOB SOURCE_FILES
 	"*.cpp"
 )
 
-add_executable(ResourceManager ${SOURCE_FILES})
+add_library(ResourceManager ${SOURCE_FILES})

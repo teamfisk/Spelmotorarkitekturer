@@ -1,5 +1,6 @@
+#include <GL/glew.h>
+
 #include "Renderer.h"
-#include <GL\glew.h>
 #include "Model.h"
 #include "InstanceData.h"
 

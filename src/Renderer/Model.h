@@ -1,11 +1,9 @@
 #pragma once
 #include <vector>
-#include <GL\glew.h>
 #include <string.h>
-
-#include "Resource.h"
+#include <GL/glew.h>
+#include "ResourceManager/Resource.h"
 #include "VertexFormat.h"
-
 
 class Model :
 	public Resource
