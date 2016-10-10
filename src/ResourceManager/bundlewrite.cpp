@@ -35,7 +35,5 @@ int main()
 	std::cout << "Offset: " << entry.Offset << std::endl;
 	std::cout << "Size: " << entry.Size << std::endl;
 
-	char c;
-	std::cin >> c;
 	return 0;
 }

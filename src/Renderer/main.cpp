@@ -103,5 +103,8 @@ int main()
 
 	glfwSwapBuffers(window);
 
+	char c;
+	std::cin >> c;
+
 	return 0;
 }
