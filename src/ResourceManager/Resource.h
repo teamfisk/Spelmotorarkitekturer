@@ -8,6 +8,21 @@ class Resource
 {
 	friend class IResourceHandle;
 	friend class ResourceManager;
+public:
+	struct StillLoadingException : public std::runtime_error
+    {
+        virtual const char* what() const throw()
+        {
+            return "Resource is still loading.";
+        }
+    };
+    struct FailedLoadingException : public std::runtime_error
+    {
+        FailedLoadingException(char const* const message)
+            : std::runtime_error(message)
+        { }
+        FailedLoadingException() : std::runtime_error("Resource failed to load.") { };
+    };
 
 protected:
 	Resource() = default;

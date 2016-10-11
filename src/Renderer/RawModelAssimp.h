@@ -7,22 +7,17 @@
 #include <cstdlib>
 #include <stack>
 #include <vector>
+#include <memory>
+#include <map>
 
-#include "Resource.h"
-/*
+#include "ResourceManager/Resource.h"
+
 #include <assimp/Importer.hpp>
 #include <assimp/scene.h>
 #include <assimp/postprocess.h>
-#include <boost/filesystem/path.hpp>
-
-#include "../Common.h"
-#include "../GLM.h"
-#include "../Core/ResourceManager.h"
-
-#include "Skeleton.h"
-*/
-
-//#include "Texture.h"
+#include "GLM.h"
+#include "ResourceManager/ResourceManager.h"
+#include "Texture.h"
 #include "GLM.h"
 
 #define RawModel RawModelAssimp
@@ -66,7 +61,6 @@ public:
 
 	std::vector<Vertex> m_Vertices;
 	std::vector<unsigned int> m_Indices;
-	Skeleton* m_Skeleton = nullptr;
 	glm::mat4 m_Matrix;
 
 private:
@@ -76,9 +70,6 @@ private:
 	std::vector<glm::vec3> TangentNormals;
 	std::vector<glm::vec3> BiTangentNormals;
 	std::vector<glm::vec2> TextureCoords;
-
-	void CreateSkeleton(std::vector<std::tuple<std::string, glm::mat4>> &boneInfo, std::map<std::string, int> &boneNameMapping, aiNode* node, int parentID);
 };
 
-#endif
 #endif

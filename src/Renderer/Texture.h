@@ -5,7 +5,6 @@
 #include "OpenGL.h"
 #include "BaseTexture.h"
 #include "PNG.h"
-#include "DDS.h"
 
 class Texture : public BaseTexture
 {

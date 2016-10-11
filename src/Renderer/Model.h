@@ -1,6 +1,8 @@
 #pragma once
 #include <vector>
-#include <string.h>
+#include <string>
+#include <exception>
+#include <stdexcept>
 #include <GL/glew.h>
 #include "ResourceManager/Resource.h"
 #include "VertexFormat.h"
@@ -20,7 +22,7 @@ public:
 	GLenum GetIndexType() const;	
 private:
 	std::vector<VertexFormat> vertexData;
-	void* indexData; // Jag stör mig allt mer på att man måste deklarera typ innan man vet vilken typ man har ... 
+	void* indexData; // Jag stï¿½r mig allt mer pï¿½ att man mï¿½ste deklarera typ innan man vet vilken typ man har ... 
 	GLenum vbo; // Vertex Buffer Object handle
 	GLenum vao; // Vertex Array Object handle
 	GLenum indexVBO;

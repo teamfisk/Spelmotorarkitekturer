@@ -4,7 +4,7 @@
 #include <GL/glew.h>
 #include <GLFW/glfw3.h>
 
-#include "ResourceManager/RawModelAssimp.h"
+#include "RawModelAssimp.h"
 
 void glfw_error_callback(int error, const char* description)
 {
@@ -93,16 +93,19 @@ int main()
 	}
 #endif // DEBUG
 
-	//Model* model = ResourceMan.Load<Model>("somepathorGUID,maybe");
-	//Renderer render;
-	//render.Render(model);
-	glBegin(GL_TRIANGLES);
-	glVertex3f(0.0f, 0.0f, 0.0f);
-	glVertex3f(1.0f, 0.0f, 0.0f);
-	glVertex3f(0.0f, 1.0f, 0.0f);
-	glEnd();
+    while (true) {
+        glClearColor(0.f, 0.f, 0.f, 1.f);
+        //Model* model = ResourceMan.Load<Model>("somepathorGUID,maybe");
+        //Renderer render;
+        //render.Render(model);
+        glBegin(GL_TRIANGLES);
+        glVertex3f(0.0f, 0.0f, 0.0f);
+        glVertex3f(1.0f, 0.0f, 0.0f);
+        glVertex3f(0.0f, 1.0f, 0.0f);
+        glEnd();
 
-	glfwSwapBuffers(window);
+        glfwSwapBuffers(window);
+    }
 
 	char c;
 	std::cin >> c;

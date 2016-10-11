@@ -1,5 +1,5 @@
 #include "Model.h"
-#include <string.h>
+#include <string>
 
 Model::Model(std::string& filename)
 {
@@ -53,7 +53,7 @@ Model::Model(std::string& filename)
 	{
 		std::string s = "Too many vertices! Max vertexCount: ";
 		s += std::numeric_limits<unsigned int>::max() + " vertexCount: " + vertexCount;
-		throw std::exception(s.c_str());
+		throw std::runtime_error(s.c_str());
 	}	
 }
 

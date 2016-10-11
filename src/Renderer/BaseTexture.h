@@ -1,7 +1,7 @@
 #ifndef BaseTexture_h__
 #define BaseTexture_h__
 
-#include "Resource.h"
+#include "ResourceManager/Resource.h"
 
 class BaseTexture : public ThreadUnsafeResource
 {
