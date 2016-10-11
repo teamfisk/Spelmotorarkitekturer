@@ -13,7 +13,7 @@ include_directories(
     ${GLEW_INCLUDE_DIRS}
     ${GLFW_INCLUDE_DIRS}
 	${PNG_INCLUDE_DIRS}
-	${assimp_INCLUDE_DIRS}
+	${assimp_INCLUDE_DIR}
 )
 
 set(LIBRARIES
