@@ -1,52 +1,52 @@
 if(CMAKE_SIZEOF_VOID_P EQUAL 8)
-	set(ASSIMP_ARCHITECTURE "64")
+	set(assimp_ARCHITECTURE "64")
 elseif(CMAKE_SIZEOF_VOID_P EQUAL 4)
-	set(ASSIMP_ARCHITECTURE "32")
+	set(assimp_ARCHITECTURE "32")
 endif(CMAKE_SIZEOF_VOID_P EQUAL 8)
 	
 if(WIN32)
-	set(ASSIMP_ROOT_DIR CACHE PATH "ASSIMP root directory")
+	set(assimp_ROOT_DIR CACHE PATH "assimp root directory")
 
 	# Find path of each library
-	find_path(ASSIMP_INCLUDE_DIR
+	find_path(assimp_INCLUDE_DIR
 		NAMES
 			assimp/anim.h
 		HINTS
-			${ASSIMP_ROOT_DIR}/include
+			${assimp_ROOT_DIR}/include
 	)
 
 	if(MSVC12)
-		set(ASSIMP_MSVC_VERSION "vc120")
+		set(assimp_MSVC_VERSION "vc120")
 	elseif(MSVC14)	
-		set(ASSIMP_MSVC_VERSION "vc140")
+		set(assimp_MSVC_VERSION "vc140")
 	endif(MSVC12)
 	
 	if(MSVC12 OR MSVC14)
 	
-		find_path(ASSIMP_LIBRARY_DIR
+		find_path(assimp_LIBRARY_DIR
 			NAMES
-				assimp-${ASSIMP_MSVC_VERSION}-mt.lib
+				assimp-${assimp_MSVC_VERSION}-mt.lib
 			HINTS
-				${ASSIMP_ROOT_DIR}/lib${ASSIMP_ARCHITECTURE}
+				${assimp_ROOT_DIR}/lib${assimp_ARCHITECTURE}
 		)
 		
-		find_library(ASSIMP_LIBRARY_RELEASE				assimp-${ASSIMP_MSVC_VERSION}-mt.lib 			PATHS ${ASSIMP_LIBRARY_DIR})
-		find_library(ASSIMP_LIBRARY_DEBUG				assimp-${ASSIMP_MSVC_VERSION}-mtd.lib			PATHS ${ASSIMP_LIBRARY_DIR})
+		find_library(assimp_LIBRARY_RELEASE				assimp-${assimp_MSVC_VERSION}-mt.lib 			PATHS ${assimp_LIBRARY_DIR})
+		find_library(assimp_LIBRARY_DEBUG				assimp-${assimp_MSVC_VERSION}-mtd.lib			PATHS ${assimp_LIBRARY_DIR})
 		
-		set(ASSIMP_LIBRARY 
-			optimized 	${ASSIMP_LIBRARY_RELEASE}
-			debug		${ASSIMP_LIBRARY_DEBUG}
+		set(assimp_LIBRARY 
+			optimized 	${assimp_LIBRARY_RELEASE}
+			debug		${assimp_LIBRARY_DEBUG}
 		)
 		
-		set(ASSIMP_LIBRARIES "ASSIMP_LIBRARY_RELEASE" "ASSIMP_LIBRARY_DEBUG")
+		set(assimp_LIBRARIES ${assimp_LIBRARY})
 	
-		FUNCTION(ASSIMP_COPY_BINARIES TargetDirectory)
+		FUNCTION(assimp_COPY_BINARIES TargetDirectory)
 			ADD_CUSTOM_TARGET(AssimpCopyBinaries
-				COMMAND ${CMAKE_COMMAND} -E copy ${ASSIMP_ROOT_DIR}/bin${ASSIMP_ARCHITECTURE}/assimp-${ASSIMP_MSVC_VERSION}-mtd.dll 	${TargetDirectory}/Debug/assimp-${ASSIMP_MSVC_VERSION}-mtd.dll
-				COMMAND ${CMAKE_COMMAND} -E copy ${ASSIMP_ROOT_DIR}/bin${ASSIMP_ARCHITECTURE}/assimp-${ASSIMP_MSVC_VERSION}-mt.dll 		${TargetDirectory}/Release/assimp-${ASSIMP_MSVC_VERSION}-mt.dll
+				COMMAND ${CMAKE_COMMAND} -E copy ${assimp_ROOT_DIR}/bin${assimp_ARCHITECTURE}/assimp-${assimp_MSVC_VERSION}-mtd.dll 	${TargetDirectory}/Debug/assimp-${assimp_MSVC_VERSION}-mtd.dll
+				COMMAND ${CMAKE_COMMAND} -E copy ${assimp_ROOT_DIR}/bin${assimp_ARCHITECTURE}/assimp-${assimp_MSVC_VERSION}-mt.dll 		${TargetDirectory}/Release/assimp-${assimp_MSVC_VERSION}-mt.dll
 			COMMENT "Copying Assimp binaries to '${TargetDirectory}'"
 			VERBATIM)
-		ENDFUNCTION(ASSIMP_COPY_BINARIES)
+		ENDFUNCTION(assimp_COPY_BINARIES)
 	
 	endif()
 	
