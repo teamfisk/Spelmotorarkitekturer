@@ -209,8 +209,29 @@ void LoadObjFile(std::string& dir, std::string& fileName, void* vertexData, std:
 	LoadObjFile(dir.c_str(), fileName.c_str(), vertexData, vertexDataBytes, indexData, indexDataBytes);
 }
 
+void EmplaceData(ifstream& f, vector<float>& v)
+{
+	float temp;
+	f >> temp;
+	v.emplace_back(temp);
+}
+
+void EmplaceIndex(ifstream& f, vector<float>& v)
+{
+	float temp;
+	f >> temp;
+	temp--;
+	v.emplace_back(temp);
+}
+
 void LoadObjFile(const char* dir, const char* fileName, void* vertexData, std::size_t& vertexDataBytes, void * indexData, std::size_t& indexDataBytes)
 {
+	vector<float> tempV;	
+	vector<float> tempVt;
+	vector<float> tempVn;
+	vector<float> tempIndices;
+	
+
 	string filePath(dir);
 	filePath += fileName;
 	
@@ -237,20 +258,30 @@ void LoadObjFile(const char* dir, const char* fileName, void* vertexData, std::s
 			switch (c)
 			{
 			case 't': // 'vt'
+				EmplaceData(f, tempVt);
+				EmplaceData(f, tempVt);
+				EmplaceData(f, tempVt);
 				break;
 			case 'n': // 'vn'
+				EmplaceData(f, tempVn);
+				EmplaceData(f, tempVn);
+				EmplaceData(f, tempVn);
 				break;
 			}			
-			
+			EmplaceData(f, tempV);
+			EmplaceData(f, tempV);
+			EmplaceData(f, tempV);
 			break;			
 		case 'f':
-
+			EmplaceIndex(f, tempIndices);
+			EmplaceIndex(f, tempIndices);
+			EmplaceIndex(f, tempIndices);
 			break;
 		case 's':
-
+			f.ignore(numeric_limits<streamsize>::max(), '\n');
 			break;
 		case 'g':
-
+			
 			break;
 
 		/*case 'mtllib':
