@@ -93,19 +93,19 @@ int main()
 	}
 #endif // DEBUG
 
-	//Model* model = ResourceMan.Load<Model>("somepathorGUID,maybe");
-	//Renderer render;
-	//render.Render(model);
-	glBegin(GL_TRIANGLES);
-	glVertex3f(0.0f, 0.0f, 0.0f);
-	glVertex3f(1.0f, 0.0f, 0.0f);
-	glVertex3f(0.0f, 1.0f, 0.0f);
-	glEnd();
+	while (!glfwWindowShouldClose(window))
+	{
+		//Model* model = ResourceMan.Load<Model>("somepathorGUID,maybe");
+		//Renderer render;
+		//render.Render(model);
+		glBegin(GL_TRIANGLES);
+		glVertex3f(0.0f, 0.0f, 0.0f);
+		glVertex3f(1.0f, 0.0f, 0.0f);
+		glVertex3f(0.0f, 1.0f, 0.0f);
+		glEnd();
 
-	glfwSwapBuffers(window);
-
-	char c;
-	std::cin >> c;
+		glfwSwapBuffers(window);
+	}
 
 	return 0;
 }
