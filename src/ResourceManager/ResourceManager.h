@@ -21,7 +21,7 @@ private:
 };
 
 template <typename T>
-static const ResourceHandle<T>& ResourceManager::Load(const std::string& path, unsigned int part)
+const ResourceHandle<T>& ResourceManager::Load(const std::string& path, unsigned int part)
 {
 	auto it = m_Instances.find(path);
 	if (it == m_Instances.end()) {
