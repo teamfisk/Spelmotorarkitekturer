@@ -4,6 +4,8 @@
 #include <GL/glew.h>
 #include <GLFW/glfw3.h>
 
+#include "ResourceManager/RawModelAssimp.h"
+
 void glfw_error_callback(int error, const char* description)
 {
 	std::cerr << __FUNCTION__ << ": ";
