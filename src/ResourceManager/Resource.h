@@ -1,23 +1,25 @@
 #ifndef Resource_h__
 #define Resource_h__
-#include <exception>
+
+#include <list>
+#include "Logging.h"
 
 class Resource
 {
+	friend class IResourceHandle;
 	friend class ResourceManager;
 
 protected:
 	Resource() = default;
-	virtual ~Resource() = default;
-
-public:
-	struct StillLoadingException : std::exception { };
-	struct FailedLoadingException : std::exception
+	virtual ~Resource()
 	{
-		FailedLoadingException(const char* const message)
-			: std::exception(message)
-		{ }
-	};
+		if (m_ReferenceCount != 0) {
+			LOG_ERROR("Resource was freed while still carrying references!");
+		}
+	}
+
+private:
+	unsigned int m_ReferenceCount = 0;
 };
 
 class ThreadUnsafeResource : public Resource
