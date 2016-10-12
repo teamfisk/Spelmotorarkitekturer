@@ -5,6 +5,7 @@
 #include <GLFW/glfw3.h>
 
 #include "RawModelAssimp.h"
+#include "Renderer.h"
 
 void glfw_error_callback(int error, const char* description)
 {
@@ -93,12 +94,20 @@ int main()
 	}
 #endif // DEBUG
 
+	Renderer render;
+	// Try to load a model and render it.
+	
+	auto teapotHandle = ResourceManager::Load<RawModelAssimp>("C:/Users/Dennis Olsen/Documents/GitHub/Spelmotorarkitekturer/teapot.obj", 0);
+	auto teapotResource = *teapotHandle;
+
+	//RawModelAssimp model("C:/Users/Dennis Olsen/Documents/GitHub/Spelmotorarkitekturer/teapot.obj");
+
 	while (!glfwWindowShouldClose(window))
 	{
 		glClearColor(0.f, 0.f, 0.f, 1.f);
-		//Model* model = ResourceMan.Load<Model>("somepathorGUID,maybe");
-		//Renderer render;
-		//render.Render(model);
+
+		//render.Render(teapotResource);
+		
 		glBegin(GL_TRIANGLES);
 		glVertex3f(0.0f, 0.0f, 0.0f);
 		glVertex3f(1.0f, 0.0f, 0.0f);

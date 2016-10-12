@@ -21,12 +21,12 @@ private:
 };
 
 template <typename T>
-const ResourceHandle<T>& ResourceManager::Load(const std::string& path, unsigned int part)
+const ResourceHandle<T>& ResourceManager::Load(const std::string& path, unsigned int part /*currently unused? */)
 {
 	auto it = m_Instances.find(path);
 	if (it == m_Instances.end()) {
 		Resource** instancePointer = new Resource*;
-		*instancePointer = new T();
+		*instancePointer = new T(path);
 		m_Instances[path] = instancePointer;
 		return ResourceHandle<T>(instancePointer);
 	} else {

@@ -1,6 +1,6 @@
 #include "RawModelAssimp.h"
 
-RawModelAssimp::RawModelAssimp(std::string fileName)
+RawModelAssimp::RawModelAssimp(const std::string& fileName)
 {
 	Assimp::Importer importer;
 	const aiScene* scene = importer.ReadFile(fileName, aiProcess_CalcTangentSpace | aiProcess_Triangulate);

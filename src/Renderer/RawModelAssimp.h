@@ -20,14 +20,12 @@
 #include "Texture.h"
 #include "GLM.h"
 
-#define RawModel RawModelAssimp
-
 class RawModelAssimp : public Resource
 {
 	friend class ResourceManager;
 
 protected:
-	RawModelAssimp(std::string fileName);
+	RawModelAssimp(const std::string& fileName);
 
 public:
 	~RawModelAssimp();
@@ -63,6 +61,8 @@ public:
 	std::vector<unsigned int> m_Indices;
 	glm::mat4 m_Matrix;
 
+	size_t GetVertexBytes() { return m_Vertices.size() * sizeof(Vertex); }
+	size_t GetIndexBytes() { return m_Vertices.size() * sizeof(unsigned int); }
 private:
 	std::vector<glm::ivec2> BoneIndices;
 	std::vector<glm::vec2> BoneWeights;
