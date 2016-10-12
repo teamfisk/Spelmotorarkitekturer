@@ -6,20 +6,13 @@
 class IResourceHandle
 {
 protected:
-	IResourceHandle(Resource** resource)
-		: m_Instance(resource)
-	{
-		(*m_Instance)->m_ReferenceCount++;
-	}
+	IResourceHandle(Resource** resource);
 
 public:
-	virtual ~IResourceHandle()
-	{
-		(*m_Instance)->m_ReferenceCount--;
-	}
+	virtual ~IResourceHandle();
 
 	//bool InUse() const { return (*m_Instance)->m_ReferenceCount > 0; }
-	//bool Valid() const { return ((*m_Instance) != nullptr) && (*m_Instance)->Valid(); }
+	bool Valid() const { return ((*m_Instance) != nullptr) && (*m_Instance)->Valid(); }
 
 protected:
 	Resource** m_Instance;
@@ -36,7 +29,15 @@ private:
 	{ }
 
 public:
-	T* operator*() const { return static_cast<T*>(*m_Instance); }
+	T* operator*() const;
 };
+
+template <typename T>
+inline T* ResourceHandle<T>::operator*() const
+{
+    // Update activity stack
+    ResourceManager::Bump(*m_Instance);
+    return static_cast<T*>(*m_Instance);
+}
 
 #endif
