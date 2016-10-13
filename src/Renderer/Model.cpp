@@ -21,11 +21,11 @@ GLenum CreateVAO(RawModelAssimp::Vertex someStruct)
 	return vao;
 }
 */
-Model::Model(std::string& path)
-{
-	auto handle = ResourceManager::Load<RawModelAssimp>(path, 0);
+Model::Model(const std::string& path)	
+{	
+	auto handle = ResourceManager::Load<RawModelAssimp>(path, 0);	
+	this->handle = handle;
 	auto model = *handle;
-	model->m_Vertices.data();
 					
 	if (model->m_Indices.size() == 0) // no indices?
 	{
@@ -35,38 +35,39 @@ Model::Model(std::string& path)
 	{	
 		glGenBuffers(1, &vbo);
 		glBindBuffer(GL_ARRAY_BUFFER, vbo);
-		glBufferData(GL_ARRAY_BUFFER, model->GetVertexBytes(), model->m_Vertices.data(), GL_STATIC_DRAW);
+		glBufferData(GL_ARRAY_BUFFER, model->GetVertexBytes(), model->m_Vertices.data(), GL_STATIC_DRAW);		
 				
 		glGenVertexArrays(1, &vao);
 		glBindVertexArray(vao);
 		glEnableVertexAttribArray(0);
-		glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 0, nullptr);		
+		auto stride = sizeof(RawModelAssimp::Vertex);
+		glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, stride, nullptr);
 
 		offsetof(RawModelAssimp::Vertex, RawModelAssimp::Vertex::Position);
 
 		auto offset = sizeof(RawModelAssimp::Vertex::Normal);
 		glEnableVertexAttribArray(1);		
-		glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 0, (GLvoid*)offset);
+		glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, stride, (GLvoid*)offset);
 
 		offset += sizeof(RawModelAssimp::Vertex::Tangent);
 		glEnableVertexAttribArray(2);
-		glVertexAttribPointer(2, 3, GL_FLOAT, GL_FALSE, 0, (GLvoid*)offset);
+		glVertexAttribPointer(2, 3, GL_FLOAT, GL_FALSE, stride, (GLvoid*)offset);
 
 		offset += sizeof(RawModelAssimp::Vertex::BiNormal);
 		glEnableVertexAttribArray(3);
-		glVertexAttribPointer(3, 3, GL_FLOAT, GL_FALSE, 0, (GLvoid*)offset);
+		glVertexAttribPointer(3, 3, GL_FLOAT, GL_FALSE, stride, (GLvoid*)offset);
 
 		offset += sizeof(RawModelAssimp::Vertex::TextureCoords);
 		glEnableVertexAttribArray(4);
-		glVertexAttribPointer(4, 2, GL_FLOAT, GL_FALSE, 0, (GLvoid*)offset);
+		glVertexAttribPointer(4, 2, GL_FLOAT, GL_FALSE, stride, (GLvoid*)offset);
 
 		offset += sizeof(RawModelAssimp::Vertex::BoneIndices);
 		glEnableVertexAttribArray(5);
-		glVertexAttribPointer(5, 3, GL_FLOAT, GL_FALSE, 0, (GLvoid*)offset);
+		glVertexAttribPointer(5, 3, GL_FLOAT, GL_FALSE, stride, (GLvoid*)offset);
 
 		offset += sizeof(RawModelAssimp::Vertex::BoneWeights);		
 		glEnableVertexAttribArray(6);
-		glVertexAttribPointer(5, 3, GL_FLOAT, GL_FALSE, 0, (GLvoid*)offset);
+		glVertexAttribPointer(6, 3, GL_FLOAT, GL_FALSE, stride, (GLvoid*)offset);
 		glBindVertexArray(0);
 
 		glBindBuffer(GL_ARRAY_BUFFER, 0);
@@ -118,12 +119,12 @@ GLenum Model::GetVBO() const
 
 const void* Model::GetIndices() const
 {
-	return indexData;
+	return (*handle)->m_Indices.data();	
 }
 
 GLsizei Model::GetIndicesCount() const
 {
-	throw std::logic_error("The method or operation is not implemented.");
+	return (*handle)->m_Indices.size();
 }
 
 GLsizei Model::GetTriangleCount() const

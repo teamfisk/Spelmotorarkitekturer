@@ -1,6 +1,7 @@
 #pragma once
-class Model;
+
 class InstanceData;
+#include "Model.h"
 #include <vector>
 #include <tuple>
 

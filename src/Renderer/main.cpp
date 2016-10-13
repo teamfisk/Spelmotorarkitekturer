@@ -97,7 +97,7 @@ int main()
 	Renderer render;
 	// Try to load a model and render it.
 	
-	auto teapotHandle = ResourceManager::Load<RawModelAssimp>("C:/Users/Dennis Olsen/Documents/GitHub/Spelmotorarkitekturer/teapot.obj", 0);
+	auto teapotHandle = ResourceManager::Load<Model>("C:/Users/Dennis Olsen/Documents/GitHub/Spelmotorarkitekturer/teapot.obj", 0);
 	auto teapotResource = *teapotHandle;
 
 	//RawModelAssimp model("C:/Users/Dennis Olsen/Documents/GitHub/Spelmotorarkitekturer/teapot.obj");
@@ -106,13 +106,7 @@ int main()
 	{
 		glClearColor(0.f, 0.f, 0.f, 1.f);
 
-		//render.Render(teapotResource);
-		
-		glBegin(GL_TRIANGLES);
-		glVertex3f(0.0f, 0.0f, 0.0f);
-		glVertex3f(1.0f, 0.0f, 0.0f);
-		glVertex3f(0.0f, 1.0f, 0.0f);
-		glEnd();
+		render.Render(teapotResource);				
 
 		glfwSwapBuffers(window);
 	}

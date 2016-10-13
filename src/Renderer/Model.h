@@ -15,8 +15,9 @@
 class Model :
 	public Resource
 {
+	friend class ResourceManager;
 public:
-	Model(std::string& path);
+	Model(const std::string& path);
 	virtual ~Model();
 	
 	GLenum GetVAO() const;
@@ -26,8 +27,8 @@ public:
 	GLsizei GetTriangleCount() const;
 	GLenum GetIndexType() const;	
 private:
-	std::vector<VertexFormat> vertexData;
-	void* indexData; // Jag st�r mig allt mer p� att man m�ste deklarera typ innan man vet vilken typ man har ... 
+	//std::unique_ptr<ResourceHandle<RawModelAssimp>> handlePtr;
+	ResourceHandle<RawModelAssimp> handle; // Can't since this would invoke the default constructor, which is only callable to ResourceManager for reasons.
 	GLenum vbo; // Vertex Buffer Object handle
 	GLenum vao; // Vertex Array Object handle
 	GLenum indexVBO;

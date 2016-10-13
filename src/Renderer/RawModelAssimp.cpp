@@ -56,8 +56,11 @@ RawModelAssimp::RawModelAssimp(const std::string& fileName)
 			desc.Position = glm::vec3(position.x, position.y, position.z);
 
 			// Normal
-			auto normal = mesh->mNormals[vertexIndex];
-			desc.Normal = glm::vec3(normal.x, normal.y, normal.z);
+			if(mesh->mNormals != nullptr)
+			{
+				auto normal = mesh->mNormals[vertexIndex];			 
+				desc.Normal = glm::vec3(normal.x, normal.y, normal.z);
+			}
 
 			//if (mesh->HasTangentsAndBitangents()) {
 			//	// Tangent

@@ -6,6 +6,11 @@
 class IResourceHandle
 {
 protected:
+	IResourceHandle()
+		: m_Instance(nullptr)
+	{
+	}
+
 	IResourceHandle(Resource** resource)
 		: m_Instance(resource)
 	{
@@ -37,6 +42,13 @@ private:
 
 public:
 	T* operator*() const { return static_cast<T*>(*m_Instance); }
+
+	ResourceHandle() {}
+
+	ResourceHandle(const ResourceHandle& handle)
+	{
+		this->m_Instance = handle.m_Instance;
+	}
 };
 
 #endif
