@@ -6,6 +6,7 @@
 
 #include "RawModelAssimp.h"
 #include "Renderer.h"
+#include "Camera.h"
 
 void glfw_error_callback(int error, const char* description)
 {
@@ -93,7 +94,8 @@ int main()
 		std::cerr << "glDebugMessageCallback not available" << std::endl;
 	}
 #endif // DEBUG
-
+	Camera camera;
+	
 	Renderer render;
 	// Try to load a model and render it.
 	
@@ -105,6 +107,7 @@ int main()
 	while (!glfwWindowShouldClose(window))
 	{
 		glClearColor(0.f, 0.f, 0.f, 1.f);
+		camera.Update();
 
 		render.Render(teapotResource);				
 		
