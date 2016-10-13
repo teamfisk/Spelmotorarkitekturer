@@ -107,8 +107,9 @@ int main()
 		glClearColor(0.f, 0.f, 0.f, 1.f);
 
 		render.Render(teapotResource);				
-
+		
 		glfwSwapBuffers(window);
+		glfwPollEvents();
 	}
 
 	return 0;

@@ -78,7 +78,7 @@ Model::Model(const std::string& path)
 		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
 	}
 
-	// Determine smallest indextype possible during load.
+	// Determine smallest index type possible during load.
 	auto vertexCount = model->m_Vertices.size();
 	if (vertexCount <= std::numeric_limits<unsigned char>::max())
 	{
@@ -103,8 +103,9 @@ Model::Model(const std::string& path)
 Model::~Model()
 {
 	// Clean up OpenGL Handles.
-	glDeleteBuffers(1, &vao);
+	glDeleteVertexArrays(1, &vao);
 	glDeleteBuffers(1, &vbo);
+	glDeleteBuffers(1, &indexVBO);
 }
 
 GLenum Model::GetVAO() const
