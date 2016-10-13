@@ -1,12 +1,17 @@
 #include <cstdio>
 #include <cstring>
 #include <iostream>
+#include <vector>
+
 #include <GL/glew.h>
 #include <GLFW/glfw3.h>
 
 #include "RawModelAssimp.h"
 #include "Renderer.h"
 #include "Camera.h"
+#include "Shader.h"
+
+using namespace std;
 
 void glfw_error_callback(int error, const char* description)
 {
@@ -93,9 +98,21 @@ int main()
 	} else {
 		std::cerr << "glDebugMessageCallback not available" << std::endl;
 	}
+
+	int major, min, rev;
+	glfwGetVersion(&major, &min, &rev);
+	cout << "OpenGL Version: " << major << "." << min << "." << rev << endl;
+
 #endif // DEBUG
 	Camera camera;
+
 	
+	vector<ShaderInfo> shader;
+	loadShader("../../../vertex.glsl", GL_VERTEX_SHADER, shader);
+	loadShader("../../../fragment.glsl", GL_FRAGMENT_SHADER, shader);	
+	GLuint programHandle;
+	compileShaderProgram(shader, programHandle);
+
 	Renderer render;
 	// Try to load a model and render it.
 	
