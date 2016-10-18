@@ -90,6 +90,8 @@ int main()
 
 	glewInit();
 
+	glEnable(GL_DEPTH_BUFFER);
+
 #ifdef _DEBUG
 	glEnable(GL_DEBUG_OUTPUT);
 	glEnable(GL_DEBUG_OUTPUT_SYNCHRONOUS);
@@ -120,14 +122,16 @@ int main()
 	auto teapotHandle = ResourceManager::Load<Model>("../../../teapot.obj", 0);
 	auto teapotResource = *teapotHandle;			
 
+	glClearColor(0.f, 0.f, 0.f, 1.f);
 	while (!glfwWindowShouldClose(window))
 	{		
-		glClearColor(0.f, 0.f, 0.f, 1.f);
+		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
 		camera.Update();
+
 		glUseProgram(programHandle);
 		glUniformMatrix4fv(glGetUniformLocation(programHandle, "projection"), 1, GL_FALSE, glm::value_ptr(camera.getProjectionMatrix()));
 		glUniformMatrix4fv(glGetUniformLocation(programHandle, "view"), 1, GL_FALSE, glm::value_ptr(camera.getViewMatrix()));
-
 
 		render.Render(teapotResource);				
 		

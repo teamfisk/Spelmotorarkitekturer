@@ -3,8 +3,9 @@
 uniform mat4 projection;
 uniform mat4 view;
 
-// Funkar inte i OpenGL 3.2.1, som vi sitter på ...
+// Funkar inte i NUCens OpenGL ... vrf?
 //layout ( location = 0 ) in vec3 vPosition;
+
 in vec3 vPosition;
 
 out vec4 position;
