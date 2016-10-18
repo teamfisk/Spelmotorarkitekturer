@@ -101,12 +101,13 @@ int main()
 
 	int major, min, rev;
 	glfwGetVersion(&major, &min, &rev);
-	cout << "OpenGL Version: " << major << "." << min << "." << rev << endl;
+	cout << "GLFW version: " << major << "." << min << "." << rev << endl;
+	cout << "OpenGL version: " << glGetString(GL_VERSION) << endl;
+	cout << "GLSL version: " << glGetString(GL_SHADING_LANGUAGE_VERSION) << endl;
 
 #endif // DEBUG
 	Camera camera;
 
-	
 	vector<ShaderInfo> shader;
 	loadShader("../../../vertex.glsl", GL_VERTEX_SHADER, shader);
 	loadShader("../../../fragment.glsl", GL_FRAGMENT_SHADER, shader);	
@@ -116,12 +117,8 @@ int main()
 	Renderer render;
 	// Try to load a model and render it.
 	
-	auto teapotHandle = ResourceManager::Load<Model>("C:/Users/Dennis Olsen/Documents/GitHub/Spelmotorarkitekturer/teapot.obj", 0);
-	auto teapotResource = *teapotHandle;
-
-	//RawModelAssimp model("C:/Users/Dennis Olsen/Documents/GitHub/Spelmotorarkitekturer/teapot.obj");
-	
-	
+	auto teapotHandle = ResourceManager::Load<Model>("../../../teapot.obj", 0);
+	auto teapotResource = *teapotHandle;			
 
 	while (!glfwWindowShouldClose(window))
 	{		
