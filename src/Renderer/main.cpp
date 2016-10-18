@@ -120,11 +120,17 @@ int main()
 	auto teapotResource = *teapotHandle;
 
 	//RawModelAssimp model("C:/Users/Dennis Olsen/Documents/GitHub/Spelmotorarkitekturer/teapot.obj");
+	
+	
 
 	while (!glfwWindowShouldClose(window))
-	{
+	{		
 		glClearColor(0.f, 0.f, 0.f, 1.f);
 		camera.Update();
+		glUseProgram(programHandle);
+		glUniformMatrix4fv(glGetUniformLocation(programHandle, "projection"), 1, GL_FALSE, glm::value_ptr(camera.getProjectionMatrix()));
+		glUniformMatrix4fv(glGetUniformLocation(programHandle, "view"), 1, GL_FALSE, glm::value_ptr(camera.getViewMatrix()));
+
 
 		render.Render(teapotResource);				
 		
