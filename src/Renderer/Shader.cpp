@@ -102,7 +102,22 @@ int compileShaderProgram(vector<ShaderInfo> & shaders, GLuint& programHandle)
 				free(log);				
 			}
 
-			string errFileName = "errdump_" + shaders[i].filename;
+			// Incase the filename contains ../ or ./, skip it. It causes the errdump to be written.
+			std::string filename; 
+			for (int j = 0; j < shaders[i].filename.size(); j++)
+			{
+				char c = shaders[i].filename[j];				
+				if (c != '.' && c != '/')
+				{
+					filename += c;
+				}
+				if (c == '.' && shaders[i].filename[j + 1] == 'g') // Don't remove the .glsl ending.
+				{
+					filename += c;
+				}
+			}
+			
+			string errFileName = "errdump_" + filename;
 			ofstream f(errFileName.c_str());
 			if(f.is_open())
 			{
@@ -112,6 +127,10 @@ int compileShaderProgram(vector<ShaderInfo> & shaders, GLuint& programHandle)
 				}
 				f.close();
 				fprintf(stderr, "Shader written to %s\n", errFileName.c_str());
+			} 
+			else
+			{
+				std::cerr << "Unable to write " << errFileName << std::endl;				
 			}
 			
 			return -1;
