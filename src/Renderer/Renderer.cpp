@@ -17,8 +17,10 @@ Renderer::~Renderer()
 //	renderList.emplace_back(std::make_tuple(model, instancedata));
 //}
 
-void Renderer::Render(Model * model)
-{
+void Renderer::Render(Model * model, const glm::mat4x4& worldMat, GLuint programHandle)
+{	
+	glUniformMatrix4fv(glGetUniformLocation(programHandle, "world"), 1, GL_FALSE, glm::value_ptr(worldMat));
+
 	glBindVertexArray(model->GetVAO());
 	glDrawElements(GL_TRIANGLES, model->GetIndicesCount(), model->GetIndexType(), model->GetIndices());
 	glBindVertexArray(0);

@@ -12,7 +12,7 @@ public:
 	~Renderer();
 
 //	void AddToRender(Model * model, InstanceData* instancedata);
-	void Render(Model * model);
+	void Render(Model * model, const glm::mat4x4& worldMat, GLuint programHandle);
 private:
 	std::vector<std::tuple<Model*, InstanceData*>> renderList;
 };

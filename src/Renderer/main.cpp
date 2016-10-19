@@ -121,19 +121,43 @@ int main()
 	
 	auto teapotHandle = ResourceManager::Load<Model>("../../../teapot.obj", 0);
 	auto teapotResource = *teapotHandle;			
+	
+	glm::mat4 worldMat = {
+		1, 0, 0, 0,
+		0, 1, 0, 0,
+		0, 0, 1, 0,
+		0, 0, 0, 1
+	};
+
+	auto v = worldMat[0];
+	auto keyILastFrame = GLFW_RELEASE;
 
 	glClearColor(0.f, 0.f, 0.f, 1.f);
+	double lastTime = glfwGetTime();
 	while (!glfwWindowShouldClose(window))
-	{		
+	{	
+		double time = glfwGetTime();
+		double dt = time - lastTime;
+		lastTime = time;
+
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-		camera.Update();
+		camera.Update();		
+		
+		auto keyICurrentFrame = glfwGetKey(window, GLFW_KEY_I);
+		if(keyICurrentFrame == GLFW_PRESS && keyILastFrame == GLFW_RELEASE)
+		{
+			keyILastFrame = GLFW_PRESS;
+			worldMat = translate(worldMat, { 5, 0, 0 });			
+		}
+		keyILastFrame = keyICurrentFrame;
 
-		glUseProgram(programHandle);
+		glUseProgram(programHandle);		
 		glUniformMatrix4fv(glGetUniformLocation(programHandle, "projection"), 1, GL_FALSE, glm::value_ptr(camera.getProjectionMatrix()));
 		glUniformMatrix4fv(glGetUniformLocation(programHandle, "view"), 1, GL_FALSE, glm::value_ptr(camera.getViewMatrix()));
 
-		render.Render(teapotResource);				
+		render.Render(teapotResource, worldMat, programHandle);
+		render.Render(teapotResource, translate(worldMat, { 7, 0, 0 }), programHandle);
 		
 		glfwSwapBuffers(window);
 		glfwPollEvents();
