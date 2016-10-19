@@ -79,6 +79,7 @@ Model::Model(const std::string& path)
 	}
 
 	// Determine smallest index type possible during load.
+	/*
 	auto vertexCount = model->m_Vertices.size();
 	if (vertexCount <= std::numeric_limits<unsigned char>::max())
 	{
@@ -97,7 +98,9 @@ Model::Model(const std::string& path)
 		std::string s = "Too many vertices! Max vertexCount: ";
 		s += std::numeric_limits<unsigned int>::max() + " vertexCount: " + vertexCount;
 		throw std::runtime_error(s.c_str());
-	}	
+	}
+	*/
+	indexType = GL_UNSIGNED_INT;	
 }
 
 Model::~Model()
