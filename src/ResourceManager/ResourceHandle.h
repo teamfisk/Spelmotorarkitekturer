@@ -7,25 +7,15 @@ class IResourceHandle
 {
 protected:
 	IResourceHandle(Resource** resource);
-	IResourceHandle(const IResourceHandle& handle)
-	{
-		LOG_DEBUG("IResourceHandle(const IResourceHandle& handle)");
-		m_Instance = handle.m_Instance;
-		incrementCount();
-	}
-	IResourceHandle& operator=(const IResourceHandle& other)
-	{
-		LOG_DEBUG("IResourceHandle& operator=(const IResourceHandle& other)");
-		m_Instance = other.m_Instance;
-		incrementCount();
-		return *this;
-	}
+	IResourceHandle(const IResourceHandle& handle);
+	IResourceHandle& operator=(const IResourceHandle& other);
 
 public:
 	virtual ~IResourceHandle();
 
 	//bool InUse() const { return (*m_Instance)->m_ReferenceCount > 0; }
-	bool Valid() const { return ((*m_Instance) != nullptr) && (*m_Instance)->Valid(); }
+	bool Valid() const;
+	void Release();
 
 protected:
 	Resource** m_Instance;
@@ -33,6 +23,7 @@ protected:
 private:
 	void incrementCount();
 	void decrementCount();
+	void invalidate();
 };
 
 template <typename T>
@@ -50,17 +41,18 @@ public:
 	{ }
 	ResourceHandle(const ResourceHandle<T>& other)
 		: IResourceHandle(other)
-	{ 
-		m_Instance = other.m_Instance;
-	}
-	ResourceHandle<T>& operator=(const ResourceHandle<T> other) 
-	{ 
-		m_Instance = other.m_Instance;
-		return *this;
-	}
+	{ }
+	ResourceHandle<T>& operator=(const ResourceHandle<T> other);
 
 	T* operator*() const;
 };
+
+template <typename T>
+ResourceHandle<T>& ResourceHandle<T>::operator=(const ResourceHandle<T> other)
+{
+	IResourceHandle::operator=(other);
+	return *this;
+}
 
 template <typename T>
 T* ResourceHandle<T>::operator*() const
