@@ -6,10 +6,6 @@
 class IResourceHandle
 {
 protected:
-	IResourceHandle()
-		: m_Instance(nullptr)
-	{
-	}
 
 	IResourceHandle(Resource** resource)
 		: m_Instance(resource)
@@ -18,13 +14,10 @@ protected:
 	}
 
 public:
-	virtual ~IResourceHandle()
-	{
-		(*m_Instance)->m_ReferenceCount--;
-	}
+	virtual ~IResourceHandle();
 
 	//bool InUse() const { return (*m_Instance)->m_ReferenceCount > 0; }
-	//bool Valid() const { return ((*m_Instance) != nullptr) && (*m_Instance)->Valid(); }
+	bool Valid() const { return ((*m_Instance) != nullptr) && (*m_Instance)->Valid(); }
 
 protected:
 	Resource** m_Instance;
@@ -41,14 +34,13 @@ private:
 	{ }
 
 public:
-	T* operator*() const { return static_cast<T*>(*m_Instance); }
-
-	ResourceHandle() {}
-
-	ResourceHandle(const ResourceHandle& handle)
-	{
-		this->m_Instance = handle.m_Instance;
-	}
+	T* operator*() const;
 };
+
+template <typename T>
+inline T* ResourceHandle<T>::operator*() const
+{
+    return static_cast<T*>(*m_Instance);
+}
 
 #endif

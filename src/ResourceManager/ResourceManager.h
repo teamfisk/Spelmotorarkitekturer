@@ -12,7 +12,7 @@ private:
 
 public:
 	template <typename T>
-	static const ResourceHandle<T>& Load(const std::string& path, unsigned int part);
+	static ResourceHandle<T> Load(const std::string& path, unsigned int part);
 	//static ResourceHandle Load(UID path, unsigned int part);
 	static void Collect();
 
@@ -21,17 +21,24 @@ private:
 };
 
 template <typename T>
-const ResourceHandle<T>& ResourceManager::Load(const std::string& path, unsigned int part /*currently unused? */)
+ResourceHandle<T> ResourceManager::Load(const std::string& path, unsigned int part)
 {
+	Resource** instancePointer = nullptr;
 	auto it = m_Instances.find(path);
 	if (it == m_Instances.end()) {
-		Resource** instancePointer = new Resource*;
-		*instancePointer = new T(path);
+		instancePointer = new Resource*;
+		*instancePointer = nullptr;
 		m_Instances[path] = instancePointer;
-		return ResourceHandle<T>(instancePointer);
 	} else {
-		return ResourceHandle<T>(it->second);
+		instancePointer = it->second;
 	}
+
+	if (*instancePointer == nullptr) {
+		// Create the resource instance
+		*instancePointer = new T();
+	}
+
+	return ResourceHandle<T>(instancePointer);
 }
 
 #endif

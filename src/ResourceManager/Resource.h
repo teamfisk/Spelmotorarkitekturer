@@ -33,8 +33,12 @@ protected:
 		}
 	}
 
+public:
+    virtual bool Valid() const { return true; }
+
 private:
 	unsigned int m_ReferenceCount = 0;
+    std::list<Resource**>::iterator m_ActivityIterator;
 };
 
 class ThreadUnsafeResource : public Resource
