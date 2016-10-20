@@ -1,7 +1,6 @@
 #include "ResourceManager.h"
 
 std::unordered_map<std::string, Resource**> ResourceManager::m_Instances;
-std::list<Resource**> ResourceManager::m_ActivityStack;
 
 void ResourceManager::Collect()
 {

@@ -35,8 +35,6 @@ public:
 template <typename T>
 inline T* ResourceHandle<T>::operator*() const
 {
-    // Update activity stack
-    ResourceManager::Bump(*m_Instance);
     return static_cast<T*>(*m_Instance);
 }
 
