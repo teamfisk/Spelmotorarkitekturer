@@ -35,7 +35,7 @@ ResourceHandle<T> ResourceManager::Load(const std::string& path, unsigned int pa
 
 	if (*instancePointer == nullptr) {
 		// Create the resource instance
-		*instancePointer = new T();
+		*instancePointer = new T(path);
 	}
 
 	return ResourceHandle<T>(instancePointer);

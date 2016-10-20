@@ -26,6 +26,7 @@ public:
 
 protected:
 	Resource() = default;
+	Resource(const std::string& path) { }
 	virtual ~Resource()
 	{
 		if (m_ReferenceCount != 0) {

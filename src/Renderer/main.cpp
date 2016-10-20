@@ -121,10 +121,8 @@ int main()
 	// Try to load a model and render it.
 	
 	auto teapotHandle = ResourceManager::Load<Model>("../../../teapot.obj", 0);
-	auto teapotResource = *teapotHandle;			
 
 	auto planeHandle = ResourceManager::Load<Model>("../../../plane.obj", 0);
-	auto planeResource = *planeHandle;
 	
 	glm::mat4 worldMat = {
 		1, 0, 0, 0,
@@ -169,10 +167,10 @@ int main()
 		glUniformMatrix4fv(glGetUniformLocation(programHandle, "projection"), 1, GL_FALSE, glm::value_ptr(camera.getProjectionMatrix()));
 		glUniformMatrix4fv(glGetUniformLocation(programHandle, "view"), 1, GL_FALSE, glm::value_ptr(camera.getViewMatrix()));
 
-		render.Render(teapotResource, worldMat, programHandle);
-		render.Render(teapotResource, translate(worldMat, { 7, 0, 0 }), programHandle);
+		render.Render(*teapotHandle, worldMat, programHandle);
+		render.Render(*teapotHandle, translate(worldMat, { 7, 0, 0 }), programHandle);
 
-		render.Render(planeResource, planeMatrix, programHandle);
+		render.Render(*planeHandle, planeMatrix, programHandle);
 		
 		glfwSwapBuffers(window);
 		glfwPollEvents();

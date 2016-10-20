@@ -28,14 +28,11 @@ public:
 	GLenum GetIndexType() const;	
 private:
 	//std::unique_ptr<ResourceHandle<RawModelAssimp>> handlePtr;
-	ResourceHandle<RawModelAssimp> handle; // Can't since this would invoke the default constructor, which is only callable to ResourceManager for reasons.
+	ResourceHandle<RawModelAssimp> handle;
 	GLenum vbo; // Vertex Buffer Object handle
 	GLenum vao; // Vertex Array Object handle
 	GLenum indexVBO;
 	GLenum indexType;
 	GLuint indexDataBytes;
-
-	// Store as an object? Can't since there is no default constructor, and need to assign resource after construction.
-	//ResourceHandle<RawModelAssimp>* rawModelAssimpHandle;
 };
 

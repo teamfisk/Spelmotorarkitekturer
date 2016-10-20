@@ -3,11 +3,25 @@
 IResourceHandle::IResourceHandle(Resource** resource)
     : m_Instance(resource)
 {
-    (*m_Instance)->m_ReferenceCount++;
+	incrementCount();
 }
 
 IResourceHandle::~IResourceHandle()
 {
-    (*m_Instance)->m_ReferenceCount--;
+	decrementCount();
+}
+
+void IResourceHandle::incrementCount()
+{
+	if (m_Instance != nullptr) {
+		(*m_Instance)->m_ReferenceCount++;
+	}
+}
+
+void IResourceHandle::decrementCount()
+{
+	if (m_Instance != nullptr) {
+		(*m_Instance)->m_ReferenceCount--;
+	}
 }
 
