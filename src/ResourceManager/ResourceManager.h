@@ -17,18 +17,24 @@ public:
 	static void Collect();
 
 private:
-	static std::unordered_map<std::string, Resource**> m_Instances;
+	typedef std::size_t ResourceTypeHash;
+	typedef std::unordered_map<std::string, Resource**> InstanceMap;
+
+	static std::unordered_map<ResourceTypeHash, InstanceMap> m_Instances;
 };
 
 template <typename T>
 ResourceHandle<T> ResourceManager::Load(const std::string& path, unsigned int part)
 {
+	const ResourceTypeHash typeHash = typeid(T).hash_code();
+	auto instanceMap = m_Instances[typeHash];
+
 	Resource** instancePointer = nullptr;
-	auto it = m_Instances.find(path);
-	if (it == m_Instances.end()) {
+	auto it = instanceMap.find(path);
+	if (it == instanceMap.end()) {
 		instancePointer = new Resource*;
 		*instancePointer = nullptr;
-		m_Instances[path] = instancePointer;
+		instanceMap[path] = instancePointer;
 	} else {
 		instancePointer = it->second;
 	}
