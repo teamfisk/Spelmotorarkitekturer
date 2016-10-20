@@ -10,6 +10,7 @@
 #include "Renderer.h"
 #include "Camera.h"
 #include "Shader.h"
+#include "zlib.h"
 
 using namespace std;
 
@@ -121,6 +122,9 @@ int main()
 	
 	auto teapotHandle = ResourceManager::Load<Model>("../../../teapot.obj", 0);
 	auto teapotResource = *teapotHandle;			
+
+	auto planeHandle = ResourceManager::Load<Model>("../../../plane.obj", 0);
+	auto planeResource = *planeHandle;
 	
 	glm::mat4 worldMat = {
 		1, 0, 0, 0,
@@ -128,12 +132,20 @@ int main()
 		0, 0, 1, 0,
 		0, 0, 0, 1
 	};
+	
+	glm::mat4x4 planeMatrix = glm::rotate(90.0f, glm::vec3(1.0, 0.0, 0.0));			
 
-	auto v = worldMat[0];
 	auto keyILastFrame = GLFW_RELEASE;
 
-	glClearColor(0.f, 0.f, 0.f, 1.f);
+	glClearColor(0.f, 0.0f, 0.3f, 1.f);
 	double lastTime = glfwGetTime();
+
+
+	//https://github.com/madler/zlib/blob/master/test/example.c
+	//z_stream s;
+	//inflateInit(&s);
+	
+
 	while (!glfwWindowShouldClose(window))
 	{	
 		double time = glfwGetTime();
@@ -147,8 +159,9 @@ int main()
 		auto keyICurrentFrame = glfwGetKey(window, GLFW_KEY_I);
 		if(keyICurrentFrame == GLFW_PRESS && keyILastFrame == GLFW_RELEASE)
 		{
+			planeMatrix = glm::rotate(planeMatrix, 3.14f / 4.0f, glm::vec3(1.0f, 0.0f, 0.0f));
 			keyILastFrame = GLFW_PRESS;
-			worldMat = translate(worldMat, { 5, 0, 0 });			
+			worldMat = translate(worldMat, { 5, 0, 0 });
 		}
 		keyILastFrame = keyICurrentFrame;
 
@@ -158,6 +171,8 @@ int main()
 
 		render.Render(teapotResource, worldMat, programHandle);
 		render.Render(teapotResource, translate(worldMat, { 7, 0, 0 }), programHandle);
+
+		render.Render(planeResource, planeMatrix, programHandle);
 		
 		glfwSwapBuffers(window);
 		glfwPollEvents();
