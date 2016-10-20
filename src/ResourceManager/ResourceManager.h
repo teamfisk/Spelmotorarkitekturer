@@ -20,7 +20,7 @@ public:
     {
 		for (num; num > 0; --num) {
 			auto leastActiveIt = m_ActivityStack.end();
-			if (leastActiveIt != m_ActivityStack.begin()) {
+			if (leastActiveIt == m_ActivityStack.begin()) {
 				return;
 			}
 			leastActiveIt--;
@@ -30,11 +30,21 @@ public:
 		}
     }
 
+	// Bump a resource to the top of the activity stack
     static void Bump(const Resource* res)
 	{
+		if (res == nullptr) {
+			return;
+		}
+		for (auto& k : m_ActivityStack) {
+			LOG_DEBUG("%x = %x", k, *k);
+		}
+		LOG_DEBUG("BUMP");
 		auto& it = res->m_ActivityIterator;
-		// Bump it to the top of the activity stack!
 		std::move(it, it, m_ActivityStack.begin());
+		for (auto& k : m_ActivityStack) {
+			LOG_DEBUG("%x = %x", k, *k);
+		}
 	}
 
 private:
@@ -56,7 +66,9 @@ ResourceHandle<T> ResourceManager::Load(const std::string& path, unsigned int pa
 	}
 
 	if (*instancePointer == nullptr) {
+		// Create the resource instance
 		*instancePointer = new T();
+		// Insert it into the activity stack
 		(*instancePointer)->m_ActivityIterator = m_ActivityStack.insert(m_ActivityStack.end(), instancePointer);
 	}
 

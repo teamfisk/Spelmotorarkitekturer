@@ -3,7 +3,7 @@
 
 TEST_CASE("ResourceManager")
 {
-	{
+	/*{
 		const ResourceHandle<Resource>& r1_1 = ResourceManager::Load<Resource>("Resource1", 0);
 		const ResourceHandle<Resource>& r1_2 = ResourceManager::Load<Resource>("Resource1", 0);
 
@@ -15,10 +15,12 @@ TEST_CASE("ResourceManager")
 		REQUIRE(*r1_2 != *r2);
 	}
 
-	ResourceManager::Collect();
+	ResourceManager::Collect();*/
 
 	const ResourceHandle<Resource>& r1 = ResourceManager::Load<Resource>("Resource1", 0);
     REQUIRE(r1.Valid());
+	Resource* p1 = *r1;
 	ResourceManager::ForceFree(1);
+	Resource* p2 = *r1;
 	REQUIRE(!r1.Valid());
 }
