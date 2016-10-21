@@ -138,12 +138,7 @@ int main()
 	glClearColor(0.f, 0.0f, 0.3f, 1.f);
 	double lastTime = glfwGetTime();
 
-
-	//https://github.com/madler/zlib/blob/master/test/example.c
-	//z_stream s;
-	//inflateInit(&s);
 	
-
 	while (!glfwWindowShouldClose(window))
 	{	
 		double time = glfwGetTime();
