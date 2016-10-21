@@ -112,8 +112,8 @@ int main()
 	Camera camera;
 
 	vector<ShaderInfo> shader;
-	loadShader("../../../vertex.glsl", GL_VERTEX_SHADER, shader);
-	loadShader("../../../fragment.glsl", GL_FRAGMENT_SHADER, shader);	
+	loadShader("../vertex.glsl", GL_VERTEX_SHADER, shader);
+	loadShader("../fragment.glsl", GL_FRAGMENT_SHADER, shader);
 	GLuint programHandle;
 	compileShaderProgram(shader, programHandle);
 
