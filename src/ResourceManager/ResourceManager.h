@@ -3,6 +3,7 @@
 
 #include <unordered_map>
 #include <string>
+#include <typeinfo>
 #include "ResourceHandle.h"
 
 class ResourceManager
