@@ -11,6 +11,8 @@
 #include "Camera.h"
 #include "Shader.h"
 #include "zlib.h"
+#define _USE_MATH_DEFINES
+#include <math.h>
 
 using namespace std;
 
@@ -109,7 +111,10 @@ int main()
 	cout << "GLSL version: " << glGetString(GL_SHADING_LANGUAGE_VERSION) << endl;
 
 #endif // DEBUG
+	// Set the camera just above the plane, pointing in the direction of the x-axis.
 	Camera camera;
+	camera.setPosition({ -3.94543, 0.807405,  0.810452 });
+	camera.setHorizontalAngle(874.95);
 
 	vector<ShaderInfo> shader;
 	loadShader("../../../vertex.glsl", GL_VERTEX_SHADER, shader);
@@ -131,7 +136,7 @@ int main()
 		0, 0, 0, 1
 	};
 	
-	glm::mat4x4 planeMatrix = glm::rotate(90.0f, glm::vec3(1.0, 0.0, 0.0));			
+	glm::mat4x4 planeMatrix = glm::rotate((float)M_PI_2, glm::vec3(1.0, 0.0, 0.0));			
 
 	auto keyILastFrame = GLFW_RELEASE;
 
@@ -151,8 +156,7 @@ int main()
 		
 		auto keyICurrentFrame = glfwGetKey(window, GLFW_KEY_I);
 		if(keyICurrentFrame == GLFW_PRESS && keyILastFrame == GLFW_RELEASE)
-		{
-			planeMatrix = glm::rotate(planeMatrix, 3.14f / 4.0f, glm::vec3(1.0f, 0.0f, 0.0f));
+		{			
 			keyILastFrame = GLFW_PRESS;
 			worldMat = translate(worldMat, { 5, 0, 0 });
 		}
@@ -165,8 +169,8 @@ int main()
 		render.Render(*teapotHandle, worldMat, programHandle);
 		render.Render(*teapotHandle, translate(worldMat, { 7, 0, 0 }), programHandle);
 
-		render.Render(*planeHandle, planeMatrix, programHandle);
-		
+		render.Render(*planeHandle, planeMatrix, programHandle);		
+
 		glfwSwapBuffers(window);
 		glfwPollEvents();
 	}
