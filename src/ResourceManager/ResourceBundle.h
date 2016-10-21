@@ -11,8 +11,9 @@ public:
 	class Block
 	{
 	public:
-		Block(const std::string& path, std::uintptr_t offset, std::size_t blockSize)
-            : m_Path(path)
+		Block(boost::interprocess::file_mapping&& fileMapping, const std::string& path, std::uintptr_t offset, std::size_t blockSize)
+            : m_FileMapping(fileMapping)
+            , m_Path(path)
             , m_Offset(offset)
             , m_BlockSize(blockSize)
 		{ }
@@ -24,7 +25,8 @@ public:
 		// Streams part of a block from disk, returns number of bytes read
 		std::size_t Stream(void* destination, std::size_t size);
 
-	private:
+    private:
+        boost::interprocess::file_mapping m_FileMapping;
 		std::string m_Path;
 		std::uintptr_t m_Offset;
 		std::size_t m_BlockSize;

@@ -30,6 +30,10 @@ add_library(ResourceManager
 	${SOURCE_FILES}
 )
 
+target_link_libraries(ResourceManager
+	${Boost_LIBRARIES}
+)
+
 add_executable(STUFFGenerator
 	${SOURCE_FILES}
 	${SOURCE_FILES_TOOLS}
