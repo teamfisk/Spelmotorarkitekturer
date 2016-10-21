@@ -112,17 +112,17 @@ int main()
 	Camera camera;
 
 	vector<ShaderInfo> shader;
-	loadShader("../vertex.glsl", GL_VERTEX_SHADER, shader);
-	loadShader("../fragment.glsl", GL_FRAGMENT_SHADER, shader);
+	loadShader("vertex.glsl", GL_VERTEX_SHADER, shader);
+	loadShader("fragment.glsl", GL_FRAGMENT_SHADER, shader);
 	GLuint programHandle;
 	compileShaderProgram(shader, programHandle);
 
 	Renderer render;
 	// Try to load a model and render it.
 	
-	auto teapotHandle = ResourceManager::Load<Model>("../../../teapot.obj", 0);
+	auto teapotHandle = ResourceManager::Load<Model>("teapot.obj", 0);
 
-	auto planeHandle = ResourceManager::Load<Model>("../../../plane.obj", 0);
+	auto planeHandle = ResourceManager::Load<Model>("plane.obj", 0);
 	
 	glm::mat4 worldMat = {
 		1, 0, 0, 0,
