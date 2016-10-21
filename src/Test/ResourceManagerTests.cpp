@@ -1,5 +1,6 @@
 #include "catch.hpp"
 #include "ResourceManager/ResourceManager.h"
+#include "ResourceManager/ResourceTreeNode.h"
 
 TEST_CASE("ResourceManager")
 {
@@ -16,4 +17,20 @@ TEST_CASE("ResourceManager")
 	}
 
 	ResourceManager::Collect();
+}
+
+TEST_CASE("ResourceTree")
+{
+    ResourceTreeNode root;
+
+	ResourceTreeNode n1;
+	n1.Name = "Folder";
+	ResourceTreeNode n2;
+	n2.Name = "File";
+
+	root.Insert("", &n1);
+	root.Insert("Folder", &n2);
+
+	auto file = root.Search("Folder/File");
+	REQUIRE(file->Name == n2.Name);
 }

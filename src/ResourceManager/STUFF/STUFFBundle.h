@@ -6,7 +6,7 @@
 
 #include "../Logging.h"
 #include "../ResourceBundle.h"
-#include "../ResourceTree.h"
+#include "ResourceManager/ResourceTreeNode.h"
 #include "STUFF.h"
 
 class STUFFBundle : ResourceBundle
