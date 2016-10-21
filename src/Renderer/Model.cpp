@@ -141,4 +141,10 @@ GLenum Model::GetIndexType() const
 	return indexType;
 }
 
+size_t Model::GetMemoryUsage() const
+{
+	size_t s;
+	s += sizeof(Model);
+	return s;
+}
 
