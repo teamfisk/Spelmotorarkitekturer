@@ -2,6 +2,7 @@
 #define ResourceBundle_h__
 
 #include <string>
+#include "ResourceTreeNode.h"
 
 class ResourceBundle
 {
@@ -10,9 +11,9 @@ public:
 		: m_BundlePath(path)
 	{ }
 
-	virtual std::size_t Read(const std::string& resourcePath, void* destination) = 0;
-
 protected:
 	std::string m_BundlePath;
+    ResourceTreeNode m_RootNode;
 };
+
 #endif

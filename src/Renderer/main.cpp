@@ -11,6 +11,10 @@
 #include "Camera.h"
 #include "Shader.h"
 #include "zlib.h"
+#define _USE_MATH_DEFINES
+#include <math.h>
+#include "CameraEndlessRunner.h"
+#include "Entity.h"
 
 using namespace std;
 
@@ -109,21 +113,25 @@ int main()
 	cout << "GLSL version: " << glGetString(GL_SHADING_LANGUAGE_VERSION) << endl;
 
 #endif // DEBUG
-	Camera camera;
+	// Set the camera just above the plane, pointing in the direction of the x-axis.
+	CameraEndlessRunner camera;
+	camera.setPosition({ -20.94543, 0.807405,  0.810452 });
+	camera.SetDirection({ 1, 0, 0 });
 
 	vector<ShaderInfo> shader;
-	loadShader("../../../vertex.glsl", GL_VERTEX_SHADER, shader);
-	loadShader("../../../fragment.glsl", GL_FRAGMENT_SHADER, shader);	
+	loadShader("vertex.glsl", GL_VERTEX_SHADER, shader);
+	loadShader("fragment.glsl", GL_FRAGMENT_SHADER, shader);
 	GLuint programHandle;
 	compileShaderProgram(shader, programHandle);
 
-	Renderer render;
-	// Try to load a model and render it.
-	
-	auto teapotHandle = ResourceManager::Load<Model>("../../../teapot.obj", 0);
+	Renderer renderer;
 
-	auto planeHandle = ResourceManager::Load<Model>("../../../plane.obj", 0);
-	
+	// Try to load a model and render it.	
+	auto teapotHandle = ResourceManager::Load<Model>("teapot.obj", 0);
+	auto planeHandle = ResourceManager::Load<Model>("plane.obj", 0);
+
+	// Load other models when needed during runtime, to minimize initial load time.
+
 	glm::mat4 worldMat = {
 		1, 0, 0, 0,
 		0, 1, 0, 0,
@@ -131,24 +139,49 @@ int main()
 		0, 0, 0, 1
 	};
 	
-	glm::mat4x4 planeMatrix = glm::rotate(90.0f, glm::vec3(1.0, 0.0, 0.0));			
+	glm::mat4x4 planeMatrix = glm::rotate((float)M_PI_2, glm::vec3(1.0, 0.0, 0.0));
+	planeMatrix = glm::scale(planeMatrix, { 200, 1, 1 });
 
 	auto keyILastFrame = GLFW_RELEASE;
 
 	glClearColor(0.f, 0.0f, 0.3f, 1.f);
 	double lastTime = glfwGetTime();
 
-
-	//https://github.com/madler/zlib/blob/master/test/example.c
-	//z_stream s;
-	//inflateInit(&s);
+	std::vector<Entity> entities;
+	entities.emplace_back(translate(glm::vec3(5, 0, 3)), teapotHandle);
+	entities.emplace_back(translate(glm::vec3(16, 0, 4)), teapotHandle);
+	entities.emplace_back(translate(glm::vec3(22, 0, -2)), teapotHandle);	
+	entities.emplace_back(translate(glm::vec3(27, 0, 1)), teapotHandle);
+	entities.emplace_back(translate(glm::vec3(32, 0, 4)), teapotHandle);
+	entities.emplace_back(translate(glm::vec3(36, 0, -2)), teapotHandle);
+	entities.emplace_back(translate(glm::vec3(40, 0, 1)), teapotHandle);
 	
-
+	double timeSinceLastEntitySpawn = 0;
 	while (!glfwWindowShouldClose(window))
 	{	
 		double time = glfwGetTime();
 		double dt = time - lastTime;
 		lastTime = time;
+		
+		for(unsigned int i = 0; i < entities.size(); i++)
+		{
+			float x = entities[i].worldMatrix[3][0];
+			float offset = 4; // Trigger this if slightly after the player has passed the entity.
+			if (x + offset < camera.getPosition().x)
+			{
+				entities[i].worldMatrix[3][0] += 40;
+			}
+		}		
+
+		//timeSinceLastEntitySpawn += dt;
+		//if (timeSinceLastEntitySpawn > 5.0)
+		//{
+		//	timeSinceLastEntitySpawn = 0;
+
+		//	auto mat = glm::mat4x4(1);
+		//	mat = translate(mat, camera.getPosition() + glm::vec3(25 + rand() % 5, -1, 0));
+		//	entities.emplace_back(mat, teapotHandle);			
+		//}		
 
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
@@ -156,8 +189,7 @@ int main()
 		
 		auto keyICurrentFrame = glfwGetKey(window, GLFW_KEY_I);
 		if(keyICurrentFrame == GLFW_PRESS && keyILastFrame == GLFW_RELEASE)
-		{
-			planeMatrix = glm::rotate(planeMatrix, 3.14f / 4.0f, glm::vec3(1.0f, 0.0f, 0.0f));
+		{			
 			keyILastFrame = GLFW_PRESS;
 			worldMat = translate(worldMat, { 5, 0, 0 });
 		}
@@ -167,11 +199,16 @@ int main()
 		glUniformMatrix4fv(glGetUniformLocation(programHandle, "projection"), 1, GL_FALSE, glm::value_ptr(camera.getProjectionMatrix()));
 		glUniformMatrix4fv(glGetUniformLocation(programHandle, "view"), 1, GL_FALSE, glm::value_ptr(camera.getViewMatrix()));
 
-		render.Render(*teapotHandle, worldMat, programHandle);
-		render.Render(*teapotHandle, translate(worldMat, { 7, 0, 0 }), programHandle);
+		renderer.Render(*teapotHandle, worldMat, programHandle);
+		renderer.Render(*teapotHandle, translate(worldMat, { 7, 0, 0 }), programHandle);
 
-		render.Render(*planeHandle, planeMatrix, programHandle);
-		
+		renderer.Render(*planeHandle, planeMatrix, programHandle);		
+
+		for (unsigned int i = 0; i < entities.size(); i++)
+		{			
+			renderer.Render(*entities[i].modelHandle, entities[i].worldMatrix, programHandle);
+		}
+
 		glfwSwapBuffers(window);
 		glfwPollEvents();
 	}

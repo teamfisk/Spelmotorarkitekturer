@@ -4,6 +4,7 @@
 
 class Camera
 {
+protected:
 	glm::mat4 viewMatrix;
 	glm::mat4 projectionMatrix;
 	glm::vec3 cameraPosition;
@@ -26,7 +27,7 @@ public:
 	Camera();
 	~Camera();
 
-	void Update();
+	virtual void Update();
 
 	glm::mat4 getViewMatrix()		{ return viewMatrix; }
 	glm::mat4 getProjectionMatrix() { return projectionMatrix;}
