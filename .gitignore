@@ -1,6 +1,12 @@
 # Build Folders
 build/
-bin/
+bin/*.pdb
+bin/*.ilk
+bin/*.exe
+bin/Allocator
+bin/Renderer
+bin/Test
+bin/STUFFGenerator
 lib/
 # Because apparently nobody has any self control
 *.orig
