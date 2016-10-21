@@ -13,6 +13,7 @@
 #include "zlib.h"
 #define _USE_MATH_DEFINES
 #include <math.h>
+#include "CameraEndlessRunner.h"
 
 using namespace std;
 
@@ -112,9 +113,9 @@ int main()
 
 #endif // DEBUG
 	// Set the camera just above the plane, pointing in the direction of the x-axis.
-	Camera camera;
+	CameraEndlessRunner camera;
 	camera.setPosition({ -3.94543, 0.807405,  0.810452 });
-	camera.setHorizontalAngle(874.95);
+	camera.SetDirection({ 1, 0, 0 });
 
 	vector<ShaderInfo> shader;
 	loadShader("../../../vertex.glsl", GL_VERTEX_SHADER, shader);
@@ -123,10 +124,9 @@ int main()
 	compileShaderProgram(shader, programHandle);
 
 	Renderer render;
-	// Try to load a model and render it.
-	
-	auto teapotHandle = ResourceManager::Load<Model>("../../../teapot.obj", 0);
 
+	// Try to load a model and render it.	
+	auto teapotHandle = ResourceManager::Load<Model>("../../../teapot.obj", 0);
 	auto planeHandle = ResourceManager::Load<Model>("../../../plane.obj", 0);
 	
 	glm::mat4 worldMat = {
