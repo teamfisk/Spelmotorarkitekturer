@@ -129,7 +129,8 @@ int main()
 	// Try to load a model and render it.	
 	auto teapotHandle = ResourceManager::Load<Model>("teapot.obj", 0);
 	auto planeHandle = ResourceManager::Load<Model>("plane.obj", 0);
-
+	//auto bunnyHandle = ResourceManager::Load<Model>("bunny.obj", 0);		
+	
 	// Load other models when needed during runtime, to minimize initial load time.
 
 	glm::mat4 worldMat = {
@@ -148,14 +149,16 @@ int main()
 	double lastTime = glfwGetTime();
 
 	std::vector<Entity> entities;
+	entities.emplace_back(translate(glm::vec3(0, 0, 0)), teapotHandle);
 	entities.emplace_back(translate(glm::vec3(5, 0, 3)), teapotHandle);
+	entities.emplace_back(translate(glm::vec3(9, 0, 0)), teapotHandle);
 	entities.emplace_back(translate(glm::vec3(16, 0, 4)), teapotHandle);
 	entities.emplace_back(translate(glm::vec3(22, 0, -2)), teapotHandle);	
 	entities.emplace_back(translate(glm::vec3(27, 0, 1)), teapotHandle);
 	entities.emplace_back(translate(glm::vec3(32, 0, 4)), teapotHandle);
-	entities.emplace_back(translate(glm::vec3(36, 0, -2)), teapotHandle);
-	entities.emplace_back(translate(glm::vec3(40, 0, 1)), teapotHandle);
-	
+	entities.emplace_back(translate(glm::vec3(40, 0, -2)), teapotHandle);
+	entities.emplace_back(translate(glm::vec3(45, 0, 1)), teapotHandle);		
+
 	double timeSinceLastEntitySpawn = 0;
 	while (!glfwWindowShouldClose(window))
 	{	
@@ -170,9 +173,15 @@ int main()
 			if (x + offset < camera.getPosition().x)
 			{
 				entities[i].worldMatrix[3][0] += 40;
-			}
-		}		
 
+				// Change models after some time. It's like a new level!!
+				if (glfwGetTime() > 20.0f)
+				{
+					//entities[i].modelHandle = ;
+				}
+			}			
+		}
+		
 		//timeSinceLastEntitySpawn += dt;
 		//if (timeSinceLastEntitySpawn > 5.0)
 		//{
@@ -198,9 +207,6 @@ int main()
 		glUseProgram(programHandle);		
 		glUniformMatrix4fv(glGetUniformLocation(programHandle, "projection"), 1, GL_FALSE, glm::value_ptr(camera.getProjectionMatrix()));
 		glUniformMatrix4fv(glGetUniformLocation(programHandle, "view"), 1, GL_FALSE, glm::value_ptr(camera.getViewMatrix()));
-
-		renderer.Render(*teapotHandle, worldMat, programHandle);
-		renderer.Render(*teapotHandle, translate(worldMat, { 7, 0, 0 }), programHandle);
 
 		renderer.Render(*planeHandle, planeMatrix, programHandle);		
 
