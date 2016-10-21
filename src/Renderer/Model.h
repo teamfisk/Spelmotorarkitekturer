@@ -26,6 +26,7 @@ public:
 	GLsizei GetIndicesCount() const;
 	GLsizei GetTriangleCount() const;
 	GLenum GetIndexType() const;	
+	size_t GetMemoryUsage() const;
 private:
 	//std::unique_ptr<ResourceHandle<RawModelAssimp>> handlePtr;
 	ResourceHandle<RawModelAssimp> handle;

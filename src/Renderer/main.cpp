@@ -172,7 +172,7 @@ int main()
 			float offset = 4; // Trigger this if slightly after the player has passed the entity.
 			if (x + offset < camera.getPosition().x)
 			{
-				entities[i].worldMatrix[3][0] += 40;
+				entities[i].worldMatrix[3][0] += 50;
 
 				// Change models after some time. It's like a new level!!
 				if (glfwGetTime() > 20.0f)

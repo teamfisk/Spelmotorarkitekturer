@@ -61,8 +61,9 @@ public:
 	std::vector<unsigned int> m_Indices;
 	glm::mat4 m_Matrix;
 
-	size_t GetVertexBytes() { return m_Vertices.size() * sizeof(Vertex); }
-	size_t GetIndexBytes() { return m_Vertices.size() * sizeof(unsigned int); }
+	size_t GetVertexBytes() const { return m_Vertices.size() * sizeof(Vertex); }
+	size_t GetIndexBytes() const { return m_Vertices.size() * sizeof(unsigned int); }
+	size_t GetMemoryUsage()const;
 private:
 	std::vector<glm::ivec2> BoneIndices;
 	std::vector<glm::vec2> BoneWeights;
