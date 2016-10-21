@@ -1,0 +1,9 @@
+<Catch name="StackPerf-release">
+  <Group name="StackPerf-release">
+    <TestCase name="SmallAllocationComparison">
+      <OverallResult success="true" durationInSeconds="0.000454"/>
+    </TestCase>
+    <OverallResults successes="0" failures="0" expectedFailures="0"/>
+  </Group>
+  <OverallResults successes="0" failures="0" expectedFailures="0"/>
+</Catch>

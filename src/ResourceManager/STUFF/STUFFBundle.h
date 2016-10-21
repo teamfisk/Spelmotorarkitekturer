@@ -60,7 +60,7 @@ public:
 	std::size_t Read(const std::string& resourcePath, void* destination) { return 0; }
 
 private:
-	ResourceTree m_Tree;
+	//ResourceTree m_Tree;
 
 	void ParseVersion_1(std::ifstream& file)
 	{
