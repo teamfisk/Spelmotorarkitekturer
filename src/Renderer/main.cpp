@@ -14,6 +14,7 @@
 #define _USE_MATH_DEFINES
 #include <math.h>
 #include "CameraEndlessRunner.h"
+#include "Entity.h"
 
 using namespace std;
 
@@ -114,7 +115,7 @@ int main()
 #endif // DEBUG
 	// Set the camera just above the plane, pointing in the direction of the x-axis.
 	CameraEndlessRunner camera;
-	camera.setPosition({ -3.94543, 0.807405,  0.810452 });
+	camera.setPosition({ -20.94543, 0.807405,  0.810452 });
 	camera.SetDirection({ 1, 0, 0 });
 
 	vector<ShaderInfo> shader;
@@ -123,7 +124,7 @@ int main()
 	GLuint programHandle;
 	compileShaderProgram(shader, programHandle);
 
-	Renderer render;
+	Renderer renderer;
 
 	// Try to load a model and render it.	
 	auto teapotHandle = ResourceManager::Load<Model>("../../../teapot.obj", 0);
@@ -136,19 +137,33 @@ int main()
 		0, 0, 0, 1
 	};
 	
-	glm::mat4x4 planeMatrix = glm::rotate((float)M_PI_2, glm::vec3(1.0, 0.0, 0.0));			
+	glm::mat4x4 planeMatrix = glm::rotate((float)M_PI_2, glm::vec3(1.0, 0.0, 0.0));
+	planeMatrix = glm::scale(planeMatrix, { 20, 1, 1 });
 
 	auto keyILastFrame = GLFW_RELEASE;
 
 	glClearColor(0.f, 0.0f, 0.3f, 1.f);
 	double lastTime = glfwGetTime();
 
-	
+	std::vector<Entity> entities;
+
+
+	double timeSinceLastEntitySpawn = 0;
 	while (!glfwWindowShouldClose(window))
 	{	
 		double time = glfwGetTime();
 		double dt = time - lastTime;
 		lastTime = time;
+
+		timeSinceLastEntitySpawn += dt;
+		if (timeSinceLastEntitySpawn > 5.0)
+		{
+			timeSinceLastEntitySpawn = 0;
+
+			auto mat = glm::mat4x4(1);
+			mat = translate(mat, camera.getPosition() + glm::vec3(5, 0, 0));
+			entities.emplace_back(mat, teapotHandle);			
+		}		
 
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
@@ -166,10 +181,15 @@ int main()
 		glUniformMatrix4fv(glGetUniformLocation(programHandle, "projection"), 1, GL_FALSE, glm::value_ptr(camera.getProjectionMatrix()));
 		glUniformMatrix4fv(glGetUniformLocation(programHandle, "view"), 1, GL_FALSE, glm::value_ptr(camera.getViewMatrix()));
 
-		render.Render(*teapotHandle, worldMat, programHandle);
-		render.Render(*teapotHandle, translate(worldMat, { 7, 0, 0 }), programHandle);
+		renderer.Render(*teapotHandle, worldMat, programHandle);
+		renderer.Render(*teapotHandle, translate(worldMat, { 7, 0, 0 }), programHandle);
 
-		render.Render(*planeHandle, planeMatrix, programHandle);		
+		renderer.Render(*planeHandle, planeMatrix, programHandle);		
+
+		for (unsigned int i = 0; i < entities.size(); i++)
+		{			
+			renderer.Render(*entities[i].modelHandle, entities[i].worldMatrix, programHandle);
+		}
 
 		glfwSwapBuffers(window);
 		glfwPollEvents();

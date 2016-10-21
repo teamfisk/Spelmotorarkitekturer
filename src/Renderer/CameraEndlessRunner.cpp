@@ -27,6 +27,7 @@ void CameraEndlessRunner::Update()
 	float deltaTime = float(currentTime - lastTime);
 
 	GLFWwindow* window = glfwGetCurrentContext();
+	
 	// Move forward
 	if (glfwGetKey(window, GLFW_KEY_UP) == GLFW_PRESS || glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS) {
 		cameraPosition += direction * deltaTime * speed;
