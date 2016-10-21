@@ -129,6 +129,8 @@ int main()
 	// Try to load a model and render it.	
 	auto teapotHandle = ResourceManager::Load<Model>("../../../teapot.obj", 0);
 	auto planeHandle = ResourceManager::Load<Model>("../../../plane.obj", 0);
+
+	// Load other models when needed during runtime, to minimize initial load time.
 	
 	glm::mat4 worldMat = {
 		1, 0, 0, 0,
@@ -138,7 +140,7 @@ int main()
 	};
 	
 	glm::mat4x4 planeMatrix = glm::rotate((float)M_PI_2, glm::vec3(1.0, 0.0, 0.0));
-	planeMatrix = glm::scale(planeMatrix, { 20, 1, 1 });
+	planeMatrix = glm::scale(planeMatrix, { 200, 1, 1 });
 
 	auto keyILastFrame = GLFW_RELEASE;
 
@@ -146,24 +148,40 @@ int main()
 	double lastTime = glfwGetTime();
 
 	std::vector<Entity> entities;
-
-
+	entities.emplace_back(translate(glm::vec3(5, 0, 3)), teapotHandle);
+	entities.emplace_back(translate(glm::vec3(16, 0, 4)), teapotHandle);
+	entities.emplace_back(translate(glm::vec3(22, 0, -2)), teapotHandle);	
+	entities.emplace_back(translate(glm::vec3(27, 0, 1)), teapotHandle);
+	entities.emplace_back(translate(glm::vec3(32, 0, 4)), teapotHandle);
+	entities.emplace_back(translate(glm::vec3(36, 0, -2)), teapotHandle);
+	entities.emplace_back(translate(glm::vec3(40, 0, 1)), teapotHandle);
+	
 	double timeSinceLastEntitySpawn = 0;
 	while (!glfwWindowShouldClose(window))
 	{	
 		double time = glfwGetTime();
 		double dt = time - lastTime;
 		lastTime = time;
-
-		timeSinceLastEntitySpawn += dt;
-		if (timeSinceLastEntitySpawn > 5.0)
+		
+		for(unsigned int i = 0; i < entities.size(); i++)
 		{
-			timeSinceLastEntitySpawn = 0;
-
-			auto mat = glm::mat4x4(1);
-			mat = translate(mat, camera.getPosition() + glm::vec3(5, 0, 0));
-			entities.emplace_back(mat, teapotHandle);			
+			float x = entities[i].worldMatrix[3][0];
+			float offset = 4; // Trigger this if slightly after the player has passed the entity.
+			if (x + offset < camera.getPosition().x)
+			{
+				entities[i].worldMatrix[3][0] += 40;
+			}
 		}		
+
+		//timeSinceLastEntitySpawn += dt;
+		//if (timeSinceLastEntitySpawn > 5.0)
+		//{
+		//	timeSinceLastEntitySpawn = 0;
+
+		//	auto mat = glm::mat4x4(1);
+		//	mat = translate(mat, camera.getPosition() + glm::vec3(25 + rand() % 5, -1, 0));
+		//	entities.emplace_back(mat, teapotHandle);			
+		//}		
 
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
