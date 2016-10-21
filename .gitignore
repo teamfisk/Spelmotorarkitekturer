@@ -1,6 +1,8 @@
 # Build Folders
 build/
-bin/
+bin/*.pdb
+bin/*.ilk
+bin/*.exe
 lib/
 # Because apparently nobody has any self control
 *.orig
