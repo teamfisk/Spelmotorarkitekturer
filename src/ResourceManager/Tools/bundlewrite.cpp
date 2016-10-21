@@ -19,7 +19,7 @@ int main()
     std::vector<STUFF::Entry> entries;
 
 
-    boost::filesystem::path dir("../Resources");
+    boost::filesystem::path dir("Resources");
 
 
     std::cout << dir << std::endl;
@@ -28,17 +28,17 @@ int main()
         it != boost::filesystem::directory_iterator(); ++it) {
         if (boost::filesystem::is_regular_file(it->status())) {
             STUFF::Entry entry;
-            entry.FilePath = it->path().filename().string;
+          //  entry.FilePath = it->path().filename().string;
             //files.push_back(it->path().filename());
         }
     }
 
-    std::cout << "Number of files: " << files.size() << std::endl;
-    header.NumEntries = files.size();
+   // std::cout << "Number of files: " << files.size() << std::endl;
+    //header.NumEntries = files.size();
 
-    for (auto it : files) {
-        std::cout << it << std::endl;
-    }
+  //  for (auto it : files) {
+   //     std::cout << it << std::endl;
+   // }
 
 
     // std::cout << "Antalet filer i mappen: " << header.NumEntries;
