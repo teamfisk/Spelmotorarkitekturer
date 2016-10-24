@@ -1,4 +1,3 @@
-#include "../STUFF/STUFF.h"
 #include <cstdio>
 #include <cstring>
 #include <iostream>
@@ -8,23 +7,27 @@
 #include <boost/filesystem.hpp>
 #include <boost/lambda/bind.hpp>
 #include <boost/algorithm/string/replace.hpp>
-#include <boost/iostreams/stream.hpp>
-#include <boost/iostreams/device/mapped_file.hpp>
 
-int main()
+#include "../STUFF/STUFF.h"
+
+int main(int argc, char* argv[])
 {
-    //using namespace boost::lambda;
+    bool verbose = false;
 
-    
+    for(int i = 1; i < argc; i++) {
+        if(argv[i] == "-v" || argv[i] == "-V" || argv[i] == "--verbose") {
+            verbose = true;
+        }
+    }
+
     STUFF::Header header;
-
     std::vector<STUFF::Entry> entries;
-
-
     boost::filesystem::path dir("Resources");
 
-
-    std::cout << dir << std::endl;
+    if (verbose) {
+        std::cout << "Reading files from directory: ";
+        std::cout << dir << std::endl;
+    }
 
     std::uint64_t fileOffset = 0;
 
@@ -48,50 +51,43 @@ int main()
         }
     }
 
-    std::cout << "Number of files: " << entries.size() << std::endl;
     header.NumEntries = entries.size();
 
-    for (auto it : entries) {
-        std::cout << std::string(it.FilePath, it.PathLength )<< "\tSize: " << it.Size << "\tOffset: " << it.Offset <<std::endl;
+    if (verbose) {
+        std::cout << "Number of files: " << entries.size() << std::endl;
+
+        for (auto it : entries) {
+            std::cout << std::string(it.FilePath, it.PathLength)<< "\tSize: " << it.Size << "\tOffset: " << it.Offset <<std::endl;
+        }
     }
-
-    //Calculate size of bundle file
-    std::uint64_t bundleSize = 0;
-    bundleSize += sizeof(header.Signature);
-    bundleSize += sizeof(header.Version);
-    bundleSize += sizeof(header.NumEntries);
-
-    for (auto entry : entries) {
-        bundleSize += sizeof(entry.PathLength);
-        bundleSize += strlen(entry.FilePath);
-        bundleSize += sizeof(entry.Offset);
-        bundleSize += sizeof(entry.Size);
-        bundleSize += entry.Size; // size of data
-    }
-
-    //Allocate bundle
-    
 
     std::ofstream ofile("bundle.STUFF", std::ios::binary);
 
     //Write header
-    ofile << header.Signature;
-    ofile << header.Version;
-    ofile << header.NumEntries;
+
+    ofile.write(header.Signature, sizeof(header.Signature));
+    ofile.write(reinterpret_cast<char *>(&header.Version), sizeof(header.Version));
+    ofile.write(reinterpret_cast<char *>(&header.NumEntries), sizeof(header.NumEntries));
+
 
     //Write file entries
     for (auto entry : entries) {
-        ofile << entry.PathLength;
-        ofile << entry.FilePath;
-        ofile << entry.Offset;
-        ofile << entry.Size;
+        ofile.write(reinterpret_cast<char *>(&entry.PathLength), sizeof(entry.PathLength));
+        ofile.write(reinterpret_cast<char *>(&entry.FilePath), sizeof(entry.FilePath));
+        ofile.write(reinterpret_cast<char *>(&entry.Offset), sizeof(entry.Offset));
+        ofile.write(reinterpret_cast<char *>(&entry.Size), sizeof(entry.Size));
     }
 
     //Write data
     for (auto entry : entries) {
-
         std::ifstream src(std::string(entry.FilePath, entry.PathLength), std::ios::binary);
-        ofile << src.rdbuf();
+
+        char* buffer = new char[entry.Size];
+        src.read(buffer, entry.Size);
+
+        ofile.write(buffer, entry.Size);
+
+        src.close();
     }
     ofile.close();
 
