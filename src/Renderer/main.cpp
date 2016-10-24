@@ -129,6 +129,10 @@ int main()
 	// Try to load a model and render it.	
 	auto teapotHandle = ResourceManager::Load<Model>("Resources/teapot.obj", 0);
 	auto planeHandle = ResourceManager::Load<Model>("Resources/plane.obj", 0);
+
+	auto textureHandle = ResourceManager::Load<Texture>("Resources/kitten_png_image.png", 0);
+
+	
 	//auto bunnyHandle = ResourceManager::Load<Model>("Resources/bunny.obj", 0);		
 
 	// Load other models when needed during runtime, to minimize initial load time.

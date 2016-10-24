@@ -7,12 +7,65 @@
 #include <boost/filesystem.hpp>
 #include <boost/lambda/bind.hpp>
 #include <boost/algorithm/string/replace.hpp>
+#include <boost/program_options.hpp>
 
 #include "ResourceManager/STUFF/STUFF.h"
+
+const size_t ERROR_IN_COMMAND_LINE = 1;
+const size_t SUCCESS = 0;
+const size_t ERROR_UNHANDLED_EXCEPTION = 2;
+
+// Declare the supported options.
+boost::program_options::options_description desc("Allowed options");
+
+
 
 int main(int argc, char* argv[])
 {
     bool verbose = false;
+    std::string outputFile = "Bundle.stuff";
+    std::string inputDirectory = "Resources";
+
+    try {
+        desc.add_options()
+            ("verbose,v", "Print more")
+            ("input-directory,i", boost::program_options::value<std::string>(), "input directory")
+            ("output-file,o", boost::program_options::value<std::string>(), "output file")
+            ;
+
+        boost::program_options::variables_map vm;
+
+        try {
+            boost::program_options::store(boost::program_options::parse_command_line(argc, argv, desc), vm);
+
+            if (vm.count("verbose")) {
+                verbose = true;
+            }
+
+            if(vm.count("output-file")) {
+                outputFile = vm["output-file"].as<std::string>();
+            }
+
+            if (vm.count("input-directory")) {
+                inputDirectory = vm["input-directory"].as<std::string>();
+            }
+
+            boost::program_options::notify(vm);
+        } catch (boost::program_options::error& e) {
+            std::cerr << "ERROR: " << e.what() << std::endl << std::endl;
+            std::cerr << desc << std::endl;
+            return ERROR_IN_COMMAND_LINE;
+        }
+
+
+    } catch (std::exception& e) {
+        std::cerr << "Unhandled Exception reached the top of main: "
+            << e.what() << ", application will now exit" << std::endl;
+        return ERROR_UNHANDLED_EXCEPTION;
+
+    }
+    
+    
 
     for(int i = 1; i < argc; i++) {
         if(argv[i] == "-v" || argv[i] == "-V" || argv[i] == "--verbose") {
@@ -22,7 +75,7 @@ int main(int argc, char* argv[])
 
     STUFF::Header header;
     std::vector<STUFF::Entry> entries;
-    boost::filesystem::path dir("Resources");
+    boost::filesystem::path dir(inputDirectory);
 
     if (verbose) {
         std::cout << "Reading files from directory: ";
@@ -61,7 +114,7 @@ int main(int argc, char* argv[])
         }
     }
 
-    std::ofstream ofile("TestBundle.stuff", std::ios::binary);
+    std::ofstream ofile(outputFile, std::ios::binary);
 
     //Write header
 
@@ -86,10 +139,6 @@ int main(int argc, char* argv[])
     }
     ofile.close();
 
-
-    if(verbose) {
-        std::cin.get();
-    }
 
     return 0;
 }
