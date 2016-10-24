@@ -2,6 +2,7 @@
 #include "ResourceManager/ResourceManager.h"
 #include "ResourceManager/ResourceTreeNode.h"
 #include "ResourceManager/STUFF/STUFFBundle.h"
+#include "ResourceManager/FilesystemBundle.h"
 
 TEST_CASE("ResourceManager")
 {
@@ -36,14 +37,12 @@ TEST_CASE("ResourceTree")
 	REQUIRE(file->Name == n2.Name);
 }
 
-TEST_CASE("STUFF_Read")
+void testBundle(ResourceBundle* bundle)
 {
-    STUFFBundle bundle("TestFiles/STUFF_Read/STUFF_Read.stuff");
-
-    // Read()
+	// Read()
 	{
-		auto block = bundle.Search("Resources/TestFolder/TestFile2.txt");
-		REQUIRE(block);
+		auto block = bundle->Search("TestFolder/TestFile2.txt");
+		REQUIRE(block != nullptr);
 		REQUIRE(block->Size() == 12);
 
 		auto buffer = new char[block->Size()];
@@ -57,8 +56,8 @@ TEST_CASE("STUFF_Read")
 
 	// Stream()
 	{
-		auto block = bundle.Search("Resources/TestFolder/TestFile2.txt");
-		REQUIRE(block);
+		auto block = bundle->Search("TestFolder/TestFile2.txt");
+		REQUIRE(block != nullptr);
 		REQUIRE(block->Size() == 12);
 
 		char buffer[4];
@@ -79,7 +78,21 @@ TEST_CASE("STUFF_Read")
 
 	// Invalid file
 	{
-		auto block = bundle.Search("Resources/TestFolder/QWERTY");
-		REQUIRE(!block);
+		auto block = bundle->Search("TestFolder/QWERTY");
+		REQUIRE(block == nullptr);
 	}
+}
+
+TEST_CASE("STUFF_Read")
+{
+	auto bundle = new STUFFBundle("TestFiles/ResourceBundle/Resources.stuff");
+	testBundle(bundle);
+	delete bundle;
+}
+
+TEST_CASE("FilesystemBundle_Read")
+{
+    auto bundle = new FilesystemBundle("TestFiles/ResourceBundle/Resources");
+	testBundle(bundle);
+	delete bundle;
 }

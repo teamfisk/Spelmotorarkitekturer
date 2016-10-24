@@ -10,36 +10,33 @@
 class ResourceBundle
 {
 public:
-	class Block
+    class Block
 	{
 	public:
-		Block(boost::interprocess::mapped_region&& fileMapping, const std::string& path, std::size_t size)
-            : m_FileMapping(std::move(fileMapping))
-            , m_Path(path)
+		Block(const std::string& path, std::size_t size)
+            : m_Path(path)
             , m_Size(size)
 		{ }
 
 		const std::string& Path() const { return m_Path; }
 		std::size_t Size() const { return m_Size; }
-        std::size_t StreamOffset() const { return m_StreamOffset; }
 
 		// Reads the whole block from disk, returns number of bytes read
-		std::size_t Read(void* destination);
+		virtual std::size_t Read(void* destination) = 0;
 		// Streams a chunk of a block from disk, returns number of bytes read
-		std::size_t Stream(void* destination, std::size_t size);
+		virtual std::size_t Stream(void* destination, std::size_t size) = 0;
 
-    private:
-        boost::interprocess::mapped_region m_FileMapping;
-		std::string m_Path;
+	protected:
+		const std::string& m_Path;
 		std::size_t m_Size;
-		std::size_t m_StreamOffset = 0;
 	};
+
 
 	ResourceBundle(const std::string& path)
 		: m_BundlePath(path)
 	{ }
 
-	virtual boost::optional<Block> Search(const std::string& path) = 0;
+	virtual std::shared_ptr<Block> Search(const std::string& path) = 0;
 
 protected:
 	std::string m_BundlePath;

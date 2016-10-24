@@ -14,7 +14,43 @@
 
 namespace bip = boost::interprocess;
 
-class STUFFBundle : ResourceBundle
+class STUFFBlock : public ResourceBundle::Block
+{
+public:
+    STUFFBlock(const std::string& path, std::size_t size, boost::interprocess::mapped_region&& fileMapping)
+            : ResourceBundle::Block(path, size)
+            , m_FileMapping(std::move(fileMapping))
+    { }
+
+    // Reads the whole block from disk, returns number of bytes read
+    std::size_t Read(void* destination) override;
+    // Streams a chunk of a block from disk, returns number of bytes read
+    std::size_t Stream(void* destination, std::size_t size) override;
+
+private:
+    boost::interprocess::mapped_region m_FileMapping;
+    std::size_t m_StreamOffset = 0;
+};
+
+std::size_t STUFFBlock::Read(void* destination)
+{
+    std::size_t size = m_Size;
+    memcpy(destination, m_FileMapping.get_address(), size);
+    return size;
+}
+
+std::size_t STUFFBlock::Stream(void* destination, std::size_t size)
+{
+    size = std::min(size, m_Size - m_StreamOffset);
+    if (size <= 0) {
+        return 0;
+    }
+    memcpy(destination, (char*)m_FileMapping.get_address() + m_StreamOffset, size);
+    m_StreamOffset += size;
+    return size;
+}
+
+class STUFFBundle : public ResourceBundle
 {
 public:
 	STUFFBundle(const std::string& path)
@@ -60,23 +96,22 @@ public:
         }
 
         m_FirstBlockOffset = file.tellg();
-
 	}
 
 	~STUFFBundle()
 	{
 	}
 
-	boost::optional<Block> Search(const std::string& path) override
+	std::shared_ptr<Block> Search(const std::string& path) override
 	{
 		auto it = m_FileEntries.find(path);
 		if (it == m_FileEntries.end()) {
-			return boost::none;
+			return nullptr;
 		} else {
             STUFF::Entry& e = it->second;
             std::size_t blockOffset = m_FirstBlockOffset + e.Offset;
             bip::mapped_region blockRegion(m_FileMapping, bip::read_only, blockOffset, e.Size);
-            return Block(std::move(blockRegion), e.FilePath, e.Size);
+            return std::make_shared<STUFFBlock>(e.FilePath, e.Size, std::move(blockRegion));
 		}
 	}
 
