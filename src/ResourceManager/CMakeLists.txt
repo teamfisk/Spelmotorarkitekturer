@@ -18,27 +18,11 @@ file(GLOB SOURCE_FILES_STUFF
 )
 source_group(STUFF FILES ${SOURCE_FILES_STUFF})
 
-file(GLOB SOURCE_FILES_TOOLS
-	"Tools/*.h"
-    "Tools/*.cpp"
-)
-source_group(TOOLS FILES ${SOURCE_FILES_TOOLS})
-
 set(SOURCE_FILES ${SOURCE_FILES} ${SOURCE_FILES_STUFF})
 
 add_library(ResourceManager 
 	${SOURCE_FILES}
 )
-
 target_link_libraries(ResourceManager
-	${Boost_LIBRARIES}
-)
-
-add_executable(STUFFGenerator
-	${SOURCE_FILES}
-	${SOURCE_FILES_TOOLS}
-)
-
-target_link_libraries(STUFFGenerator
 	${Boost_LIBRARIES}
 )

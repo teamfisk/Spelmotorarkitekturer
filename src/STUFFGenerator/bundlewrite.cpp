@@ -8,7 +8,7 @@
 #include <boost/lambda/bind.hpp>
 #include <boost/algorithm/string/replace.hpp>
 
-#include "../STUFF/STUFF.h"
+#include "ResourceManager/STUFF/STUFF.h"
 
 int main(int argc, char* argv[])
 {
@@ -81,14 +81,15 @@ int main(int argc, char* argv[])
     //Write data
     for (auto entry : entries) {
         std::ifstream src(std::string(entry.FilePath, entry.PathLength), std::ios::binary);
-
-        char* buffer = new char[entry.Size];
-        src.read(buffer, entry.Size);
-        ofile.write(buffer, entry.Size);
-        delete[] buffer;
+        ofile << src.rdbuf();
         src.close();
     }
     ofile.close();
+
+
+    if(verbose) {
+        std::cin.get();
+    }
 
     return 0;
 }
