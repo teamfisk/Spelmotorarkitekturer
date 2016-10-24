@@ -1,6 +1,7 @@
 #include "catch.hpp"
 #include "ResourceManager/ResourceManager.h"
 #include "ResourceManager/ResourceTreeNode.h"
+#include "ResourceManager/STUFF/STUFFBundle.h"
 
 TEST_CASE("ResourceManager")
 {
@@ -33,4 +34,20 @@ TEST_CASE("ResourceTree")
 
 	auto file = root.Search("Folder/File");
 	REQUIRE(file->Name == n2.Name);
+}
+
+TEST_CASE("STUFF_Read")
+{
+    STUFFBundle bundle("TestFiles/STUFF_Read/STUFF_Read.stuff");
+
+    auto block = bundle.Search("Resources/TestFolder/TestFile2.txt");
+    REQUIRE(block != nullptr);
+
+    REQUIRE(block->BlockSize() == 12);
+
+    auto buffer = new char[block->BlockSize()];
+    std::size_t size = block->Read(buffer);
+    REQUIRE(size == 12);
+
+    REQUIRE(std::memcmp(buffer, "TestContent2", 12) == 0);
 }

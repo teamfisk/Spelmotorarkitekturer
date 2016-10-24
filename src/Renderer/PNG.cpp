@@ -81,7 +81,8 @@ PNG::PNG(std::string path)
 
 	this->Width = width;
 	this->Height = height;
-
+	auto bytePerPixel = bit_depth / 8 * 4;	
+	this->ByteSize = width * height * bytePerPixel;
 	png_destroy_read_struct(&png_ptr, &info_ptr, &info_end_ptr);
 	fclose(file);
 }
