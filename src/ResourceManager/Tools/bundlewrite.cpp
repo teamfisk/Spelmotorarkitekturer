@@ -7,14 +7,14 @@
 
 #include <boost/filesystem.hpp>
 #include <boost/lambda/bind.hpp>
-#include <boost/algorithm/string/case_conv.hpp>
+#include <boost/algorithm/string/replace.hpp>
 
 int main()
 {
     //using namespace boost::lambda;
 
-    std::size_t offset = 0;
-    STUFF::Header header; offset += sizeof(header);
+    
+    STUFF::Header header;
 
     std::vector<STUFF::Entry> entries;
 
@@ -24,35 +24,41 @@ int main()
 
     std::cout << dir << std::endl;
 
+    std::uint64_t fileOffset = 0;
+
     for (boost::filesystem::directory_iterator it(dir);
         it != boost::filesystem::directory_iterator(); ++it) {
         if (boost::filesystem::is_regular_file(it->status())) {
+            std::string pathStr = it->path().string();
+            boost::replace_all(pathStr, "\\", "/");
+
             STUFF::Entry entry;
-          //  entry.FilePath = it->path().filename().string;
-            //files.push_back(it->path().filename());
+            entry.PathLength = pathStr.length();
+            entry.FilePath = new char[entry.PathLength];
+            memcpy(entry.FilePath, pathStr.c_str(), entry.PathLength);
+
+            entry.Size = boost::filesystem::file_size(it->path());
+
+            entry.Offset = fileOffset;
+            fileOffset += entry.Size;
+
+            entries.push_back(entry);
         }
     }
 
-   // std::cout << "Number of files: " << files.size() << std::endl;
-    //header.NumEntries = files.size();
+    std::cout << "Number of files: " << entries.size() << std::endl;
+    header.NumEntries = entries.size();
 
-  //  for (auto it : files) {
-   //     std::cout << it << std::endl;
-   // }
+    for (auto it : entries) {
+        std::cout << std::string(it.FilePath, it.PathLength )<< "\tSize: " << it.Size << "\tOffset: " << it.Offset <<std::endl;
+    }
 
 
-    // std::cout << "Antalet filer i mappen: " << header.NumEntries;
+    //Allocate bundle
 
 
     FILE* file = fopen("bundle.stuff", "w");
 
-
-
-    STUFF::Entry entry; offset += sizeof(entry) - sizeof(entry.FilePath);
-    entry.FilePath = "things/thing.txt"; offset += strlen(entry.FilePath);
-    entry.PathLength = strlen(entry.FilePath);
-    entry.Offset = offset;
-    //entry.Size = strlen(thing) + 1;
 
     //Write header
     fwrite(&header.Signature, sizeof(header.Signature), 1, file);
@@ -60,19 +66,22 @@ int main()
     fwrite(&header.NumEntries, sizeof(header.NumEntries), 1, file);
 
     //Write file entries
-    fwrite(&entry.PathLength, sizeof(entry.PathLength), 1, file);
-    fwrite(entry.FilePath, strlen(entry.FilePath), 1, file);
-    fwrite(&entry.Offset, sizeof(entry.Offset), 1, file);
-    fwrite(&entry.Size, sizeof(entry.Size), 1, file);
-
+    for (auto entry : entries) {
+        fwrite(&entry.PathLength, sizeof(entry.PathLength), 1, file);
+        fwrite(entry.FilePath, strlen(entry.FilePath), 1, file);
+        fwrite(&entry.Offset, sizeof(entry.Offset), 1, file);
+        fwrite(&entry.Size, sizeof(entry.Size), 1, file);
+    }
 
     //Write data
-    //fwrite(thing, strlen(thing) + 1, 1, file);
+    for (auto entry : entries) {
 
+
+
+        //fwrite(thing, strlen(thing) + 1, 1, file);
+    }
     fclose(file);
 
-    std::cout << "Offset: " << entry.Offset << std::endl;
-    std::cout << "Size: " << entry.Size << std::endl;
 
 
 

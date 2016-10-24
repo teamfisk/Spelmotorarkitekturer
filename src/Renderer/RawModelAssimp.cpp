@@ -201,3 +201,20 @@ RawModelAssimp::RawModelAssimp(const std::string& fileName)
 RawModelAssimp::~RawModelAssimp()
 {
 }
+
+size_t RawModelAssimp::GetMemoryUsage() const
+{	
+	size_t s = 0;
+	s += sizeof(RawModelAssimp);
+	s += MaterialGroups.size() * sizeof(MaterialGroup);
+	s += m_Vertices.size() * sizeof(Vertex);
+	s += m_Indices.size() * sizeof(unsigned int);
+	s += sizeof(m_Matrix);
+	s += BoneIndices.size() * sizeof(glm::ivec2);
+	s += BoneWeights.size() * sizeof(glm::vec2);
+	s += Normals.size() * sizeof(glm::vec3);
+	s += TangentNormals.size() * sizeof(glm::vec3);
+	s += BiTangentNormals.size() * sizeof(glm::vec3);
+	s += TextureCoords.size() * sizeof(glm::vec2);
+	return s;
+}
