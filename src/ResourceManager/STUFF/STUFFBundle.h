@@ -83,7 +83,8 @@ public:
         // Read header
         STUFF::Header header;
         file.read(header.Signature, sizeof(header.Signature));
-        if (std::strcmp(header.Signature, "STUFF") != 0) {
+        if (std::memcmp(header.Signature, "STUFF", 5) != 0) {
+            LOG_WARNING("Unknown STUFF header: %s", std::string(header.Signature, 5).c_str());
             throw std::runtime_error("Bundle is not STUFF");
         }
         file.read((char*)&header.Version, sizeof(header.Version));
@@ -112,17 +113,15 @@ public:
             file.read((char*)&entry.Size, sizeof(entry.Size));
 
             LOG_DEBUG("Entry %i: %s (%o, %o)", i + 1, entry.FilePath, entry.Offset, entry.Size);
-            entries.push_back(std::move(entry));
+            m_FileEntries[entry.FilePath] = std::move(entry);
         }
 
-        std::size_t firstBlockOffset = file.tellg();
+        m_FirstBlockOffset = file.tellg();
 
         // Construct block instances
         m_FileMapping = bip::file_mapping(path.c_str(), bip::read_only);
         for (auto& e : entries) {
-            std::size_t blockOffset = firstBlockOffset + e.Offset;
-            bip::mapped_region blockRegion(m_FileMapping, bip::read_only, blockOffset, e.Size);
-            m_FileEntries[e.FilePath] = new Block(std::move(blockRegion), e.FilePath, e.Size);
+
         }
 	}
 
@@ -130,19 +129,23 @@ public:
 	{
 	}
 
-	Block* Search(const std::string& path) override
+	boost::optional<Block> Search(const std::string& path) override
 	{
 		auto it = m_FileEntries.find(path);
 		if (it == m_FileEntries.end()) {
-			return nullptr;
+			return boost::none;
 		} else {
-			return it->second;
+            STUFF::Entry& e = it->second;
+            std::size_t blockOffset = m_FirstBlockOffset + e.Offset;
+            bip::mapped_region blockRegion(m_FileMapping, bip::read_only, blockOffset, e.Size);
+            return Block(std::move(blockRegion), e.FilePath, e.Size);
 		}
 	}
 
 private:
 	bip::file_mapping m_FileMapping;
-	std::unordered_map<std::string, Block*> m_FileEntries;
+    std::size_t m_FirstBlockOffset = 0;
+	std::unordered_map<std::string, STUFF::Entry> m_FileEntries;
 };
 
 #endif

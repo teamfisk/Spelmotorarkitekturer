@@ -40,14 +40,39 @@ TEST_CASE("STUFF_Read")
 {
     STUFFBundle bundle("TestFiles/STUFF_Read/STUFF_Read.stuff");
 
-    auto block = bundle.Search("Resources/TestFolder/TestFile2.txt");
-    REQUIRE(block != nullptr);
+    // Read()
+	{
+		auto block = bundle.Search("Resources/TestFolder/TestFile2.txt");
+		REQUIRE(block);
+		REQUIRE(block->BlockSize() == 12);
 
-    REQUIRE(block->BlockSize() == 12);
+		auto buffer = new char[block->BlockSize()];
+		std::size_t bytesRead = block->Read(buffer);
+		REQUIRE(bytesRead == 12);
 
-    auto buffer = new char[block->BlockSize()];
-    std::size_t size = block->Read(buffer);
-    REQUIRE(size == 12);
+		REQUIRE(std::memcmp(buffer, "TestContent2", 12) == 0);
 
-    REQUIRE(std::memcmp(buffer, "TestContent2", 12) == 0);
+		delete[] buffer;
+	}
+	// Stream()
+	{
+		auto block = bundle.Search("Resources/TestFolder/TestFile2.txt");
+		REQUIRE(block);
+		REQUIRE(block->BlockSize() == 12);
+
+		char buffer[4];
+		std::size_t bytesRead;
+
+		bytesRead = block->Stream(buffer, 4);
+		REQUIRE(bytesRead == 4);
+		REQUIRE(std::memcmp(buffer, "Test", 4) == 0);
+		bytesRead = block->Stream(buffer, 4);
+		REQUIRE(bytesRead == 4);
+		REQUIRE(std::memcmp(buffer, "Cont", 4) == 0);
+		bytesRead = block->Stream(buffer, 4);
+		REQUIRE(bytesRead == 4);
+		REQUIRE(std::memcmp(buffer, "ent2", 4) == 0);
+		bytesRead = block->Stream(buffer, 4);
+		REQUIRE(bytesRead == 0);
+	}
 }

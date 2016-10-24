@@ -4,6 +4,8 @@
 #include <string>
 #include <memory>
 #include <boost/interprocess/mapped_region.hpp>
+#include <boost/optional.hpp>
+#include "Logging.h"
 
 class ResourceBundle
 {
@@ -21,7 +23,7 @@ public:
 
 		// Reads the whole block from disk, returns number of bytes read
 		std::size_t Read(void* destination);
-		// Streams part of a block from disk, returns number of bytes read
+		// Streams a chunk of a block from disk, returns number of bytes read
 		std::size_t Stream(void* destination, std::size_t size);
 
     private:
@@ -35,7 +37,7 @@ public:
 		: m_BundlePath(path)
 	{ }
 
-	virtual Block* Search(const std::string& path) = 0;
+	virtual boost::optional<Block> Search(const std::string& path) = 0;
 
 protected:
 	std::string m_BundlePath;
