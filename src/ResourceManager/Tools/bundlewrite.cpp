@@ -8,6 +8,8 @@
 #include <boost/filesystem.hpp>
 #include <boost/lambda/bind.hpp>
 #include <boost/algorithm/string/replace.hpp>
+#include <boost/iostreams/stream.hpp>
+#include <boost/iostreams/device/mapped_file.hpp>
 
 int main()
 {
@@ -26,8 +28,8 @@ int main()
 
     std::uint64_t fileOffset = 0;
 
-    for (boost::filesystem::directory_iterator it(dir);
-        it != boost::filesystem::directory_iterator(); ++it) {
+    for (boost::filesystem::recursive_directory_iterator  it(dir);
+        it != boost::filesystem::recursive_directory_iterator(); ++it) {
         if (boost::filesystem::is_regular_file(it->status())) {
             std::string pathStr = it->path().string();
             boost::replace_all(pathStr, "\\", "/");
@@ -53,37 +55,45 @@ int main()
         std::cout << std::string(it.FilePath, it.PathLength )<< "\tSize: " << it.Size << "\tOffset: " << it.Offset <<std::endl;
     }
 
+    //Calculate size of bundle file
+    std::uint64_t bundleSize = 0;
+    bundleSize += sizeof(header.Signature);
+    bundleSize += sizeof(header.Version);
+    bundleSize += sizeof(header.NumEntries);
+
+    for (auto entry : entries) {
+        bundleSize += sizeof(entry.PathLength);
+        bundleSize += strlen(entry.FilePath);
+        bundleSize += sizeof(entry.Offset);
+        bundleSize += sizeof(entry.Size);
+        bundleSize += entry.Size; // size of data
+    }
 
     //Allocate bundle
+    
 
-
-    FILE* file = fopen("bundle.stuff", "w");
-
+    std::ofstream ofile("bundle.STUFF", std::ios::binary);
 
     //Write header
-    fwrite(&header.Signature, sizeof(header.Signature), 1, file);
-    fwrite(&header.Version, sizeof(header.Version), 1, file);
-    fwrite(&header.NumEntries, sizeof(header.NumEntries), 1, file);
+    ofile << header.Signature;
+    ofile << header.Version;
+    ofile << header.NumEntries;
 
     //Write file entries
     for (auto entry : entries) {
-        fwrite(&entry.PathLength, sizeof(entry.PathLength), 1, file);
-        fwrite(entry.FilePath, strlen(entry.FilePath), 1, file);
-        fwrite(&entry.Offset, sizeof(entry.Offset), 1, file);
-        fwrite(&entry.Size, sizeof(entry.Size), 1, file);
+        ofile << entry.PathLength;
+        ofile << entry.FilePath;
+        ofile << entry.Offset;
+        ofile << entry.Size;
     }
 
     //Write data
     for (auto entry : entries) {
 
-
-
-        //fwrite(thing, strlen(thing) + 1, 1, file);
+        std::ifstream src(std::string(entry.FilePath, entry.PathLength), std::ios::binary);
+        ofile << src.rdbuf();
     }
-    fclose(file);
-
-
-
+    ofile.close();
 
     return 0;
 }
