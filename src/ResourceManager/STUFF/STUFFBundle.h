@@ -20,64 +20,7 @@ public:
 	STUFFBundle(const std::string& path)
 		: ResourceBundle(path)
 	{
-//        m_File = bip::file_mapping(path.c_str(), bip::read_only);
-//
-//		void* data = nullptr;
-//		std::size_t offset = 0;
-//
-//		// Read header
-//		bip::mapped_region headerRegion(m_File, bip::read_only, offset, sizeof(STUFF::Header::Signature) + sizeof(STUFF::Header::Version) + sizeof(STUFF::Header::NumEntries));
-//		offset += headerRegion.get_size();
-//		data = headerRegion.get_address();
-//		STUFF::Header header;
-//		memcpy(header.Signature, data, sizeof(header.Signature));
-//		data += sizeof(header.Signature);
-//		if (std::strcmp(header.Signature, "STUFF") != 0) {
-//			throw std::runtime_error("Bundle is not STUFF");
-//		}
-//		memcpy(&header.Version, data, sizeof(header.Version));
-//		data += sizeof(header.Version);
-//		memcpy(&header.NumEntries, data, sizeof(header.NumEntries));
-//		data += sizeof(header.NumEntries);
-//		if (header.NumEntries == 0) {
-//			LOG_WARNING("No entries in bundle!");
-//		}
-//
-//		// Read file entries
-//		if (header.NumEntries > 0) {
-//			for (int i = 0; i < header.NumEntries; ++i) {
-//                bip::mapped_region entryRegion(m_File, bip::read_only, offset, sizeof(STUFF::Entry));
-//                offset += entryRegion.get_size();
-//                data = entryRegion.get_address();
-//				// Read entry
-//				STUFF::Entry entry;
-//				memcpy(&entry.PathLength, data, sizeof(entry.PathLength));
-//				data += sizeof(entry.PathLength);
-//                if (entry.PathLength == 0) {
-//                    LOG_WARNING("Encountered an empty m_File.entry path!");
-//                }
-//                entry.FilePath = new char[entry.PathLength + 1];
-//                entry.FilePath[entry.PathLength] = '\0';
-//				memcpy(entry.FilePath, data, entry.PathLength);
-//				data += entry.PathLength;
-//				memcpy(&entry.Offset, data, sizeof(entry.Offset));
-//				data += sizeof(entry.Offset);
-//				memcpy(&entry.Size, data, sizeof(entry.Size));
-//				data += sizeof(entry.Size);
-//				LOG_DEBUG("Entry %i: %s (%o, %o)", i + 1, entry.FilePath, entry.Offset, entry.Size);
-//
-//				// Construct block instance
-//                std::size_t blockOffset = offset + entry.Offset;
-//				//std::size_t blockOffset = entry.Offset; // HACK: Offsets should be relative to first block later
-//                bip::mapped_region blockRegion(m_File, bip::read_only, blockOffset, entry.Size);
-//				m_FileEntries[entry.FilePath] = new Block(std::move(blockRegion), entry.FilePath, entry.Size);
-//			}
-//		}
-//
-//		if (m_FileEntries.size() == 0) {
-//			LOG_WARNING("No file entries found!");
-//		}
-
+        m_FileMapping = bip::file_mapping(path.c_str(), bip::read_only);
         std::ifstream file(path.c_str(), std::ios::binary);
 
         // Read header
@@ -118,11 +61,6 @@ public:
 
         m_FirstBlockOffset = file.tellg();
 
-        // Construct block instances
-        m_FileMapping = bip::file_mapping(path.c_str(), bip::read_only);
-        for (auto& e : entries) {
-
-        }
 	}
 
 	~STUFFBundle()

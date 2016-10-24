@@ -13,13 +13,15 @@ public:
 	class Block
 	{
 	public:
-		Block(boost::interprocess::mapped_region&& fileMapping, const std::string& path, std::size_t blockSize)
+		Block(boost::interprocess::mapped_region&& fileMapping, const std::string& path, std::size_t size)
             : m_FileMapping(std::move(fileMapping))
             , m_Path(path)
-            , m_BlockSize(blockSize)
+            , m_Size(size)
 		{ }
 
-		std::size_t BlockSize() const { return m_BlockSize; }
+		const std::string& Path() const { return m_Path; }
+		std::size_t Size() const { return m_Size; }
+        std::size_t StreamOffset() const { return m_StreamOffset; }
 
 		// Reads the whole block from disk, returns number of bytes read
 		std::size_t Read(void* destination);
@@ -29,7 +31,7 @@ public:
     private:
         boost::interprocess::mapped_region m_FileMapping;
 		std::string m_Path;
-		std::size_t m_BlockSize;
+		std::size_t m_Size;
 		std::size_t m_StreamOffset = 0;
 	};
 

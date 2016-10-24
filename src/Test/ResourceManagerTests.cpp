@@ -44,9 +44,9 @@ TEST_CASE("STUFF_Read")
 	{
 		auto block = bundle.Search("Resources/TestFolder/TestFile2.txt");
 		REQUIRE(block);
-		REQUIRE(block->BlockSize() == 12);
+		REQUIRE(block->Size() == 12);
 
-		auto buffer = new char[block->BlockSize()];
+		auto buffer = new char[block->Size()];
 		std::size_t bytesRead = block->Read(buffer);
 		REQUIRE(bytesRead == 12);
 
@@ -54,11 +54,12 @@ TEST_CASE("STUFF_Read")
 
 		delete[] buffer;
 	}
+
 	// Stream()
 	{
 		auto block = bundle.Search("Resources/TestFolder/TestFile2.txt");
 		REQUIRE(block);
-		REQUIRE(block->BlockSize() == 12);
+		REQUIRE(block->Size() == 12);
 
 		char buffer[4];
 		std::size_t bytesRead;
@@ -74,5 +75,11 @@ TEST_CASE("STUFF_Read")
 		REQUIRE(std::memcmp(buffer, "ent2", 4) == 0);
 		bytesRead = block->Stream(buffer, 4);
 		REQUIRE(bytesRead == 0);
+	}
+
+	// Invalid file
+	{
+		auto block = bundle.Search("Resources/TestFolder/QWERTY");
+		REQUIRE(!block);
 	}
 }
