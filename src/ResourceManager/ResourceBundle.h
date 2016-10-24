@@ -3,7 +3,7 @@
 
 #include <string>
 #include <memory>
-#include <boost/interprocess/file_mapping.hpp>
+#include <boost/interprocess/mapped_region.hpp>
 
 class ResourceBundle
 {
@@ -11,10 +11,9 @@ public:
 	class Block
 	{
 	public:
-		Block(boost::interprocess::file_mapping&& fileMapping, const std::string& path, std::uintptr_t offset, std::size_t blockSize)
-            : m_FileMapping(fileMapping)
+		Block(boost::interprocess::mapped_region&& fileMapping, const std::string& path, std::size_t blockSize)
+            : m_FileMapping(std::move(fileMapping))
             , m_Path(path)
-            , m_Offset(offset)
             , m_BlockSize(blockSize)
 		{ }
 
@@ -26,17 +25,17 @@ public:
 		std::size_t Stream(void* destination, std::size_t size);
 
     private:
-        boost::interprocess::file_mapping m_FileMapping;
+        boost::interprocess::mapped_region m_FileMapping;
 		std::string m_Path;
-		std::uintptr_t m_Offset;
 		std::size_t m_BlockSize;
+		std::size_t m_StreamOffset = 0;
 	};
 
 	ResourceBundle(const std::string& path)
 		: m_BundlePath(path)
 	{ }
 
-	virtual std::shared_ptr<Block> Search(const std::string& path) = 0;
+	virtual Block* Search(const std::string& path) = 0;
 
 protected:
 	std::string m_BundlePath;
