@@ -3,6 +3,7 @@
 
 #include <list>
 #include "Logging.h"
+#include "ResourceBundle.h"
 
 class Resource
 {
@@ -27,6 +28,7 @@ public:
 protected:
 	Resource() = default;
 	Resource(const std::string& path) { }
+	Resource(std::shared_ptr<ResourceBundle::Block> block) { }
 	virtual ~Resource()
 	{
 		if (m_ReferenceCount != 0) {

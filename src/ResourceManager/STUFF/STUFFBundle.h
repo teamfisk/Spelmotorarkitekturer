@@ -4,6 +4,7 @@
 #include <fstream>
 #include <cstring>
 #include <unordered_map>
+#include <boost/filesystem.hpp>
 #include <boost/interprocess/file_mapping.hpp>
 #include <boost/interprocess/mapped_region.hpp>
 
@@ -56,15 +57,17 @@ public:
 	STUFFBundle(const std::string& path)
 		: ResourceBundle(path)
 	{
-        m_FileMapping = bip::file_mapping(path.c_str(), bip::read_only);
+        if (!boost::filesystem::is_regular_file(path)) {
+            throw ResourceBundle::InvalidBundleFormat();
+        }
+
         std::ifstream file(path.c_str(), std::ios::binary);
 
         // Read header
         STUFF::Header header;
         file.read(header.Signature, sizeof(header.Signature));
         if (std::memcmp(header.Signature, "STUFF", 5) != 0) {
-            LOG_WARNING("Unknown STUFF header: %s", std::string(header.Signature, 5).c_str());
-            throw std::runtime_error("Bundle is not STUFF");
+            throw ResourceBundle::InvalidBundleFormat();
         }
         file.read((char*)&header.Version, sizeof(header.Version));
         file.read((char*)&header.NumEntries, sizeof(header.NumEntries));
@@ -96,6 +99,7 @@ public:
         }
 
         m_FirstBlockOffset = file.tellg();
+        m_FileMapping = bip::file_mapping(path.c_str(), bip::read_only);
 	}
 
 	~STUFFBundle()

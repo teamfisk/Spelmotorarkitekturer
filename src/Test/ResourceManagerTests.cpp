@@ -3,22 +3,18 @@
 #include "ResourceManager/ResourceTreeNode.h"
 #include "ResourceManager/STUFF/STUFFBundle.h"
 #include "ResourceManager/FilesystemBundle.h"
+#include "ResourceManager/TXT.h"
 
 TEST_CASE("ResourceManager")
 {
-	{
-		const ResourceHandle<Resource>& r1_1 = ResourceManager::Load<Resource>("Resource1", 0);
-		const ResourceHandle<Resource>& r1_2 = ResourceManager::Load<Resource>("Resource1", 0);
+    ResourceManager::RegisterBundleFormat<STUFFBundle>();
+	ResourceManager::RegisterBundleFormat<FilesystemBundle>();
+	ResourceManager::RegisterBundle("TestFiles/ResourceBundle/Resources");
 
-		REQUIRE(*r1_1 == *r1_2);
-
-		const ResourceHandle<Resource>& r2 = ResourceManager::Load<Resource>("Resource2", 0);
-
-		REQUIRE(*r1_1 != *r2);
-		REQUIRE(*r1_2 != *r2);
-	}
-
-	ResourceManager::Collect();
+	auto txt = ResourceManager::Load<TXT>("TestFolder/TestFile1.txt");
+	REQUIRE(txt.Valid());
+	REQUIRE((*txt)->Length() == 12);
+	REQUIRE(std::memcmp((*txt)->Text(), "TestContent1", 12) == 0);
 }
 
 TEST_CASE("ResourceTree")

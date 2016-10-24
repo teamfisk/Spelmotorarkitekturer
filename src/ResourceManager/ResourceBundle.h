@@ -3,6 +3,7 @@
 
 #include <string>
 #include <memory>
+#include <stdexcept>
 #include <boost/interprocess/mapped_region.hpp>
 #include <boost/optional.hpp>
 #include "Logging.h"
@@ -31,6 +32,7 @@ public:
 		std::size_t m_Size;
 	};
 
+	class InvalidBundleFormat : public std::exception { };
 
 	ResourceBundle(const std::string& path)
 		: m_BundlePath(path)

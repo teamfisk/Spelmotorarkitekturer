@@ -1,6 +1,31 @@
 #include "ResourceManager.h"
 
+std::vector<std::function<ResourceBundle*(const std::string&)>> ResourceManager::m_BundleFormatFactoryFunctions;
+std::list<ResourceBundle*> ResourceManager::m_Bundles;
 std::unordered_map<ResourceManager::ResourceTypeHash, ResourceManager::InstanceMap> ResourceManager::m_Instances;
+
+void ResourceManager::RegisterBundle(const std::string& path)
+{
+	ResourceBundle* bundle = nullptr;
+	// Try all registered bundle formats
+	for (auto& f : m_BundleFormatFactoryFunctions) {
+		try {
+			bundle = f(path);
+		} catch (const ResourceBundle::InvalidBundleFormat& ex) {
+			continue;
+		} catch (const std::exception& ex) {
+			LOG_ERROR("Failed to register bundle \"%s\": %s", path.c_str(), ex.what());
+            throw;
+		}
+		break;
+	}
+
+	if (bundle != nullptr) {
+        m_Bundles.push_front(bundle);
+	} else {
+		LOG_ERROR("Failed to register bundle \"%s\": Unknown bundle format", path.c_str());
+	}
+}
 
 void ResourceManager::Collect()
 {
