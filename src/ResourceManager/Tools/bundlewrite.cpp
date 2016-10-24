@@ -61,21 +61,21 @@ int main(int argc, char* argv[])
         }
     }
 
-    std::ofstream ofile("bundle.STUFF", std::ios::binary);
+    std::ofstream ofile("TestBundle.stuff", std::ios::binary);
 
     //Write header
 
     ofile.write(header.Signature, sizeof(header.Signature));
-    ofile.write(reinterpret_cast<char *>(&header.Version), sizeof(header.Version));
-    ofile.write(reinterpret_cast<char *>(&header.NumEntries), sizeof(header.NumEntries));
+    ofile.write(reinterpret_cast<char*>(&header.Version), sizeof(header.Version));
+    ofile.write(reinterpret_cast<char*>(&header.NumEntries), sizeof(header.NumEntries));
 
 
     //Write file entries
     for (auto entry : entries) {
-        ofile.write(reinterpret_cast<char *>(&entry.PathLength), sizeof(entry.PathLength));
-        ofile.write(reinterpret_cast<char *>(&entry.FilePath), sizeof(entry.FilePath));
-        ofile.write(reinterpret_cast<char *>(&entry.Offset), sizeof(entry.Offset));
-        ofile.write(reinterpret_cast<char *>(&entry.Size), sizeof(entry.Size));
+        ofile.write(reinterpret_cast<char*>(&entry.PathLength), sizeof(entry.PathLength));
+        ofile.write(reinterpret_cast<char*>(entry.FilePath), entry.PathLength);
+        ofile.write(reinterpret_cast<char*>(&entry.Offset), sizeof(entry.Offset));
+        ofile.write(reinterpret_cast<char*>(&entry.Size), sizeof(entry.Size));
     }
 
     //Write data
@@ -84,9 +84,8 @@ int main(int argc, char* argv[])
 
         char* buffer = new char[entry.Size];
         src.read(buffer, entry.Size);
-
         ofile.write(buffer, entry.Size);
-
+        delete[] buffer;
         src.close();
     }
     ofile.close();
