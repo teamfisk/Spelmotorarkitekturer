@@ -127,10 +127,10 @@ int main()
 	Renderer renderer;
 
 	// Try to load a model and render it.	
-	auto teapotHandle = ResourceManager::Load<Model>("Resources/teapot.obj", 0);
-	auto planeHandle = ResourceManager::Load<Model>("Resources/plane.obj", 0);
+	auto teapotHandle = ResourceManager::Load<Model>("Resources/teapot.obj");
+	auto planeHandle = ResourceManager::Load<Model>("Resources/plane.obj");
 
-	auto textureHandle = ResourceManager::Load<Texture>("Resources/kitten_png_image.png", 0);
+	auto textureHandle = ResourceManager::Load<Texture>("Resources/kitten_png_image.png");
 
 	
 	//auto bunnyHandle = ResourceManager::Load<Model>("Resources/bunny.obj", 0);		
