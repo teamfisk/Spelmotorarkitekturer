@@ -11,7 +11,7 @@ class Texture : public BaseTexture
 	friend class ResourceManager;
 
 protected:
-	Texture(std::string path);
+	Texture(std::shared_ptr<ResourceBundle::Block> block);
 
 public:
 	~Texture();

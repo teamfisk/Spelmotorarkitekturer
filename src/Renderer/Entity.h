@@ -1,6 +1,6 @@
 #pragma once
 #include "OpenGL.h"
-#include "ResourceManager\ResourceHandle.h"
+#include "ResourceManager/ResourceHandle.h"
 #include "Model.h"
 
 

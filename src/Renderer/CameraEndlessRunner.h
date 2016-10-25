@@ -1,5 +1,5 @@
 #pragma once
-#include "Renderer\Camera.h"
+#include "Renderer/Camera.h"
 
 class CameraEndlessRunner
 	: public Camera

@@ -1,12 +1,15 @@
 #include "RawModelAssimp.h"
 
-RawModelAssimp::RawModelAssimp(const std::string& fileName)
+RawModelAssimp::RawModelAssimp(std::shared_ptr<ResourceBundle::Block> block)
 {
 	Assimp::Importer importer;
-	const aiScene* scene = importer.ReadFile(fileName, aiProcess_CalcTangentSpace | aiProcess_Triangulate);
+    char* data = new char[block->Size()];
+	block->Read(data);
+	const aiScene* scene = importer.ReadFileFromMemory(data, block->Size(), aiProcess_CalcTangentSpace | aiProcess_Triangulate);
+	delete[] data;
 
 	if (scene == nullptr) {
-		LOG_ERROR("Failed to load model \"%s\"", fileName.c_str());
+		LOG_ERROR("Failed to load model \"%s\"", block->Path().c_str());
 		LOG_ERROR("Assimp error: %s", importer.GetErrorString());
         throw std::runtime_error("Failed to open model file.");
 	}

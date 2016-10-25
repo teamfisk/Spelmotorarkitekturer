@@ -1,8 +1,8 @@
 #include "Texture.h"
 
-Texture::Texture(std::string path)
+Texture::Texture(std::shared_ptr<ResourceBundle::Block> block)
 {
-	ResourceHandle<PNG> handle = ResourceManager::Load<PNG>(path, 0);
+	ResourceHandle<PNG> handle = ResourceManager::Load<PNG>(block->Path());
 	auto png = *handle;
 
 	switch (png->Format)

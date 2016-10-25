@@ -8,7 +8,7 @@ void SetAttribPointer(GLuint attributeIndex, GLuint numElements, unsigned int lo
 	glVertexAttribPointer(attributeIndex, numElements, GL_FLOAT, GL_FALSE, 0, (GLvoid*)(sizeOfT));
 }
 /*
-Öndskade att det här funkade ...
+ï¿½ndskade att det hï¿½r funkade ...
 GLenum CreateVAO(RawModelAssimp::Vertex someStruct)
 {
 	GLenum vao;
@@ -21,10 +21,10 @@ GLenum CreateVAO(RawModelAssimp::Vertex someStruct)
 	return vao;
 }
 */
-Model::Model(const std::string& path)	
-{	
-	auto handle = ResourceManager::Load<RawModelAssimp>(path, 0);	
-	this->handle = handle;
+Model::Model(std::shared_ptr<ResourceBundle::Block> block)
+{
+	auto handle = ResourceManager::Load<RawModelAssimp>(block->Path());
+	m_Handle = handle;
 	auto model = *handle;
 					
 	if (model->m_Indices.size() == 0) // no indices?
@@ -123,12 +123,12 @@ GLenum Model::GetVBO() const
 
 const void* Model::GetIndices() const
 {
-	return (*handle)->m_Indices.data();	
+	return (*m_Handle)->m_Indices.data();
 }
 
 GLsizei Model::GetIndicesCount() const
 {
-	return (*handle)->m_Indices.size();
+	return (*m_Handle)->m_Indices.size();
 }
 
 GLsizei Model::GetTriangleCount() const

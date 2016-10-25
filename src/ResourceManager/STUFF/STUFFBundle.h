@@ -4,6 +4,7 @@
 #include <fstream>
 #include <cstring>
 #include <unordered_map>
+#include <boost/filesystem.hpp>
 #include <boost/interprocess/file_mapping.hpp>
 #include <boost/interprocess/mapped_region.hpp>
 
@@ -14,77 +15,59 @@
 
 namespace bip = boost::interprocess;
 
-class STUFFBundle : ResourceBundle
+class STUFFBlock : public ResourceBundle::Block
+{
+public:
+    STUFFBlock(const std::string& path, std::size_t size, boost::interprocess::mapped_region&& fileMapping)
+            : ResourceBundle::Block(path, size)
+            , m_FileMapping(std::move(fileMapping))
+    { }
+
+    // Reads the whole block from disk, returns number of bytes read
+    std::size_t Read(void* destination) override;
+    // Streams a chunk of a block from disk, returns number of bytes read
+    std::size_t Stream(void* destination, std::size_t size) override;
+
+private:
+    boost::interprocess::mapped_region m_FileMapping;
+    std::size_t m_StreamOffset = 0;
+};
+
+std::size_t STUFFBlock::Read(void* destination)
+{
+    std::size_t size = m_Size;
+    memcpy(destination, m_FileMapping.get_address(), size);
+    return size;
+}
+
+std::size_t STUFFBlock::Stream(void* destination, std::size_t size)
+{
+    size = std::min(size, m_Size - m_StreamOffset);
+    if (size <= 0) {
+        return 0;
+    }
+    memcpy(destination, (char*)m_FileMapping.get_address() + m_StreamOffset, size);
+    m_StreamOffset += size;
+    return size;
+}
+
+class STUFFBundle : public ResourceBundle
 {
 public:
 	STUFFBundle(const std::string& path)
 		: ResourceBundle(path)
 	{
-//        m_File = bip::file_mapping(path.c_str(), bip::read_only);
-//
-//		void* data = nullptr;
-//		std::size_t offset = 0;
-//
-//		// Read header
-//		bip::mapped_region headerRegion(m_File, bip::read_only, offset, sizeof(STUFF::Header::Signature) + sizeof(STUFF::Header::Version) + sizeof(STUFF::Header::NumEntries));
-//		offset += headerRegion.get_size();
-//		data = headerRegion.get_address();
-//		STUFF::Header header;
-//		memcpy(header.Signature, data, sizeof(header.Signature));
-//		data += sizeof(header.Signature);
-//		if (std::strcmp(header.Signature, "STUFF") != 0) {
-//			throw std::runtime_error("Bundle is not STUFF");
-//		}
-//		memcpy(&header.Version, data, sizeof(header.Version));
-//		data += sizeof(header.Version);
-//		memcpy(&header.NumEntries, data, sizeof(header.NumEntries));
-//		data += sizeof(header.NumEntries);
-//		if (header.NumEntries == 0) {
-//			LOG_WARNING("No entries in bundle!");
-//		}
-//
-//		// Read file entries
-//		if (header.NumEntries > 0) {
-//			for (int i = 0; i < header.NumEntries; ++i) {
-//                bip::mapped_region entryRegion(m_File, bip::read_only, offset, sizeof(STUFF::Entry));
-//                offset += entryRegion.get_size();
-//                data = entryRegion.get_address();
-//				// Read entry
-//				STUFF::Entry entry;
-//				memcpy(&entry.PathLength, data, sizeof(entry.PathLength));
-//				data += sizeof(entry.PathLength);
-//                if (entry.PathLength == 0) {
-//                    LOG_WARNING("Encountered an empty m_File.entry path!");
-//                }
-//                entry.FilePath = new char[entry.PathLength + 1];
-//                entry.FilePath[entry.PathLength] = '\0';
-//				memcpy(entry.FilePath, data, entry.PathLength);
-//				data += entry.PathLength;
-//				memcpy(&entry.Offset, data, sizeof(entry.Offset));
-//				data += sizeof(entry.Offset);
-//				memcpy(&entry.Size, data, sizeof(entry.Size));
-//				data += sizeof(entry.Size);
-//				LOG_DEBUG("Entry %i: %s (%o, %o)", i + 1, entry.FilePath, entry.Offset, entry.Size);
-//
-//				// Construct block instance
-//                std::size_t blockOffset = offset + entry.Offset;
-//				//std::size_t blockOffset = entry.Offset; // HACK: Offsets should be relative to first block later
-//                bip::mapped_region blockRegion(m_File, bip::read_only, blockOffset, entry.Size);
-//				m_FileEntries[entry.FilePath] = new Block(std::move(blockRegion), entry.FilePath, entry.Size);
-//			}
-//		}
-//
-//		if (m_FileEntries.size() == 0) {
-//			LOG_WARNING("No file entries found!");
-//		}
+        if (!boost::filesystem::is_regular_file(path)) {
+            throw ResourceBundle::InvalidBundleFormat();
+        }
 
         std::ifstream file(path.c_str(), std::ios::binary);
 
         // Read header
         STUFF::Header header;
         file.read(header.Signature, sizeof(header.Signature));
-        if (std::strcmp(header.Signature, "STUFF") != 0) {
-            throw std::runtime_error("Bundle is not STUFF");
+        if (std::memcmp(header.Signature, "STUFF", 5) != 0) {
+            throw ResourceBundle::InvalidBundleFormat();
         }
         file.read((char*)&header.Version, sizeof(header.Version));
         file.read((char*)&header.NumEntries, sizeof(header.NumEntries));
@@ -112,37 +95,34 @@ public:
             file.read((char*)&entry.Size, sizeof(entry.Size));
 
             LOG_DEBUG("Entry %i: %s (%o, %o)", i + 1, entry.FilePath, entry.Offset, entry.Size);
-            entries.push_back(std::move(entry));
+            m_FileEntries[entry.FilePath] = std::move(entry);
         }
 
-        std::size_t firstBlockOffset = file.tellg();
-
-        // Construct block instances
+        m_FirstBlockOffset = file.tellg();
         m_FileMapping = bip::file_mapping(path.c_str(), bip::read_only);
-        for (auto& e : entries) {
-            std::size_t blockOffset = firstBlockOffset + e.Offset;
-            bip::mapped_region blockRegion(m_FileMapping, bip::read_only, blockOffset, e.Size);
-            m_FileEntries[e.FilePath] = new Block(std::move(blockRegion), e.FilePath, e.Size);
-        }
 	}
 
 	~STUFFBundle()
 	{
 	}
 
-	Block* Search(const std::string& path) override
+	std::shared_ptr<Block> Search(const std::string& path) override
 	{
 		auto it = m_FileEntries.find(path);
 		if (it == m_FileEntries.end()) {
 			return nullptr;
 		} else {
-			return it->second;
+            STUFF::Entry& e = it->second;
+            std::size_t blockOffset = m_FirstBlockOffset + e.Offset;
+            bip::mapped_region blockRegion(m_FileMapping, bip::read_only, blockOffset, e.Size);
+            return std::make_shared<STUFFBlock>(e.FilePath, e.Size, std::move(blockRegion));
 		}
 	}
 
 private:
 	bip::file_mapping m_FileMapping;
-	std::unordered_map<std::string, Block*> m_FileEntries;
+    std::size_t m_FirstBlockOffset = 0;
+	std::unordered_map<std::string, STUFF::Entry> m_FileEntries;
 };
 
 #endif
