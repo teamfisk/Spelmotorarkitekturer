@@ -6,6 +6,7 @@ add_definitions(-DGLEW_STATIC)
 find_package(GLFW REQUIRED)
 find_package(PNG REQUIRED)
 find_package(assimp REQUIRED)
+find_package(Boost REQUIRED COMPONENTS system filesystem thread chrono timer program_options)
 
 include_directories(
     ${INCLUDE_PATH}
@@ -14,6 +15,7 @@ include_directories(
     ${GLFW_INCLUDE_DIRS}
 	${PNG_INCLUDE_DIRS}
 	${assimp_INCLUDE_DIR}
+	${Boost_INCLUDE_DIRS}
 )
 
 set(LIBRARIES
@@ -22,6 +24,7 @@ set(LIBRARIES
     ${GLFW_LIBRARIES}
 	${PNG_LIBRARIES}
 	${assimp_LIBRARIES}
+	${Boost_LIBRARIES}
 )
 
 file(GLOB SOURCE_FILES
