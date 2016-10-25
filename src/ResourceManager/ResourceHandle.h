@@ -45,6 +45,7 @@ public:
 	ResourceHandle<T>& operator=(const ResourceHandle<T> other);
 
 	T* operator*() const;
+	T* operator->() const;
 };
 
 template <typename T>
@@ -58,6 +59,12 @@ template <typename T>
 T* ResourceHandle<T>::operator*() const
 {
     return static_cast<T*>(*m_Instance);
+}
+
+template <typename T>
+T* ResourceHandle<T>::operator->() const
+{
+	return this->operator*();
 }
 
 #endif
