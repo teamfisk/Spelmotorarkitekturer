@@ -1,8 +1,21 @@
 #include "ResourceManager.h"
 
+std::thread::id ResourceManager::m_MainThreadID = std::this_thread::get_id();
+
+std::queue<ResourceManager::AsyncLoadJob> ResourceManager::m_AsyncLoadQueue;
+std::mutex ResourceManager::m_AsyncLoadQueueMutex;
+std::queue<ResourceManager::AsyncLoadJob> ResourceManager::m_AsyncFinalizationQueue;
+std::mutex ResourceManager::m_AsyncFinalizationQueueMutex;
+std::thread ResourceManager::m_AsyncLoadThread;
+
 std::vector<std::function<ResourceBundle*(const std::string&)>> ResourceManager::m_BundleFormatFactoryFunctions;
 std::list<ResourceBundle*> ResourceManager::m_Bundles;
-std::unordered_map<ResourceManager::ResourceTypeHash, ResourceManager::InstanceMap> ResourceManager::m_Instances;
+std::unordered_map<ResourceManager::ResourceTypeHash_t, ResourceManager::InstanceMap_t> ResourceManager::m_Instances;
+
+void ResourceManager::Initialize()
+{
+	m_AsyncLoadThread = std::thread(ResourceManager::asyncLoadThreadFunction);
+}
 
 void ResourceManager::RegisterBundle(const std::string& path)
 {
@@ -44,5 +57,45 @@ void ResourceManager::Collect()
 				LOG_ERROR("Ref count is less than 0, wtf have you done?");
 			}
 		}
+	}
+}
+
+void ResourceManager::ProcessAsyncQueue()
+{
+	while (!m_AsyncFinalizationQueue.empty()) {
+		// Grab a job
+		m_AsyncFinalizationQueueMutex.lock();
+		auto job = m_AsyncFinalizationQueue.front();
+		m_AsyncFinalizationQueue.pop();
+		m_AsyncFinalizationQueueMutex.unlock();
+
+		// Finalize it
+		(*job.Handle)->Finalize();
+        LOG_DEBUG("FINALIZE");
+	}
+}
+
+void ResourceManager::asyncLoadThreadFunction()
+{
+	LOG_DEBUG("Started ResourceManager async load thread");
+	while (true) {
+		// Grab a job
+        m_AsyncLoadQueueMutex.lock();
+		if (m_AsyncLoadQueue.empty()) {
+            m_AsyncLoadQueueMutex.unlock();
+			continue;
+		}
+        auto job = m_AsyncLoadQueue.front();
+		m_AsyncLoadQueue.pop();
+		m_AsyncLoadQueueMutex.unlock();
+
+		// Run the factory function
+		LOG_DEBUG("ResourceLoadThread: Calling factory function");
+		job.FactoryFunction();
+
+		// Insert into finalization queue
+		m_AsyncFinalizationQueueMutex.lock();
+		m_AsyncFinalizationQueue.push(std::move(job));
+		m_AsyncFinalizationQueueMutex.unlock();
 	}
 }

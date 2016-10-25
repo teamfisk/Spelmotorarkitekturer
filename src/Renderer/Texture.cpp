@@ -2,25 +2,28 @@
 
 Texture::Texture(std::shared_ptr<ResourceBundle::Block> block)
 {
-	ResourceHandle<PNG> handle = ResourceManager::Load<PNG>(block->Path());
-	auto png = *handle;
+	m_PNG = ResourceManager::Load<PNG>(block->Path());
 
-	switch (png->Format)
-	{
-	case Image::ImageFormat::RGBA:
-		m_Format = GL_RGBA;
-		break;
-	case Image::ImageFormat::RGB:
-		m_Format = GL_RGB;
-	default:
-		throw std::runtime_error("Unsupported image format.");
-		break;
+	switch (m_PNG->Format) {
+		case Image::ImageFormat::RGBA:
+			m_Format = GL_RGBA;
+			break;
+		case Image::ImageFormat::RGB:
+			m_Format = GL_RGB;
+            break;
+		default:
+			throw std::runtime_error("Unsupported image format.");
 	}
+}
 
+void Texture::Finalize()
+{
 	glGenTextures(1, &m_Texture);
 	glBindTexture(GL_TEXTURE_2D, m_Texture);	
-	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, png->Width, png->Height, 0, m_Format, GL_UNSIGNED_BYTE, png->Data);	
+	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, m_PNG->Width, m_PNG->Height, 0, m_Format, GL_UNSIGNED_BYTE, m_PNG->Data);
 	glBindTexture(GL_TEXTURE_2D, 0);
+
+	Resource::Finalize();
 }
 
 Texture::~Texture()

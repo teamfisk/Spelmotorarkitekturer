@@ -37,14 +37,14 @@ void IResourceHandle::Release()
 
 void IResourceHandle::incrementCount()
 {
-	if (m_Instance != nullptr) {
+	if (m_Instance != nullptr && *m_Instance != nullptr) {
 		(*m_Instance)->m_ReferenceCount++;
 	}
 }
 
 void IResourceHandle::decrementCount()
 {
-	if (m_Instance != nullptr) {
+	if (m_Instance != nullptr && *m_Instance != nullptr) {
 		(*m_Instance)->m_ReferenceCount--;
 	}
 }

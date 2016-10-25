@@ -10,13 +10,6 @@ class Resource
 	friend class IResourceHandle;
 	friend class ResourceManager;
 public:
-	struct StillLoadingException : public std::runtime_error
-    {
-        virtual const char* what() const throw()
-        {
-            return "Resource is still loading.";
-        }
-    };
     struct FailedLoadingException : public std::runtime_error
     {
         FailedLoadingException(char const* const message)
@@ -35,17 +28,15 @@ protected:
 		}
 	}
 
+    // Guaranteed to be called on main thread after constructor is finished
+	virtual void Finalize() { m_Finalized = true; }
+
 public:
-    virtual bool Valid() const { return true; }
+    virtual bool Valid() const { return m_Finalized; }
 
 private:
 	unsigned int m_ReferenceCount = 0;
-    std::list<Resource**>::iterator m_ActivityIterator;
-};
-
-class ThreadUnsafeResource : public Resource
-{
-	friend class ResourceManager;
+	bool m_Finalized = false;
 };
 
 #endif
