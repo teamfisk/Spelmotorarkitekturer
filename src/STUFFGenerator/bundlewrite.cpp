@@ -113,7 +113,6 @@ int main(int argc, char* argv[])
     std::ofstream ofile(outputFile, std::ios::binary);
 
     //Write header
-
     ofile.write(header.Signature, sizeof(header.Signature));
     ofile.write(reinterpret_cast<char*>(&header.Version), sizeof(header.Version));
     ofile.write(reinterpret_cast<char*>(&header.NumEntries), sizeof(header.NumEntries));
@@ -145,11 +144,9 @@ int main(int argc, char* argv[])
             ofile.write(reinterpret_cast<char*>(&entry.PathLength), sizeof(entry.PathLength));
             ofile.write(reinterpret_cast<char*>(entry.FilePath), entry.PathLength);
         }
-
         ofile.write(reinterpret_cast<char*>(&entry.Offset), sizeof(entry.Offset));
         ofile.write(reinterpret_cast<char*>(&entry.Size), sizeof(entry.Size));
     }
-
 
     //Write data
     for (auto entry : entries) {
@@ -163,7 +160,6 @@ int main(int argc, char* argv[])
         std::cin.get();
     }
     
-    
     return 0;
 }
 
@@ -171,17 +167,12 @@ void addFileEntry(boost::filesystem::path p, std::vector<STUFF::Entry> &entries,
 {
     std::string pathStr = p.string();
     boost::replace_all(pathStr, "\\", "/");
-
-
     STUFF::Entry entry;
     entry.PathLength = pathStr.length();
     entry.FilePath = new char[entry.PathLength];
     memcpy(entry.FilePath, pathStr.c_str(), entry.PathLength);
-
     entry.Size = boost::filesystem::file_size(p);
-
     entry.Offset = offset;
     offset += entry.Size;
-
     entries.push_back(entry);
 }
