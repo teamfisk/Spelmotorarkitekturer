@@ -27,7 +27,6 @@ public:
 
 protected:
 	Resource() = default;
-	Resource(const std::string& path) { }
 	Resource(std::shared_ptr<ResourceBundle::Block> block) { }
 	virtual ~Resource()
 	{

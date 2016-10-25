@@ -25,7 +25,7 @@ class RawModelAssimp : public Resource
 	friend class ResourceManager;
 
 protected:
-	RawModelAssimp(const std::string& fileName);
+	RawModelAssimp(std::shared_ptr<ResourceBundle::Block> block);
 
 public:
 	~RawModelAssimp();

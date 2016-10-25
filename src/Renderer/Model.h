@@ -17,7 +17,7 @@ class Model :
 {
 	friend class ResourceManager;
 public:
-	Model(const std::string& path);
+	Model(std::shared_ptr<ResourceBundle::Block> block);
 	virtual ~Model();
 	
 	GLenum GetVAO() const;
@@ -29,7 +29,7 @@ public:
 	size_t GetMemoryUsage() const;
 private:
 	//std::unique_ptr<ResourceHandle<RawModelAssimp>> handlePtr;
-	ResourceHandle<RawModelAssimp> handle;
+	ResourceHandle<RawModelAssimp> m_Handle;
 	GLenum vbo; // Vertex Buffer Object handle
 	GLenum vao; // Vertex Array Object handle
 	GLenum indexVBO;

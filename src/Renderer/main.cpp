@@ -13,6 +13,8 @@
 #include "zlib.h"
 #define _USE_MATH_DEFINES
 #include <math.h>
+#include "ResourceManager/STUFF/STUFFBundle.h"
+#include "ResourceManager/FilesystemBundle.h"
 #include "CameraEndlessRunner.h"
 #include "Entity.h"
 
@@ -79,6 +81,10 @@ void APIENTRY OpenGLCallbackFunction(GLenum source, GLenum type, GLuint id, GLen
 
 int main()
 {
+    ResourceManager::RegisterBundleFormat<STUFFBundle>();
+	ResourceManager::RegisterBundleFormat<FilesystemBundle>();
+	ResourceManager::RegisterBundle("Resources");
+
 	glfwSetErrorCallback(glfw_error_callback);
 	glfwInit();
 
@@ -127,13 +133,13 @@ int main()
 	Renderer renderer;
 
 	// Try to load a model and render it.	
-	auto teapotHandle = ResourceManager::Load<Model>("Resources/teapot.obj", 0);
-	auto planeHandle = ResourceManager::Load<Model>("Resources/plane.obj", 0);
+	auto teapotHandle = ResourceManager::Load<Model>("teapot.obj");
+	auto planeHandle = ResourceManager::Load<Model>("plane.obj");
 
-	auto textureHandle = ResourceManager::Load<Texture>("Resources/kitten_png_image.png", 0);
+	auto textureHandle = ResourceManager::Load<Texture>("kitten_png_image.png");
 
 	
-	//auto bunnyHandle = ResourceManager::Load<Model>("Resources/bunny.obj", 0);		
+	//auto bunnyHandle = ResourceManager::Load<Model>("bunny.obj", 0);
 
 	// Load other models when needed during runtime, to minimize initial load time.
 
