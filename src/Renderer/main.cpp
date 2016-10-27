@@ -182,8 +182,8 @@ int main()
 	{	
 		double time = glfwGetTime();
 		double dt = time - lastTime;
-		lastTime = time;
-		
+		lastTime = time;				
+
 		for(unsigned int i = 0; i < entities.size(); i++)
 		{
 			float x = entities[i].worldMatrix[3][0];
@@ -224,8 +224,7 @@ int main()
 
 		glUseProgram(programHandle);		
 		glUniformMatrix4fv(glGetUniformLocation(programHandle, "projection"), 1, GL_FALSE, glm::value_ptr(camera.getProjectionMatrix()));
-		glUniformMatrix4fv(glGetUniformLocation(programHandle, "view"), 1, GL_FALSE, glm::value_ptr(camera.getViewMatrix()));
-		glUniform1i(glGetUniformLocation(programHandle, "tex"), textureHandle->m_Texture);		
+		glUniformMatrix4fv(glGetUniformLocation(programHandle, "view"), 1, GL_FALSE, glm::value_ptr(camera.getViewMatrix()));	
 
 		textureHandle->Bind();
 		glBindSampler(0, linearSampler);
