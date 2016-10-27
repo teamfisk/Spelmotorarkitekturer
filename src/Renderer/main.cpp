@@ -170,6 +170,14 @@ int main()
 	entities.emplace_back(translate(glm::vec3(45, 0, 1)), teapotHandle);		
 
 	double timeSinceLastEntitySpawn = 0;
+
+	GLuint linearSampler;
+	glGenSamplers(1, &linearSampler);
+	glSamplerParameteri(linearSampler, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+	glSamplerParameteri(linearSampler, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+	glSamplerParameteri(linearSampler, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+	glSamplerParameteri(linearSampler, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);	
+
 	while (!glfwWindowShouldClose(window))
 	{	
 		double time = glfwGetTime();
@@ -179,8 +187,8 @@ int main()
 		for(unsigned int i = 0; i < entities.size(); i++)
 		{
 			float x = entities[i].worldMatrix[3][0];
-			float offset = 4; // Trigger this if slightly after the player has passed the entity.
-			if (x + offset < camera.getPosition().x)
+			float offset = 4; 
+			if (x + offset < camera.getPosition().x) // Trigger this slightly after the player has passed the entity.
 			{
 				entities[i].worldMatrix[3][0] += 50;
 
@@ -217,6 +225,10 @@ int main()
 		glUseProgram(programHandle);		
 		glUniformMatrix4fv(glGetUniformLocation(programHandle, "projection"), 1, GL_FALSE, glm::value_ptr(camera.getProjectionMatrix()));
 		glUniformMatrix4fv(glGetUniformLocation(programHandle, "view"), 1, GL_FALSE, glm::value_ptr(camera.getViewMatrix()));
+		glUniform1i(glGetUniformLocation(programHandle, "tex"), textureHandle->m_Texture);		
+
+		textureHandle->Bind();
+		glBindSampler(0, linearSampler);
 
 		renderer.Render(*planeHandle, planeMatrix, programHandle);		
 

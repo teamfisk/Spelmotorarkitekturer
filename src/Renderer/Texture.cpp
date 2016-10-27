@@ -30,6 +30,10 @@ Texture::~Texture()
 
 void Texture::Bind(GLenum textureUnit /*= GL_TEXTURE0*/, GLenum access /*= GL_READ_ONLY*/)
 {		
-	glBindImageTexture(textureUnit, m_Texture, 0, GL_FALSE, 0, access, m_Format);
+	glActiveTexture(textureUnit);
+	glBindTexture(GL_TEXTURE_2D, m_Texture);
+
+	// GL_INVALID_VALUE
+	//glBindImageTexture(textureUnit, m_Texture, 0, GL_FALSE, 0, access, GL_RGBA);	// GL_RGBA seems to not be in this table https://www.opengl.org/sdk/docs/man4/html/glBindImageTexture.xhtml
 }
 
