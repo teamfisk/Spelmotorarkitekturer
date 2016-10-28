@@ -20,6 +20,8 @@
 
 using namespace std;
 
+const int ENTITY_MOVE_DIST_X = 50;
+
 void glfw_error_callback(int error, const char* description)
 {
 	std::cerr << __FUNCTION__ << ": ";
@@ -102,6 +104,7 @@ int main()
 	glewInit();
 
 	glEnable(GL_DEPTH_BUFFER);
+	glEnable(GL_DEPTH_TEST);
 
 #ifdef _DEBUG
 	glEnable(GL_DEBUG_OUTPUT);
@@ -149,10 +152,7 @@ int main()
 		0, 0, 1, 0,
 		0, 0, 0, 1
 	};
-	
-	glm::mat4x4 planeMatrix = glm::rotate((float)M_PI_2, glm::vec3(1.0, 0.0, 0.0));
-	planeMatrix = glm::scale(planeMatrix, { 200, 1, 1 });
-
+		
 	auto keyILastFrame = GLFW_RELEASE;
 
 	glClearColor(0.f, 0.0f, 0.3f, 1.f);
@@ -167,7 +167,17 @@ int main()
 	entities.emplace_back(translate(glm::vec3(27, 0, 1)), teapotHandle);
 	entities.emplace_back(translate(glm::vec3(32, 0, 4)), teapotHandle);
 	entities.emplace_back(translate(glm::vec3(40, 0, -2)), teapotHandle);
-	entities.emplace_back(translate(glm::vec3(45, 0, 1)), teapotHandle);		
+	entities.emplace_back(translate(glm::vec3(45, 0, 1)), teapotHandle);
+	
+	// Planes
+	glm::mat4x4 planeMatrix = glm::rotate((float)M_PI_2, glm::vec3(1.0, 0.0, 0.0));
+	planeMatrix = glm::scale(planeMatrix, { 1, 1, 1 });
+
+	entities.emplace_back(translate(glm::vec3(0, 0, 0)) * planeMatrix, planeHandle);
+	for (int i = 0; i < 6; i++)
+	{
+		entities.emplace_back(translate(glm::vec3(10 * i, 0, 0)) * planeMatrix, planeHandle);
+	}		
 
 	double timeSinceLastEntitySpawn = 0;
 
@@ -177,6 +187,8 @@ int main()
 	glSamplerParameteri(linearSampler, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
 	glSamplerParameteri(linearSampler, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
 	glSamplerParameteri(linearSampler, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);	
+	glSamplerParameteri(linearSampler, GL_TEXTURE_WRAP_S, GL_REPEAT);
+	glSamplerParameteri(linearSampler, GL_TEXTURE_WRAP_T, GL_REPEAT);	
 
 	while (!glfwWindowShouldClose(window))
 	{	
@@ -187,10 +199,11 @@ int main()
 		for(unsigned int i = 0; i < entities.size(); i++)
 		{
 			float x = entities[i].worldMatrix[3][0];
-			float offset = 4; 
+			float offset = 6; 
 			if (x + offset < camera.getPosition().x) // Trigger this slightly after the player has passed the entity.
 			{
-				entities[i].worldMatrix[3][0] += 50;
+				
+				entities[i].worldMatrix[3][0] += ENTITY_MOVE_DIST_X;
 
 				// Change models after some time. It's like a new level!!
 				if (glfwGetTime() > 20.0f)
@@ -229,7 +242,7 @@ int main()
 		textureHandle->Bind();
 		glBindSampler(0, linearSampler);
 
-		renderer.Render(*planeHandle, planeMatrix, programHandle);		
+		//renderer.Render(*planeHandle, planeMatrix, programHandle);		
 
 		for (unsigned int i = 0; i < entities.size(); i++)
 		{			
