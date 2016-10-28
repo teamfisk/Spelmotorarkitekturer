@@ -16,7 +16,7 @@ Texture::Texture(std::shared_ptr<ResourceBundle::Block> block)
 	}
 }
 
-void Texture::Finalize()
+std::size_t Texture::Finalize()
 {
 	glGenTextures(1, &m_Texture);
 	glBindTexture(GL_TEXTURE_2D, m_Texture);	
@@ -24,9 +24,11 @@ void Texture::Finalize()
 	glBindTexture(GL_TEXTURE_2D, 0);
 
 	m_PNG.Release();
+
+	return 0;
 }
 
-Texture::~Texture()
+void Texture::Destroy()
 {
 	glDeleteTextures(1, &m_Texture);
 }

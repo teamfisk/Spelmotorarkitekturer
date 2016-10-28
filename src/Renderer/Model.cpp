@@ -55,15 +55,7 @@ Model::Model(std::shared_ptr<ResourceBundle::Block> block)
 	indexType = GL_UNSIGNED_INT;	
 }
 
-Model::~Model()
-{
-	// Clean up OpenGL Handles.
-	glDeleteVertexArrays(1, &vao);
-	glDeleteBuffers(1, &vbo);
-	glDeleteBuffers(1, &indexVBO);
-}
-
-void Model::Finalize()
+std::size_t Model::Finalize()
 {
 	glGenBuffers(1, &vbo);
 	glBindBuffer(GL_ARRAY_BUFFER, vbo);
@@ -105,7 +97,19 @@ void Model::Finalize()
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
 
 	m_RawModel.Release();
+
+	return 0;
 }
+
+void Model::Destroy()
+{
+	// Clean up OpenGL Handles.
+	glDeleteVertexArrays(1, &vao);
+	glDeleteBuffers(1, &vbo);
+	glDeleteBuffers(1, &indexVBO);
+}
+
+Model::~Model() { }
 
 GLenum Model::GetVAO() const
 {

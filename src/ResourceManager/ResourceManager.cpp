@@ -51,6 +51,7 @@ void ResourceManager::Collect()
 				continue;
 			}
 			if (instance.ReferenceCount == 0) {
+				res->Destroy();
 				delete res;
 				*instance.Handle = nullptr;
 			}

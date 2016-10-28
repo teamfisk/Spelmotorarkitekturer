@@ -24,8 +24,10 @@ public:
     std::size_t Length() const { return m_Length; }
 
 private:
-	//TODO: Make sure that all memory used is logged.
-	std::size_t Size() { return m_UsedMemory; }
+	std::size_t Finalize() override
+	{
+		return m_Length;
+	}
 
     char* m_Text = nullptr;
     std::size_t m_Length = 0;

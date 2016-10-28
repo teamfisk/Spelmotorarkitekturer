@@ -60,7 +60,6 @@ PNG::PNG(std::shared_ptr<ResourceBundle::Block> block)
 	std::size_t row_bytes = png_get_rowbytes(png_ptr, info_ptr);
 	m_DataSize = height * row_bytes;
 	this->Data = new unsigned char[m_DataSize];
-	LogMemoryUsed(m_DataSize);
 	png_bytep* row_pointers = new png_bytep[height];
 
 	// Point each row to the continuous data array
@@ -80,11 +79,15 @@ PNG::PNG(std::shared_ptr<ResourceBundle::Block> block)
 	png_destroy_read_struct(&png_ptr, &info_ptr, &info_end_ptr);
 }
 
+std::size_t PNG::Finalize()
+{
+	return m_DataSize;
+}
+
 PNG::~PNG()
 {
 	if (this->Data != nullptr) {
 		delete[] this->Data;
-		LogMemoryFreed(m_DataSize);
 		this->Data = nullptr;
 	}
 }

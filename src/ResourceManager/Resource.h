@@ -23,20 +23,20 @@ protected:
 	Resource(std::shared_ptr<ResourceBundle::Block> block) { }
 	virtual ~Resource() = default;
 
-    // Guaranteed to be called on main thread after constructor is finished
-	virtual void Finalize() { }
+    // Called by ResourceManager from main thread after constructor is finished 
+	// (Useful for e.g. OpenGL calls that needs to be run in a specific context)
+	// NEEDS to return the total number of bytes of any internal allocations of the resource!
+	virtual std::size_t Finalize() = 0;
+	// Called by ResourceManager from main thread before destroying the resource
+	virtual void Destroy() { }
 
-	//Run this function when you use memory from any resource.
-	void LogMemoryUsed(size_t size) { m_UsedMemory += size; }
-	//Run this function when you delete memory in any resource.
-	void LogMemoryFreed(size_t size) { m_UsedMemory -= size; }
-
+	// Utility functions to track used memory
+	void LogMemoryUsed(std::size_t size) { m_UsedMemory += size; }
+	void LogMemoryFreed(std::size_t size) { m_UsedMemory -= size; }
 	std::size_t m_UsedMemory = 0;
 
 public:
     virtual bool Valid() const { return m_Finalized; }
-	// This needs to be implemented to return the allocated size of the resource
-	virtual std::size_t Size() = 0;
 
 private:
 	bool m_Finalized = false;

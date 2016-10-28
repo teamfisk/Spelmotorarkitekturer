@@ -68,6 +68,7 @@ private:
 		}
         Resource** Handle;
         unsigned int ReferenceCount = 0;
+		std::size_t MemoryUsage = 0;
     };
 	typedef std::unordered_map<std::string, InstanceInfo> InstanceMap_t;
 	static std::unordered_map<ResourceTypeHash_t, InstanceMap_t> m_Instances;
@@ -92,19 +93,8 @@ ResourceHandle<T> ResourceManager::Load(const std::string& path)
 	const ResourceTypeHash_t typeHash = typeid(T).hash_code();
 	InstanceMap_t& instanceMap = m_Instances[typeHash];
 
-	// Check the cache for the resource
+	// Check the cache for the resource and create the resource instance if it doesn't exist in cache
     InstanceInfo& instance = instanceMap[path];
-//	Resource** instanceHandle = nullptr;
-//	auto it = instanceMap.find(path);
-//	if (it == instanceMap.end()) {
-//		instanceHandle = new Resource*;
-//		*instanceHandle = nullptr;
-//		instanceMap[path] = instanceHandle;
-//	} else {
-//		instanceHandle = it->second;
-//	}
-
-	// Create the resource instance if it doesn't exist in cache
 	if (*instance.Handle == nullptr) {
 		// Find the first bundle that serves our request
 		std::shared_ptr<ResourceBundle::Block> block = nullptr;
@@ -131,21 +121,21 @@ ResourceHandle<T> ResourceManager::Load(const std::string& path)
 }
 
 template <typename T>
-void ResourceManager::loadSync(std::shared_ptr<ResourceBundle::Block> block, Resource** instanceHandle)
+void ResourceManager::loadSync(std::shared_ptr<ResourceBundle::Block> block, InstanceInfo& instance)
 {
     // Create the instance
-    *instanceHandle = new T(block);
-	(*instanceHandle)->Finalize();
+    *instance.Handle = new T(block);
+	(*instance.Handle)->Finalize();
 	(*instanceHandle)->m_Finalized = true;
 }
 
 template <typename T>
-void ResourceManager::loadAsync(std::shared_ptr<ResourceBundle::Block> block, Resource** instanceHandle)
+void ResourceManager::loadAsync(std::shared_ptr<ResourceBundle::Block> block, InstanceInfo& instance)
 {
     AsyncLoadJob job;
-	job.Handle = instanceHandle;
-	job.FactoryFunction = [block, instanceHandle]() {
-		*instanceHandle = new T(block);
+	job.Handle = instance.Handle;
+	job.FactoryFunction = [block, instance]() {
+		*instance.Handle = new T(block);
 	};
 	m_AsyncLoadQueueMutex.lock();
     m_AsyncLoadQueue.push(std::move(job));
@@ -160,6 +150,7 @@ void ResourceManager::Free(ResourceHandle<T>& handle)
     handle.invalidate();
     // Free the resource
     if (*instanceHandle != nullptr) {
+		(*instanceHandle)->Destroy();
         delete *instanceHandle;
         *instanceHandle = nullptr;
     }
