@@ -177,6 +177,8 @@ int main()
 	glSamplerParameteri(linearSampler, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
 	glSamplerParameteri(linearSampler, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
 	glSamplerParameteri(linearSampler, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);	
+	glSamplerParameteri(linearSampler, GL_TEXTURE_WRAP_S, GL_REPEAT);
+	glSamplerParameteri(linearSampler, GL_TEXTURE_WRAP_T, GL_REPEAT);	
 
 	while (!glfwWindowShouldClose(window))
 	{	
