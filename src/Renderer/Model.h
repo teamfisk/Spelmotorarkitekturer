@@ -28,6 +28,9 @@ public:
 	size_t GetMemoryUsage() const;
 	GLenum GetIndexBuffer();
 private:
+	//TODO: Make sure that all memory used is logged.
+	std::size_t Size() { return m_UsedMemory; }
+
 	GLenum vbo; // Vertex Buffer Object handle
 	GLenum vao; // Vertex Array Object handle
 	GLenum indexVBO;

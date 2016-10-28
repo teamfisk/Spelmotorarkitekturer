@@ -22,6 +22,10 @@ public:
 	GLenum m_Format = 0;
 	enum TextureType : GLint { cInvalid = 0, cDDS = 1, cPNG = 2};
 	TextureType m_Type;	
+
+private:
+	//TODO: Make sure that all memory used is logged.
+	std::size_t Size() { return m_UsedMemory; }
 };
 
 #endif 

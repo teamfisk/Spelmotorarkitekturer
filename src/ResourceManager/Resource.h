@@ -35,12 +35,19 @@ protected:
 		}
 	}
 
+	//Run this function when you use memory from any resource.
+	void LogMemoryUsed(size_t size) { m_UsedMemory += size; }
+	//Run this function when you delete memory in any resource.
+	void LogMemoryFreed(size_t size) { m_UsedMemory -= size; }
+
+	size_t m_UsedMemory = 0;
+
 public:
     virtual bool Valid() const { return true; }
-
+	virtual size_t Size() = 0;
 
 private:
-	size_t m_UsedMemory = 0;
+
 	unsigned int m_ReferenceCount = 0;
     std::list<Resource**>::iterator m_ActivityIterator;
 };
