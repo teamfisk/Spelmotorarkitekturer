@@ -28,7 +28,7 @@ public:
 		virtual std::size_t Stream(void* destination, std::size_t size) = 0;
 
 	protected:
-		const std::string& m_Path;
+		const std::string m_Path;
 		std::size_t m_Size;
 	};
 

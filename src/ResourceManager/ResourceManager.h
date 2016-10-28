@@ -136,6 +136,7 @@ void ResourceManager::loadSync(std::shared_ptr<ResourceBundle::Block> block, Res
     // Create the instance
     *instanceHandle = new T(block);
 	(*instanceHandle)->Finalize();
+	(*instanceHandle)->m_Finalized = true;
 }
 
 template <typename T>

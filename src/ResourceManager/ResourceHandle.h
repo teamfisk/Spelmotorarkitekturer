@@ -39,7 +39,7 @@ private:
 
 public:
 	ResourceHandle()
-		: IResourceHandle(nullptr)
+		: IResourceHandle(nullptr, nullptr)
 	{ }
 	ResourceHandle(const ResourceHandle<T>& other)
 		: IResourceHandle(other)

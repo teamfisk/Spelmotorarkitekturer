@@ -10,12 +10,14 @@ IResourceHandle::IResourceHandle(Resource** resource, unsigned int* refCount)
 IResourceHandle::IResourceHandle(const IResourceHandle& handle)
 {
 	m_Instance = handle.m_Instance;
+	m_RefCount = handle.m_RefCount;
 	incrementCount();
 }
 
 IResourceHandle& IResourceHandle::operator=(const IResourceHandle& other)
 {
 	m_Instance = other.m_Instance;
+	m_RefCount = other.m_RefCount;
 	incrementCount();
 	return *this;
 }

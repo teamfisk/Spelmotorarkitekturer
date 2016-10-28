@@ -42,13 +42,13 @@ public:
         boost::filesystem::path fullPath = m_BundlePath;
         fullPath /= path;
 
-        if (!boost::filesystem::exists(fullPath)) {
+        if (!boost::filesystem::exists(fullPath) || !boost::filesystem::is_regular_file(fullPath)) {
             return nullptr;
         }
 
-        std::size_t size = boost::filesystem::file_size(fullPath);
-        std::ifstream file(fullPath.string(), std::ios::binary);
-        return std::make_shared<FilesystemBlock>(path, size, std::move(file));
+		std::size_t size = boost::filesystem::file_size(fullPath);
+		std::ifstream file(fullPath.string(), std::ios::binary);
+		return std::make_shared<FilesystemBlock>(path, size, std::move(file));
     }
 };
 

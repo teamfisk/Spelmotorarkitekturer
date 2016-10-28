@@ -69,6 +69,7 @@ void ResourceManager::ProcessAsyncQueue()
 
 		// Finalize it
 		(*job.Handle)->Finalize();
+		(*job.Handle)->m_Finalized = true;
         LOG_DEBUG("FINALIZE");
 	}
 }

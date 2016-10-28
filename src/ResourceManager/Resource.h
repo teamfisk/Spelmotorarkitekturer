@@ -24,7 +24,7 @@ protected:
 	virtual ~Resource() = default;
 
     // Guaranteed to be called on main thread after constructor is finished
-	virtual void Finalize() { m_Finalized = true; }
+	virtual void Finalize() { }
 
 	//Run this function when you use memory from any resource.
 	void LogMemoryUsed(size_t size) { m_UsedMemory += size; }
