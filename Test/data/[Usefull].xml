@@ -1,0 +1,174 @@
+<Catch name="Test.exe">
+  <Group name="Test.exe">
+    <TestCase name="Pool- Linear allocate">
+      <Section name="SS">
+        <OverallResults successes="0" failures="0" expectedFailures="0" durationInSeconds="5.6e-05"/>
+      </Section>
+      <Section name="SL">
+        <OverallResults successes="0" failures="0" expectedFailures="0" durationInSeconds="0.006217"/>
+      </Section>
+      <Section name="MS">
+        <OverallResults successes="0" failures="0" expectedFailures="0" durationInSeconds="0.000142"/>
+      </Section>
+      <Section name="ML">
+        <OverallResults successes="0" failures="0" expectedFailures="0" durationInSeconds="0.010983"/>
+      </Section>
+      <Section name="LS">
+        <OverallResults successes="0" failures="0" expectedFailures="0" durationInSeconds="0.000275"/>
+      </Section>
+      <Section name="LL">
+        <OverallResults successes="0" failures="0" expectedFailures="0" durationInSeconds="0.032858"/>
+      </Section>
+      <OverallResult success="true" durationInSeconds="0.051049"/>
+    </TestCase>
+    <TestCase name="Stand- Linear allocate">
+      <Section name="SS">
+        <OverallResults successes="0" failures="0" expectedFailures="0" durationInSeconds="0.001757"/>
+      </Section>
+      <Section name="SL">
+        <OverallResults successes="0" failures="0" expectedFailures="0" durationInSeconds="0.212817"/>
+      </Section>
+      <Section name="MS">
+        <OverallResults successes="0" failures="0" expectedFailures="0" durationInSeconds="0.001802"/>
+      </Section>
+      <Section name="ML">
+        <OverallResults successes="0" failures="0" expectedFailures="0" durationInSeconds="0.218144"/>
+      </Section>
+      <Section name="LS">
+        <OverallResults successes="0" failures="0" expectedFailures="0" durationInSeconds="0.002632"/>
+      </Section>
+      <Section name="LL">
+        <OverallResults successes="0" failures="0" expectedFailures="0" durationInSeconds="0.295974"/>
+      </Section>
+      <OverallResult success="true" durationInSeconds="0.733612"/>
+    </TestCase>
+    <TestCase name="Pool- Linear access">
+      <Section name="SS">
+        <OverallResults successes="0" failures="0" expectedFailures="0" durationInSeconds="2e-05"/>
+      </Section>
+      <Section name="SL">
+        <OverallResults successes="0" failures="0" expectedFailures="0" durationInSeconds="0.002238"/>
+      </Section>
+      <Section name="MS">
+        <OverallResults successes="0" failures="0" expectedFailures="0" durationInSeconds="2e-05"/>
+      </Section>
+      <Section name="ML">
+        <OverallResults successes="0" failures="0" expectedFailures="0" durationInSeconds="0.002058"/>
+      </Section>
+      <Section name="LS">
+        <OverallResults successes="0" failures="0" expectedFailures="0" durationInSeconds="5.2e-05"/>
+      </Section>
+      <Section name="LL">
+        <OverallResults successes="0" failures="0" expectedFailures="0" durationInSeconds="0.008441"/>
+      </Section>
+      <OverallResult success="true" durationInSeconds="0.013162"/>
+    </TestCase>
+    <TestCase name="Stand- Linear access">
+      <Section name="SS">
+        <OverallResults successes="0" failures="0" expectedFailures="0" durationInSeconds="3.8e-05"/>
+      </Section>
+      <Section name="SL">
+        <OverallResults successes="0" failures="0" expectedFailures="0" durationInSeconds="0.003334"/>
+      </Section>
+      <Section name="MS">
+        <OverallResults successes="0" failures="0" expectedFailures="0" durationInSeconds="7.1e-05"/>
+      </Section>
+      <Section name="ML">
+        <OverallResults successes="0" failures="0" expectedFailures="0" durationInSeconds="0.005815"/>
+      </Section>
+      <Section name="LS">
+        <OverallResults successes="0" failures="0" expectedFailures="0" durationInSeconds="0.000138"/>
+      </Section>
+      <Section name="LL">
+        <OverallResults successes="0" failures="0" expectedFailures="0" durationInSeconds="0.017181"/>
+      </Section>
+      <OverallResult success="true" durationInSeconds="0.027067"/>
+    </TestCase>
+    <TestCase name="Pool- Fragment the memory">
+      <Section name="SS">
+        <OverallResults successes="0" failures="0" expectedFailures="0" durationInSeconds="0.000441"/>
+      </Section>
+      <Section name="SL">
+        <OverallResults successes="0" failures="0" expectedFailures="0" durationInSeconds="0.039391"/>
+      </Section>
+      <Section name="MS">
+        <OverallResults successes="0" failures="0" expectedFailures="0" durationInSeconds="0.000388"/>
+      </Section>
+      <Section name="ML">
+        <OverallResults successes="0" failures="0" expectedFailures="0" durationInSeconds="0.04528"/>
+      </Section>
+      <Section name="LS">
+        <OverallResults successes="0" failures="0" expectedFailures="0" durationInSeconds="0.000373"/>
+      </Section>
+      <Section name="LL">
+        <OverallResults successes="0" failures="0" expectedFailures="0" durationInSeconds="0.041413"/>
+      </Section>
+      <OverallResult success="true" durationInSeconds="0.128167"/>
+    </TestCase>
+    <TestCase name="Stand- Fragment the memory">
+      <Section name="SS">
+        <OverallResults successes="0" failures="0" expectedFailures="0" durationInSeconds="0.000467"/>
+      </Section>
+      <Section name="SL">
+        <OverallResults successes="0" failures="0" expectedFailures="0" durationInSeconds="0.050053"/>
+      </Section>
+      <Section name="MS">
+        <OverallResults successes="0" failures="0" expectedFailures="0" durationInSeconds="0.000785"/>
+      </Section>
+      <Section name="ML">
+        <OverallResults successes="0" failures="0" expectedFailures="0" durationInSeconds="0.056908"/>
+      </Section>
+      <Section name="LS">
+        <OverallResults successes="0" failures="0" expectedFailures="0" durationInSeconds="0.000553"/>
+      </Section>
+      <Section name="LL">
+        <OverallResults successes="0" failures="0" expectedFailures="0" durationInSeconds="0.066025"/>
+      </Section>
+      <OverallResult success="true" durationInSeconds="0.175282"/>
+    </TestCase>
+    <TestCase name="Pool- Fragmented linear access">
+      <Section name="SS">
+        <OverallResults successes="0" failures="0" expectedFailures="0" durationInSeconds="5.4e-05"/>
+      </Section>
+      <Section name="SL">
+        <OverallResults successes="0" failures="0" expectedFailures="0" durationInSeconds="0.00668"/>
+      </Section>
+      <Section name="MS">
+        <OverallResults successes="0" failures="0" expectedFailures="0" durationInSeconds="7e-05"/>
+      </Section>
+      <Section name="ML">
+        <OverallResults successes="0" failures="0" expectedFailures="0" durationInSeconds="0.007651"/>
+      </Section>
+      <Section name="LS">
+        <OverallResults successes="0" failures="0" expectedFailures="0" durationInSeconds="0.000274"/>
+      </Section>
+      <Section name="LL">
+        <OverallResults successes="0" failures="0" expectedFailures="0" durationInSeconds="0.010375"/>
+      </Section>
+      <OverallResult success="true" durationInSeconds="0.025575"/>
+    </TestCase>
+    <TestCase name="Stand- Fragmented linear access">
+      <Section name="SS">
+        <OverallResults successes="0" failures="0" expectedFailures="0" durationInSeconds="5.1e-05"/>
+      </Section>
+      <Section name="SL">
+        <OverallResults successes="0" failures="0" expectedFailures="0" durationInSeconds="0.00415"/>
+      </Section>
+      <Section name="MS">
+        <OverallResults successes="0" failures="0" expectedFailures="0" durationInSeconds="5e-05"/>
+      </Section>
+      <Section name="ML">
+        <OverallResults successes="0" failures="0" expectedFailures="0" durationInSeconds="0.005378"/>
+      </Section>
+      <Section name="LS">
+        <OverallResults successes="0" failures="0" expectedFailures="0" durationInSeconds="0.000101"/>
+      </Section>
+      <Section name="LL">
+        <OverallResults successes="0" failures="0" expectedFailures="0" durationInSeconds="0.015187"/>
+      </Section>
+      <OverallResult success="true" durationInSeconds="0.025263"/>
+    </TestCase>
+    <OverallResults successes="0" failures="0" expectedFailures="0"/>
+  </Group>
+  <OverallResults successes="0" failures="0" expectedFailures="0"/>
+</Catch>

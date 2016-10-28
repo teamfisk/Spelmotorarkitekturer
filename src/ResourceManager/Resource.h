@@ -25,6 +25,16 @@ public:
         FailedLoadingException() : std::runtime_error("Resource failed to load.") { };
     };
 
+	void* operator new(size_t size) {
+		std::cout << "New with size: " << size << std::endl;
+		return ::operator new(size);
+	}
+
+	void operator delete(void* ptr) {
+		
+		return ::operator delete(ptr);
+	}
+
 protected:
 	Resource() = default;
 	Resource(std::shared_ptr<ResourceBundle::Block> block) { }
@@ -40,6 +50,7 @@ public:
 
 private:
 	unsigned int m_ReferenceCount = 0;
+	static unsigned int m_UsedMemory;
     std::list<Resource**>::iterator m_ActivityIterator;
 };
 
