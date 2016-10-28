@@ -86,6 +86,7 @@ int main()
     ResourceManager::RegisterBundleFormat<STUFFBundle>();
 	ResourceManager::RegisterBundleFormat<FilesystemBundle>();
 	ResourceManager::RegisterBundle("Resources");
+	ResourceManager::Initialize();
 
 	glfwSetErrorCallback(glfw_error_callback);
 	glfwInit();
@@ -197,7 +198,9 @@ int main()
 	{	
 		double time = glfwGetTime();
 		double dt = time - lastTime;
-		lastTime = time;				
+		lastTime = time;
+
+		ResourceManager::ProcessAsyncQueue();
 
 		for(unsigned int i = 0; i < entities.size(); i++)
 		{
@@ -242,14 +245,19 @@ int main()
 		glUniformMatrix4fv(glGetUniformLocation(programHandle, "projection"), 1, GL_FALSE, glm::value_ptr(camera.getProjectionMatrix()));
 		glUniformMatrix4fv(glGetUniformLocation(programHandle, "view"), 1, GL_FALSE, glm::value_ptr(camera.getViewMatrix()));	
 
-		textureHandle->Bind();
-		glBindSampler(0, linearSampler);
+		if (textureHandle.Valid()) {
+			textureHandle->Bind();
+			glBindSampler(0, linearSampler);
+		}
 
 		//renderer.Render(*planeHandle, planeMatrix, programHandle);		
 
 		for (unsigned int i = 0; i < entities.size(); i++)
-		{			
-			renderer.Render(*entities[i].modelHandle, entities[i].worldMatrix, programHandle);
+		{
+			auto& entity = entities[i];
+			if (entity.modelHandle.Valid()) {
+				renderer.Render(*entity.modelHandle, entity.worldMatrix, programHandle);
+			}
 		}
 
 		glfwSwapBuffers(window);

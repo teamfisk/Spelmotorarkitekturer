@@ -19,6 +19,7 @@ class Model :
 public:
 	Model(std::shared_ptr<ResourceBundle::Block> block);
 	virtual ~Model();
+	void Finalize();
 	
 	GLenum GetVAO() const;
 	GLenum GetVBO() const;	
@@ -31,6 +32,7 @@ private:
 	//TODO: Make sure that all memory used is logged.
 	std::size_t Size() { return m_UsedMemory; }
 
+	ResourceHandle<RawModelAssimp> m_RawModel;
 	GLenum vbo; // Vertex Buffer Object handle
 	GLenum vao; // Vertex Array Object handle
 	GLenum indexVBO;

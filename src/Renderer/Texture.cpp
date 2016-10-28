@@ -23,7 +23,7 @@ void Texture::Finalize()
 	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, m_PNG->Width, m_PNG->Height, 0, m_Format, GL_UNSIGNED_BYTE, m_PNG->Data);
 	glBindTexture(GL_TEXTURE_2D, 0);
 
-	Resource::Finalize();
+	m_PNG.Release();
 }
 
 Texture::~Texture()

@@ -23,54 +23,11 @@ GLenum CreateVAO(RawModelAssimp::Vertex someStruct)
 */
 Model::Model(std::shared_ptr<ResourceBundle::Block> block)
 {
-	auto handle = ResourceManager::Load<RawModelAssimp>(block->Path());	
-	auto model = *handle;		
-	m_IndexCount = model->m_Indices.size();
+	m_RawModel = ResourceManager::Load<RawModelAssimp>(block->Path());	
+	m_IndexCount = m_RawModel->m_Indices.size();
 					
-	if (model->m_Indices.size() == 0) // no indices?
-	{
+	if (m_RawModel->m_Indices.size() == 0) {
 		throw std::logic_error("The method or operation is not implemented.");
-	}
-	else
-	{	
-		glGenBuffers(1, &vbo);
-		glBindBuffer(GL_ARRAY_BUFFER, vbo);
-		glBufferData(GL_ARRAY_BUFFER, model->GetVertexBytes(), model->m_Vertices.data(), GL_STATIC_DRAW);		
-				
-		glGenVertexArrays(1, &vao);
-		glBindVertexArray(vao);
-		
-		using Vertex = RawModelAssimp::Vertex;
-		auto stride = sizeof(Vertex);
-		
-		glEnableVertexAttribArray(0);
-		glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, stride, nullptr);
-				
-		glEnableVertexAttribArray(1);		
-		glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, stride, (GLvoid*)offsetof(Vertex, Vertex::Normal));
-
-		glEnableVertexAttribArray(2);
-		glVertexAttribPointer(2, 3, GL_FLOAT, GL_FALSE, stride, (GLvoid*)offsetof(Vertex, Vertex::Tangent));
-		
-		glEnableVertexAttribArray(3);
-		glVertexAttribPointer(3, 3, GL_FLOAT, GL_FALSE, stride, (GLvoid*)offsetof(Vertex, Vertex::BiNormal));
-		
-		glEnableVertexAttribArray(4);
-		glVertexAttribPointer(4, 2, GL_FLOAT, GL_FALSE, stride, (GLvoid*)offsetof(Vertex, Vertex::TextureCoords));
-		
-		glEnableVertexAttribArray(5);
-		glVertexAttribPointer(5, 4, GL_FLOAT, GL_FALSE, stride, (GLvoid*)offsetof(Vertex, Vertex::BoneIndices));
-		
-		glEnableVertexAttribArray(6);
-		glVertexAttribPointer(6, 4, GL_FLOAT, GL_FALSE, stride, (GLvoid*)offsetof(Vertex, Vertex::BoneWeights));
-		glBindVertexArray(0);
-
-		glBindBuffer(GL_ARRAY_BUFFER, 0);
-
-		glGenBuffers(1, &indexVBO);
-		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, indexVBO);
-		glBufferData(GL_ELEMENT_ARRAY_BUFFER, model->GetIndexBytes(), model->m_Indices.data(), GL_STATIC_DRAW);
-		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
 	}
 
 	// Determine smallest index type possible during load.
@@ -104,6 +61,50 @@ Model::~Model()
 	glDeleteVertexArrays(1, &vao);
 	glDeleteBuffers(1, &vbo);
 	glDeleteBuffers(1, &indexVBO);
+}
+
+void Model::Finalize()
+{
+	glGenBuffers(1, &vbo);
+	glBindBuffer(GL_ARRAY_BUFFER, vbo);
+	glBufferData(GL_ARRAY_BUFFER, m_RawModel->GetVertexBytes(), m_RawModel->m_Vertices.data(), GL_STATIC_DRAW);
+
+	glGenVertexArrays(1, &vao);
+	glBindVertexArray(vao);
+
+	using Vertex = RawModelAssimp::Vertex;
+	auto stride = sizeof(Vertex);
+
+	glEnableVertexAttribArray(0);
+	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, stride, nullptr);
+
+	glEnableVertexAttribArray(1);
+	glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, stride, (GLvoid*)offsetof(Vertex, Vertex::Normal));
+
+	glEnableVertexAttribArray(2);
+	glVertexAttribPointer(2, 3, GL_FLOAT, GL_FALSE, stride, (GLvoid*)offsetof(Vertex, Vertex::Tangent));
+
+	glEnableVertexAttribArray(3);
+	glVertexAttribPointer(3, 3, GL_FLOAT, GL_FALSE, stride, (GLvoid*)offsetof(Vertex, Vertex::BiNormal));
+
+	glEnableVertexAttribArray(4);
+	glVertexAttribPointer(4, 2, GL_FLOAT, GL_FALSE, stride, (GLvoid*)offsetof(Vertex, Vertex::TextureCoords));
+
+	glEnableVertexAttribArray(5);
+	glVertexAttribPointer(5, 4, GL_FLOAT, GL_FALSE, stride, (GLvoid*)offsetof(Vertex, Vertex::BoneIndices));
+
+	glEnableVertexAttribArray(6);
+	glVertexAttribPointer(6, 4, GL_FLOAT, GL_FALSE, stride, (GLvoid*)offsetof(Vertex, Vertex::BoneWeights));
+	glBindVertexArray(0);
+
+	glBindBuffer(GL_ARRAY_BUFFER, 0);
+
+	glGenBuffers(1, &indexVBO);
+	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, indexVBO);
+	glBufferData(GL_ELEMENT_ARRAY_BUFFER, m_RawModel->GetIndexBytes(), m_RawModel->m_Indices.data(), GL_STATIC_DRAW);
+	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
+
+	m_RawModel.Release();
 }
 
 GLenum Model::GetVAO() const
