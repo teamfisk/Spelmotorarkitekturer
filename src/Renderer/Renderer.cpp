@@ -24,6 +24,7 @@ void Renderer::Render(Model * model, const glm::mat4x4& worldMat, GLuint program
 	glBindVertexArray(model->GetVAO());
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, model->GetIndexBuffer());
 	glDrawElements(GL_TRIANGLES, model->GetIndicesCount(), model->GetIndexType(), (GLvoid*)0);
+	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0	);
 	glBindVertexArray(0);
 
 	//for(unsigned int i = 0; i < renderList.size(); i++)
