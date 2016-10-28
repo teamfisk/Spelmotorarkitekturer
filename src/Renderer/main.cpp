@@ -139,6 +139,7 @@ int main()
 	auto teapotHandle = ResourceManager::Load<Model>("teapot.obj");
 	auto planeHandle = ResourceManager::Load<Model>("plane.obj");
 
+	//auto textureHandle = ResourceManager::Load<Texture>("moss 5.png");
 	auto textureHandle = ResourceManager::Load<Texture>("kitten_png_image.png");
 
 	
@@ -173,6 +174,8 @@ int main()
 	glm::mat4x4 planeMatrix = glm::rotate((float)M_PI_2, glm::vec3(1.0, 0.0, 0.0));
 	planeMatrix = glm::scale(planeMatrix, { 1, 1, 1 });
 
+	entities.emplace_back(translate(glm::vec3(-20, 0, 0)) * planeMatrix, planeHandle);
+	entities.emplace_back(translate(glm::vec3(-10, 0, 0)) * planeMatrix, planeHandle);
 	entities.emplace_back(translate(glm::vec3(0, 0, 0)) * planeMatrix, planeHandle);
 	for (int i = 0; i < 6; i++)
 	{
