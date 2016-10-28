@@ -39,35 +39,30 @@ Model::Model(std::shared_ptr<ResourceBundle::Block> block)
 				
 		glGenVertexArrays(1, &vao);
 		glBindVertexArray(vao);
+		
+		using Vertex = RawModelAssimp::Vertex;
+		auto stride = sizeof(Vertex);
+
 		glEnableVertexAttribArray(0);
-		auto stride = sizeof(RawModelAssimp::Vertex);
 		glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, stride, nullptr);
-
-		offsetof(RawModelAssimp::Vertex, RawModelAssimp::Vertex::Position);
-
-		auto offset = sizeof(RawModelAssimp::Vertex::Normal);
+				
 		glEnableVertexAttribArray(1);		
-		glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, stride, (GLvoid*)offset);
+		glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, stride, (GLvoid*)offsetof(Vertex, Vertex::Normal));
 
-		offset += sizeof(RawModelAssimp::Vertex::Tangent);
 		glEnableVertexAttribArray(2);
-		glVertexAttribPointer(2, 3, GL_FLOAT, GL_FALSE, stride, (GLvoid*)offset);
-
-		offset += sizeof(RawModelAssimp::Vertex::BiNormal);
+		glVertexAttribPointer(2, 3, GL_FLOAT, GL_FALSE, stride, (GLvoid*)offsetof(Vertex, Vertex::Tangent));
+		
 		glEnableVertexAttribArray(3);
-		glVertexAttribPointer(3, 3, GL_FLOAT, GL_FALSE, stride, (GLvoid*)offset);
-
-		offset += sizeof(RawModelAssimp::Vertex::TextureCoords);
+		glVertexAttribPointer(3, 3, GL_FLOAT, GL_FALSE, stride, (GLvoid*)offsetof(Vertex, Vertex::BiNormal));
+		
 		glEnableVertexAttribArray(4);
-		glVertexAttribPointer(4, 2, GL_FLOAT, GL_FALSE, stride, (GLvoid*)offset);
-
-		offset += sizeof(RawModelAssimp::Vertex::BoneIndices);
+		glVertexAttribPointer(4, 2, GL_FLOAT, GL_FALSE, stride, (GLvoid*)offsetof(Vertex, Vertex::TextureCoords));
+		
 		glEnableVertexAttribArray(5);
-		glVertexAttribPointer(5, 3, GL_FLOAT, GL_FALSE, stride, (GLvoid*)offset);
-
-		offset += sizeof(RawModelAssimp::Vertex::BoneWeights);		
+		glVertexAttribPointer(5, 4, GL_FLOAT, GL_FALSE, stride, (GLvoid*)offsetof(Vertex, Vertex::BoneIndices));
+		
 		glEnableVertexAttribArray(6);
-		glVertexAttribPointer(6, 3, GL_FLOAT, GL_FALSE, stride, (GLvoid*)offset);
+		glVertexAttribPointer(6, 4, GL_FLOAT, GL_FALSE, stride, (GLvoid*)offsetof(Vertex, Vertex::BoneWeights));
 		glBindVertexArray(0);
 
 		glBindBuffer(GL_ARRAY_BUFFER, 0);
