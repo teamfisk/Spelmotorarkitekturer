@@ -1,9 +1,10 @@
 #version 440
 
+// will use the texture bound to GL_TEXTURE0
+layout (binding = 0) uniform sampler2D tex;
+
 in vec4 position;
 in vec2 uv;
-
-layout (binding = 0/*will use the texture bound to GL_TEXTURE0*/) uniform sampler2D tex;
 
 out vec4 color;
 

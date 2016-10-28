@@ -38,7 +38,9 @@ protected:
 public:
     virtual bool Valid() const { return true; }
 
+
 private:
+	size_t m_UsedMemory = 0;
 	unsigned int m_ReferenceCount = 0;
     std::list<Resource**>::iterator m_ActivityIterator;
 };
