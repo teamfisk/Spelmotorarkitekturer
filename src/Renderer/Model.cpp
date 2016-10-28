@@ -23,9 +23,9 @@ GLenum CreateVAO(RawModelAssimp::Vertex someStruct)
 */
 Model::Model(std::shared_ptr<ResourceBundle::Block> block)
 {
-	auto handle = ResourceManager::Load<RawModelAssimp>(block->Path());
-	m_Handle = handle;
-	auto model = *handle;
+	auto handle = ResourceManager::Load<RawModelAssimp>(block->Path());	
+	auto model = *handle;		
+	m_IndexCount = model->m_Indices.size();
 					
 	if (model->m_Indices.size() == 0) // no indices?
 	{
@@ -42,7 +42,7 @@ Model::Model(std::shared_ptr<ResourceBundle::Block> block)
 		
 		using Vertex = RawModelAssimp::Vertex;
 		auto stride = sizeof(Vertex);
-
+		
 		glEnableVertexAttribArray(0);
 		glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, stride, nullptr);
 				
@@ -116,14 +116,9 @@ GLenum Model::GetVBO() const
 	return vbo;
 }
 
-const void* Model::GetIndices() const
-{
-	return (*m_Handle)->m_Indices.data();
-}
-
 GLsizei Model::GetIndicesCount() const
 {
-	return (*m_Handle)->m_Indices.size();
+	return m_IndexCount;
 }
 
 GLsizei Model::GetTriangleCount() const
@@ -137,9 +132,12 @@ GLenum Model::GetIndexType() const
 }
 
 size_t Model::GetMemoryUsage() const
+{	
+	return sizeof(Model);
+}
+
+GLenum Model::GetIndexBuffer()
 {
-	size_t s;
-	s += sizeof(Model);
-	return s;
+	return indexVBO;
 }
 
