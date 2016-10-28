@@ -174,7 +174,10 @@ int main()
 	planeMatrix = glm::scale(planeMatrix, { 1, 1, 1 });
 
 	entities.emplace_back(translate(glm::vec3(0, 0, 0)) * planeMatrix, planeHandle);
-	entities.emplace_back(translate(glm::vec3(ENTITY_MOVE_DIST_X, 0, 0)) * planeMatrix, planeHandle);
+	for (int i = 0; i < 6; i++)
+	{
+		entities.emplace_back(translate(glm::vec3(10 * i, 0, 0)) * planeMatrix, planeHandle);
+	}		
 
 	double timeSinceLastEntitySpawn = 0;
 
@@ -196,7 +199,7 @@ int main()
 		for(unsigned int i = 0; i < entities.size(); i++)
 		{
 			float x = entities[i].worldMatrix[3][0];
-			float offset = 4; 
+			float offset = 6; 
 			if (x + offset < camera.getPosition().x) // Trigger this slightly after the player has passed the entity.
 			{
 				
