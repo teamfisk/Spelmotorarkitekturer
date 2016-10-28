@@ -7,7 +7,7 @@ class IResourceHandle
 {
     friend class ResourceManager;
 protected:
-	IResourceHandle(Resource** resource);
+	IResourceHandle(Resource** resource, unsigned int* refCount);
 	IResourceHandle(const IResourceHandle& handle);
 	IResourceHandle& operator=(const IResourceHandle& other);
 
@@ -20,6 +20,7 @@ public:
 
 protected:
 	Resource** m_Instance;
+    unsigned int* m_RefCount;
 
 private:
 	void incrementCount();
@@ -32,8 +33,8 @@ class ResourceHandle : public IResourceHandle
 {
 	friend class ResourceManager;
 private:
-	ResourceHandle(Resource** resource)
-		: IResourceHandle(resource)
+	ResourceHandle(Resource** resource, unsigned int* refCount)
+		: IResourceHandle(resource, refCount)
 	{ }
 
 public:

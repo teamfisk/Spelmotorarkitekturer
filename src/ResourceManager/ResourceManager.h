@@ -59,7 +59,17 @@ private:
 	static std::list<ResourceBundle*> m_Bundles;
 
 	// Instance map
-	typedef std::unordered_map<std::string, Resource**> InstanceMap_t;
+    struct InstanceInfo
+    {
+		InstanceInfo()
+		{
+			Handle = new Resource*;
+			*Handle = nullptr;
+		}
+        Resource** Handle;
+        unsigned int ReferenceCount = 0;
+    };
+	typedef std::unordered_map<std::string, InstanceInfo> InstanceMap_t;
 	static std::unordered_map<ResourceTypeHash_t, InstanceMap_t> m_Instances;
 
 	template <typename T>
@@ -83,18 +93,19 @@ ResourceHandle<T> ResourceManager::Load(const std::string& path)
 	InstanceMap_t& instanceMap = m_Instances[typeHash];
 
 	// Check the cache for the resource
-	Resource** instanceHandle = nullptr;
-	auto it = instanceMap.find(path);
-	if (it == instanceMap.end()) {
-		instanceHandle = new Resource*;
-		*instanceHandle = nullptr;
-		instanceMap[path] = instanceHandle;
-	} else {
-		instanceHandle = it->second;
-	}
+    InstanceInfo& instance = instanceMap[path];
+//	Resource** instanceHandle = nullptr;
+//	auto it = instanceMap.find(path);
+//	if (it == instanceMap.end()) {
+//		instanceHandle = new Resource*;
+//		*instanceHandle = nullptr;
+//		instanceMap[path] = instanceHandle;
+//	} else {
+//		instanceHandle = it->second;
+//	}
 
 	// Create the resource instance if it doesn't exist in cache
-	if (*instanceHandle == nullptr) {
+	if (*instance.Handle == nullptr) {
 		// Find the first bundle that serves our request
 		std::shared_ptr<ResourceBundle::Block> block = nullptr;
 		for (auto& bundle : m_Bundles) {
@@ -107,16 +118,16 @@ ResourceHandle<T> ResourceManager::Load(const std::string& path)
 			// Only allow threaded loading on main thread
 			auto currentThread = std::this_thread::get_id();
 			if (currentThread == m_MainThreadID) {
-				loadAsync<T>(block, instanceHandle);
+				loadAsync<T>(block, instance.Handle);
 			} else {
-				loadSync<T>(block, instanceHandle);
+				loadSync<T>(block, instance.Handle);
 			}
 		} else {
 			LOG_ERROR("Failed to load resource \"%s\": Not found", path.c_str());
 		}
 	}
 
-	return ResourceHandle<T>(instanceHandle);
+	return ResourceHandle<T>(instance.Handle, &instance.ReferenceCount);
 }
 
 template <typename T>
@@ -143,13 +154,13 @@ void ResourceManager::loadAsync(std::shared_ptr<ResourceBundle::Block> block, Re
 template <typename T>
 void ResourceManager::Free(ResourceHandle<T>& handle)
 {
-    Resource* resourceInstance = *handle.m_Instance;
+    Resource** instanceHandle = handle.m_Instance;
     // Invalidate the handle
     handle.invalidate();
     // Free the resource
-    if (resourceInstance != nullptr) {
-        delete resourceInstance;
-        resourceInstance = nullptr;
+    if (*instanceHandle != nullptr) {
+        delete *instanceHandle;
+        *instanceHandle = nullptr;
     }
 }
 

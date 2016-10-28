@@ -13,7 +13,6 @@ TEST_CASE("ResourceManager")
 	ResourceManager::RegisterBundle("TestFiles/ResourceBundle/Resources.stuff");
 
 	auto txt = ResourceManager::Load<TXT>("TestFolder/TestFile1.txt");
-
 	// If this loops forever there's something wrong in the async loading!
 	while (!txt.Valid()) {
 		ResourceManager::ProcessAsyncQueue();
@@ -23,7 +22,12 @@ TEST_CASE("ResourceManager")
 	REQUIRE((*txt)->Length() == 12);
 	REQUIRE(std::memcmp((*txt)->Text(), "TestContent1", 12) == 0);
     ResourceManager::Free(txt);
-    REQUIRE(txt.Valid() == false);
+    REQUIRE(!txt.Valid());
+}
+
+TEST_CASE("ResourceManagerGarbage")
+{
+
 }
 
 TEST_CASE("ResourceTree")

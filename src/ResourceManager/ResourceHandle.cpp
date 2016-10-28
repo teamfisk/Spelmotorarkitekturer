@@ -1,7 +1,8 @@
 #include "ResourceHandle.h"
 
-IResourceHandle::IResourceHandle(Resource** resource)
+IResourceHandle::IResourceHandle(Resource** resource, unsigned int* refCount)
     : m_Instance(resource)
+	, m_RefCount(refCount)
 {
 	incrementCount();
 }
@@ -36,15 +37,15 @@ void IResourceHandle::Release()
 
 void IResourceHandle::incrementCount()
 {
-	if (m_Instance != nullptr && *m_Instance != nullptr) {
-		(*m_Instance)->m_ReferenceCount++;
+	if (m_Instance != nullptr) {
+		(*m_RefCount)++;
 	}
 }
 
 void IResourceHandle::decrementCount()
 {
-	if (m_Instance != nullptr && *m_Instance != nullptr) {
-		(*m_Instance)->m_ReferenceCount--;
+	if (m_Instance != nullptr) {
+		(*m_RefCount)--;
 	}
 }
 

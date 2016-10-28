@@ -21,12 +21,7 @@ public:
 protected:
 	Resource() = default;
 	Resource(std::shared_ptr<ResourceBundle::Block> block) { }
-	virtual ~Resource()
-	{
-		if (m_ReferenceCount != 0) {
-			LOG_ERROR("Resource was freed while still carrying references!");
-		}
-	}
+	virtual ~Resource() = default;
 
     // Guaranteed to be called on main thread after constructor is finished
 	virtual void Finalize() { m_Finalized = true; }
@@ -36,15 +31,14 @@ protected:
 	//Run this function when you delete memory in any resource.
 	void LogMemoryFreed(size_t size) { m_UsedMemory -= size; }
 
-	size_t m_UsedMemory = 0;
+	std::size_t m_UsedMemory = 0;
 
 public:
     virtual bool Valid() const { return m_Finalized; }
-	virtual size_t Size() = 0;
+	// This needs to be implemented to return the allocated size of the resource
+	virtual std::size_t Size() = 0;
 
 private:
-
-	unsigned int m_ReferenceCount = 0;
 	bool m_Finalized = false;
 };
 
