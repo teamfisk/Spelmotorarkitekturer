@@ -4,6 +4,7 @@ RawModelAssimp::RawModelAssimp(std::shared_ptr<ResourceBundle::Block> block)
 {
 	Assimp::Importer importer;
     char* data = new char[block->Size()];
+
 	block->Read(data);
 	const aiScene* scene = importer.ReadFileFromMemory(data, block->Size(), aiProcess_CalcTangentSpace | aiProcess_Triangulate);
 	delete[] data;

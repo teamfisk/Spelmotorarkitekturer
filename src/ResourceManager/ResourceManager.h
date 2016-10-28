@@ -28,6 +28,8 @@ public:
 	// TODO: template <typename T> static ResourceHandle<T> Load(std::shared_ptr<ResourceBundle::Block> block);
 	//static ResourceHandle Load(UID path, unsigned int part);
 	static void Collect();
+    template <typename T>
+    static void Free(ResourceHandle<T>& handle);
 
 	// Process items waiting for finalization in async queue. Call this every frame!
 	static void ProcessAsyncQueue();
@@ -136,6 +138,19 @@ void ResourceManager::loadAsync(std::shared_ptr<ResourceBundle::Block> block, Re
 	m_AsyncLoadQueueMutex.lock();
     m_AsyncLoadQueue.push(std::move(job));
 	m_AsyncLoadQueueMutex.unlock();
+}
+
+template <typename T>
+void ResourceManager::Free(ResourceHandle<T>& handle)
+{
+    Resource* resourceInstance = *handle.m_Instance;
+    // Invalidate the handle
+    handle.invalidate();
+    // Free the resource
+    if (resourceInstance != nullptr) {
+        delete resourceInstance;
+        resourceInstance = nullptr;
+    }
 }
 
 #endif

@@ -31,10 +31,19 @@ protected:
     // Guaranteed to be called on main thread after constructor is finished
 	virtual void Finalize() { m_Finalized = true; }
 
+	//Run this function when you use memory from any resource.
+	void LogMemoryUsed(size_t size) { m_UsedMemory += size; }
+	//Run this function when you delete memory in any resource.
+	void LogMemoryFreed(size_t size) { m_UsedMemory -= size; }
+
+	size_t m_UsedMemory = 0;
+
 public:
     virtual bool Valid() const { return m_Finalized; }
+	virtual size_t Size() = 0;
 
 private:
+
 	unsigned int m_ReferenceCount = 0;
 	bool m_Finalized = false;
 };

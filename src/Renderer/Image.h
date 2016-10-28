@@ -18,6 +18,7 @@ struct Image
     unsigned int MipMapLevels = 0;
     bool Compressed = false;
 	unsigned char* Data = nullptr;
+	std::size_t m_DataSize = 0;
     std::size_t ByteSize = 0;
 };
 

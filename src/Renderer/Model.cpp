@@ -23,9 +23,9 @@ GLenum CreateVAO(RawModelAssimp::Vertex someStruct)
 */
 Model::Model(std::shared_ptr<ResourceBundle::Block> block)
 {
-	auto handle = ResourceManager::Load<RawModelAssimp>(block->Path());
-	m_Handle = handle;
-	auto model = *handle;
+	auto handle = ResourceManager::Load<RawModelAssimp>(block->Path());	
+	auto model = *handle;		
+	m_IndexCount = model->m_Indices.size();
 					
 	if (model->m_Indices.size() == 0) // no indices?
 	{
@@ -39,35 +39,30 @@ Model::Model(std::shared_ptr<ResourceBundle::Block> block)
 				
 		glGenVertexArrays(1, &vao);
 		glBindVertexArray(vao);
+		
+		using Vertex = RawModelAssimp::Vertex;
+		auto stride = sizeof(Vertex);
+		
 		glEnableVertexAttribArray(0);
-		auto stride = sizeof(RawModelAssimp::Vertex);
 		glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, stride, nullptr);
-
-		offsetof(RawModelAssimp::Vertex, RawModelAssimp::Vertex::Position);
-
-		auto offset = sizeof(RawModelAssimp::Vertex::Normal);
+				
 		glEnableVertexAttribArray(1);		
-		glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, stride, (GLvoid*)offset);
+		glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, stride, (GLvoid*)offsetof(Vertex, Vertex::Normal));
 
-		offset += sizeof(RawModelAssimp::Vertex::Tangent);
 		glEnableVertexAttribArray(2);
-		glVertexAttribPointer(2, 3, GL_FLOAT, GL_FALSE, stride, (GLvoid*)offset);
-
-		offset += sizeof(RawModelAssimp::Vertex::BiNormal);
+		glVertexAttribPointer(2, 3, GL_FLOAT, GL_FALSE, stride, (GLvoid*)offsetof(Vertex, Vertex::Tangent));
+		
 		glEnableVertexAttribArray(3);
-		glVertexAttribPointer(3, 3, GL_FLOAT, GL_FALSE, stride, (GLvoid*)offset);
-
-		offset += sizeof(RawModelAssimp::Vertex::TextureCoords);
+		glVertexAttribPointer(3, 3, GL_FLOAT, GL_FALSE, stride, (GLvoid*)offsetof(Vertex, Vertex::BiNormal));
+		
 		glEnableVertexAttribArray(4);
-		glVertexAttribPointer(4, 2, GL_FLOAT, GL_FALSE, stride, (GLvoid*)offset);
-
-		offset += sizeof(RawModelAssimp::Vertex::BoneIndices);
+		glVertexAttribPointer(4, 2, GL_FLOAT, GL_FALSE, stride, (GLvoid*)offsetof(Vertex, Vertex::TextureCoords));
+		
 		glEnableVertexAttribArray(5);
-		glVertexAttribPointer(5, 3, GL_FLOAT, GL_FALSE, stride, (GLvoid*)offset);
-
-		offset += sizeof(RawModelAssimp::Vertex::BoneWeights);		
+		glVertexAttribPointer(5, 4, GL_FLOAT, GL_FALSE, stride, (GLvoid*)offsetof(Vertex, Vertex::BoneIndices));
+		
 		glEnableVertexAttribArray(6);
-		glVertexAttribPointer(6, 3, GL_FLOAT, GL_FALSE, stride, (GLvoid*)offset);
+		glVertexAttribPointer(6, 4, GL_FLOAT, GL_FALSE, stride, (GLvoid*)offsetof(Vertex, Vertex::BoneWeights));
 		glBindVertexArray(0);
 
 		glBindBuffer(GL_ARRAY_BUFFER, 0);
@@ -121,14 +116,9 @@ GLenum Model::GetVBO() const
 	return vbo;
 }
 
-const void* Model::GetIndices() const
-{
-	return (*m_Handle)->m_Indices.data();
-}
-
 GLsizei Model::GetIndicesCount() const
 {
-	return (*m_Handle)->m_Indices.size();
+	return m_IndexCount;
 }
 
 GLsizei Model::GetTriangleCount() const
@@ -142,9 +132,12 @@ GLenum Model::GetIndexType() const
 }
 
 size_t Model::GetMemoryUsage() const
+{	
+	return sizeof(Model);
+}
+
+GLenum Model::GetIndexBuffer()
 {
-	size_t s;
-	s += sizeof(Model);
-	return s;
+	return indexVBO;
 }
 

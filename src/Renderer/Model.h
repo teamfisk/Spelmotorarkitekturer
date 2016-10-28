@@ -21,19 +21,21 @@ public:
 	virtual ~Model();
 	
 	GLenum GetVAO() const;
-	GLenum GetVBO() const;
-	const void* GetIndices() const;
+	GLenum GetVBO() const;	
 	GLsizei GetIndicesCount() const;
 	GLsizei GetTriangleCount() const;
 	GLenum GetIndexType() const;	
 	size_t GetMemoryUsage() const;
+	GLenum GetIndexBuffer();
 private:
-	//std::unique_ptr<ResourceHandle<RawModelAssimp>> handlePtr;
-	ResourceHandle<RawModelAssimp> m_Handle;
+	//TODO: Make sure that all memory used is logged.
+	std::size_t Size() { return m_UsedMemory; }
+
 	GLenum vbo; // Vertex Buffer Object handle
 	GLenum vao; // Vertex Array Object handle
 	GLenum indexVBO;
 	GLenum indexType;
 	GLuint indexDataBytes;
+	size_t m_IndexCount;
 };
 

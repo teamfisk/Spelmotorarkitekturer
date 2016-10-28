@@ -25,6 +25,9 @@ private:
 	TextureType m_Type;
 
 	ResourceHandle<PNG> m_PNG;
+private:
+	//TODO: Make sure that all memory used is logged.
+	std::size_t Size() { return m_UsedMemory; }
 };
 
 #endif 

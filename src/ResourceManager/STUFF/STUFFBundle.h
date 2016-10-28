@@ -89,7 +89,8 @@ public:
             if (entry.PathLength == 0) {
                 LOG_WARNING("Encountered an empty file.entry path!");
             }
-            entry.FilePath = new char[entry.PathLength];
+            entry.FilePath = new char[entry.PathLength + 1];
+            entry.FilePath[entry.PathLength] = '\0';
             file.read(entry.FilePath, entry.PathLength);
             file.read((char*)&entry.Offset, sizeof(entry.Offset));
             file.read((char*)&entry.Size, sizeof(entry.Size));

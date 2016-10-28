@@ -65,6 +65,9 @@ public:
 	size_t GetIndexBytes() const { return m_Vertices.size() * sizeof(unsigned int); }
 	size_t GetMemoryUsage()const;
 private:
+	//TODO: Make sure that all memory used is logged.
+	std::size_t Size() { return m_UsedMemory; }
+
 	std::vector<glm::ivec2> BoneIndices;
 	std::vector<glm::vec2> BoneWeights;
 	std::vector<glm::vec3> Normals;
