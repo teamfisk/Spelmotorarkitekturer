@@ -23,6 +23,8 @@ public:
 	static ResourceHandle<T> Load(const std::string& path);
 	//static ResourceHandle Load(UID path, unsigned int part);
 	static void Collect();
+    template <typename T>
+    static void Free(ResourceHandle<T>& handle);
 
 private:
 	typedef std::size_t ResourceTypeHash;
@@ -76,5 +78,18 @@ ResourceHandle<T> ResourceManager::Load(const std::string& path)
 	return ResourceHandle<T>(instancePointer);
 }
 
+
+template <typename T>
+void ResourceManager::Free(ResourceHandle<T>& handle)
+{
+    Resource* resourceInstance = *handle.m_Instance;
+    // Invalidate the handle
+    handle.invalidate();
+    // Free the resource
+    if (resourceInstance != nullptr) {
+        delete resourceInstance;
+        resourceInstance = nullptr;
+    }
+}
 
 #endif

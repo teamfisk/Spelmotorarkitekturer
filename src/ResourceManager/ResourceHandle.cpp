@@ -31,8 +31,7 @@ bool IResourceHandle::Valid() const
 
 void IResourceHandle::Release()
 {
-	invalidate();
-	// TODO: Actually free the affected resource
+    invalidate();
 }
 
 void IResourceHandle::incrementCount()

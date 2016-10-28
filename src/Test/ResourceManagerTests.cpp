@@ -15,6 +15,8 @@ TEST_CASE("ResourceManager")
 	REQUIRE(txt.Valid());
 	REQUIRE((*txt)->Length() == 12);
 	REQUIRE(std::memcmp((*txt)->Text(), "TestContent1", 12) == 0);
+    ResourceManager::Free(txt);
+    REQUIRE(txt.Valid() == false);
 }
 
 TEST_CASE("ResourceTree")

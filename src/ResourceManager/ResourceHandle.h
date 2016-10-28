@@ -5,6 +5,7 @@
 
 class IResourceHandle
 {
+    friend class ResourceManager;
 protected:
 	IResourceHandle(Resource** resource);
 	IResourceHandle(const IResourceHandle& handle);
