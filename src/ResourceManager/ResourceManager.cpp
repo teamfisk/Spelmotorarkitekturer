@@ -50,7 +50,7 @@ void ResourceManager::Collect()
 			if (res == nullptr) {
 				continue;
 			}
-			if (res->m_ReferenceCount == 0) {
+			if (instance.ReferenceCount == 0) {
 				delete res;
 				*instance.Handle = nullptr;
 			}
