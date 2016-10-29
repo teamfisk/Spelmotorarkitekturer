@@ -104,7 +104,7 @@ int main()
 
 	glewInit();
 
-	glEnable(GL_DEPTH_BUFFER);
+	//glEnable(GL_DEPTH_BUFFER); // This is apparently not a thing, but Intel does not warn about it. Nvidia does though.
 	glEnable(GL_DEPTH_TEST);
 
 #ifdef _DEBUG
@@ -139,9 +139,8 @@ int main()
 	// Try to load a model and render it.	
 	auto teapotHandle = ResourceManager::Load<Model>("teapot.obj");
 	auto planeHandle = ResourceManager::Load<Model>("plane.obj");
-
-	//auto textureHandle = ResourceManager::Load<Texture>("moss 5.png");
-	auto textureHandle = ResourceManager::Load<Texture>("kitten_png_image.png");
+	
+	auto catTexHandle = ResourceManager::Load<Texture>("kitten_png_image.png");
 
 	
 	//auto bunnyHandle = ResourceManager::Load<Model>("bunny.obj", 0);
@@ -161,38 +160,29 @@ int main()
 	double lastTime = glfwGetTime();
 
 	std::vector<Entity> entities;
-	entities.emplace_back(translate(glm::vec3(0, 0, 0)), teapotHandle);
-	entities.emplace_back(translate(glm::vec3(5, 0, 3)), teapotHandle);
-	entities.emplace_back(translate(glm::vec3(9, 0, 0)), teapotHandle);
-	entities.emplace_back(translate(glm::vec3(16, 0, 4)), teapotHandle);
-	entities.emplace_back(translate(glm::vec3(22, 0, -2)), teapotHandle);	
-	entities.emplace_back(translate(glm::vec3(27, 0, 1)), teapotHandle);
-	entities.emplace_back(translate(glm::vec3(32, 0, 4)), teapotHandle);
-	entities.emplace_back(translate(glm::vec3(40, 0, -2)), teapotHandle);
-	entities.emplace_back(translate(glm::vec3(45, 0, 1)), teapotHandle);
+	entities.emplace_back(translate(glm::vec3(0, 0, 0)), teapotHandle, catTexHandle);
+	entities.emplace_back(translate(glm::vec3(5, 0, 3)), teapotHandle, catTexHandle);
+	entities.emplace_back(translate(glm::vec3(9, 0, 0)), teapotHandle, catTexHandle);
+	entities.emplace_back(translate(glm::vec3(16, 0, 4)), teapotHandle, catTexHandle);
+	entities.emplace_back(translate(glm::vec3(22, 0, -2)), teapotHandle, catTexHandle);
+	entities.emplace_back(translate(glm::vec3(27, 0, 1)), teapotHandle, catTexHandle);
+	entities.emplace_back(translate(glm::vec3(32, 0, 4)), teapotHandle, catTexHandle);
+	entities.emplace_back(translate(glm::vec3(40, 0, -2)), teapotHandle, catTexHandle);
+	entities.emplace_back(translate(glm::vec3(45, 0, 1)), teapotHandle, catTexHandle);
 	
 	// Planes
 	glm::mat4x4 planeMatrix = glm::rotate((float)M_PI_2, glm::vec3(1.0, 0.0, 0.0));
 	planeMatrix = glm::scale(planeMatrix, { 1, 1, 1 });
 
-	entities.emplace_back(translate(glm::vec3(-20, 0, 0)) * planeMatrix, planeHandle);
-	entities.emplace_back(translate(glm::vec3(-10, 0, 0)) * planeMatrix, planeHandle);
-	entities.emplace_back(translate(glm::vec3(0, 0, 0)) * planeMatrix, planeHandle);
+	entities.emplace_back(translate(glm::vec3(-20, 0, 0)) * planeMatrix, planeHandle, catTexHandle);
+	entities.emplace_back(translate(glm::vec3(-10, 0, 0)) * planeMatrix, planeHandle, catTexHandle);
+	entities.emplace_back(translate(glm::vec3(0, 0, 0)) * planeMatrix, planeHandle, catTexHandle);
 	for (int i = 0; i < 6; i++)
 	{
-		entities.emplace_back(translate(glm::vec3(10 * i, 0, 0)) * planeMatrix, planeHandle);
+		entities.emplace_back(translate(glm::vec3(10 * i, 0, 0)) * planeMatrix, planeHandle, catTexHandle);
 	}		
 
 	double timeSinceLastEntitySpawn = 0;
-
-	GLuint linearSampler;
-	glGenSamplers(1, &linearSampler);
-	glSamplerParameteri(linearSampler, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-	glSamplerParameteri(linearSampler, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-	glSamplerParameteri(linearSampler, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
-	glSamplerParameteri(linearSampler, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);	
-	glSamplerParameteri(linearSampler, GL_TEXTURE_WRAP_S, GL_REPEAT);
-	glSamplerParameteri(linearSampler, GL_TEXTURE_WRAP_T, GL_REPEAT);	
 
 	while (!glfwWindowShouldClose(window))
 	{	
@@ -201,20 +191,20 @@ int main()
 		lastTime = time;
 
 		ResourceManager::ProcessAsyncQueue();
+		//ResourceManager::Collect();
 
 		for(unsigned int i = 0; i < entities.size(); i++)
 		{
 			float x = entities[i].worldMatrix[3][0];
 			float offset = 6; 
 			if (x + offset < camera.getPosition().x) // Trigger this slightly after the player has passed the entity.
-			{
-				
+			{				
 				entities[i].worldMatrix[3][0] += ENTITY_MOVE_DIST_X;
 
 				// Change models after some time. It's like a new level!!
-				if (glfwGetTime() > 20.0f)
-				{
-					//entities[i].modelHandle = ;
+				if (glfwGetTime() > 10.0f)
+				{					
+					entities[i].textureHandle = ResourceManager::Load<Texture>("moss 5.png");
 				}
 			}			
 		}
@@ -244,19 +234,17 @@ int main()
 		glUseProgram(programHandle);		
 		glUniformMatrix4fv(glGetUniformLocation(programHandle, "projection"), 1, GL_FALSE, glm::value_ptr(camera.getProjectionMatrix()));
 		glUniformMatrix4fv(glGetUniformLocation(programHandle, "view"), 1, GL_FALSE, glm::value_ptr(camera.getViewMatrix()));	
-
-		if (textureHandle.Valid()) {
-			textureHandle->Bind();
-			glBindSampler(0, linearSampler);
-		}
-
-		//renderer.Render(*planeHandle, planeMatrix, programHandle);		
-
+		
 		for (unsigned int i = 0; i < entities.size(); i++)
 		{
 			auto& entity = entities[i];
-			if (entity.modelHandle.Valid()) {
-				renderer.Render(*entity.modelHandle, entity.worldMatrix, programHandle);
+			
+			if (entity.modelHandle.Valid() && entity.textureHandle.Valid()) // Check that the handle is valid.
+			{
+				if (entity.modelHandle->Valid() && entity.textureHandle->Valid()) // Check that the resource the handle refers to is valid.
+				{
+					renderer.Render(*entity.modelHandle, entity.worldMatrix, *entity.textureHandle, programHandle);
+				}
 			}
 		}
 

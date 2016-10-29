@@ -13,7 +13,7 @@ Texture::Texture(std::shared_ptr<ResourceBundle::Block> block)
             break;
 		default:
 			throw std::runtime_error("Unsupported image format.");
-	}
+	}	
 }
 
 void Texture::Finalize()
@@ -25,7 +25,6 @@ void Texture::Finalize()
 
 	m_PNG.Release();
 }
-
 std::size_t Texture::Size()
 {
 	return 0;

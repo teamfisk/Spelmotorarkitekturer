@@ -37,11 +37,12 @@ protected:
 	void LogMemoryFreed(std::size_t size) { m_UsedMemory -= size; }
 	std::size_t m_UsedMemory = 0;
 
+	bool m_Finalized = false;
 public:
     virtual bool Valid() const { return m_Finalized; }
 
 private:
-	bool m_Finalized = false;
+	
 };
 
 #endif
