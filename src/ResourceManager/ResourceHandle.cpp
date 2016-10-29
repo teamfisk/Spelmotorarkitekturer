@@ -16,6 +16,8 @@ IResourceHandle::IResourceHandle(const IResourceHandle& handle)
 
 IResourceHandle& IResourceHandle::operator=(const IResourceHandle& other)
 {
+	decrementCount();
+
 	m_Instance = other.m_Instance;
 	m_RefCount = other.m_RefCount;
 	incrementCount();

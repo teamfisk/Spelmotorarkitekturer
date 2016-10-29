@@ -34,7 +34,7 @@ public:
 
 	// Process items waiting for finalization in async queue. Call this every frame!
 	static void ProcessAsyncQueue();
-
+	static void PrintResources();
 private:
     static std::thread::id m_MainThreadID;
     static std::size_t m_MemoryLimit;
