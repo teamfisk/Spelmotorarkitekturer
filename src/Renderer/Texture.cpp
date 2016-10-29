@@ -13,7 +13,7 @@ Texture::Texture(std::shared_ptr<ResourceBundle::Block> block)
             break;
 		default:
 			throw std::runtime_error("Unsupported image format.");
-	}
+	}	
 }
 
 std::size_t Texture::Finalize()
@@ -24,7 +24,7 @@ std::size_t Texture::Finalize()
 	glBindTexture(GL_TEXTURE_2D, 0);
 
 	m_PNG.Release();
-
+	m_Finalized = true;
 	return 0;
 }
 
