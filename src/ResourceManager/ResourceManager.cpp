@@ -18,6 +18,7 @@ void ResourceManager::Initialize(std::size_t memoryLimit)
 {
 	m_MemoryLimit = memoryLimit;
 	m_AsyncLoadThread = std::thread(ResourceManager::asyncLoadThreadFunction);
+	LOG_INFO("ResourceManager memory limit: %u bytes", m_MemoryLimit);
 }
 
 void ResourceManager::RegisterBundle(const std::string& path)
@@ -87,7 +88,7 @@ void ResourceManager::ProcessAsyncQueue()
 
 void ResourceManager::asyncLoadThreadFunction()
 {
-	LOG_DEBUG("Started ResourceManager async load thread");
+	LOG_DEBUG("Started ResourceManager async load thread\n");
 	while (true) {
 		// Grab a job
         m_AsyncLoadQueueMutex.lock();
