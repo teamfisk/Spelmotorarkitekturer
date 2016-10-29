@@ -104,7 +104,7 @@ int main()
 
 	glewInit();
 
-	glEnable(GL_DEPTH_BUFFER);
+	glEnable(GL_DEPTH_BUFFER); // This is apparently not a thing, but Intel does not warn about it. Nvidia does though.
 	glEnable(GL_DEPTH_TEST);
 
 #ifdef _DEBUG
