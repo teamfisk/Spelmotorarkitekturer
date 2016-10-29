@@ -207,8 +207,7 @@ int main()
 			float x = entities[i].worldMatrix[3][0];
 			float offset = 6; 
 			if (x + offset < camera.getPosition().x) // Trigger this slightly after the player has passed the entity.
-			{
-				
+			{				
 				entities[i].worldMatrix[3][0] += ENTITY_MOVE_DIST_X;
 
 				// Change models after some time. It's like a new level!!
