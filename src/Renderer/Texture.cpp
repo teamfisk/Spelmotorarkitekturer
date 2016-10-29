@@ -16,7 +16,7 @@ Texture::Texture(std::shared_ptr<ResourceBundle::Block> block)
 	}
 }
 
-std::size_t Texture::Finalize()
+void Texture::Finalize()
 {
 	glGenTextures(1, &m_Texture);
 	glBindTexture(GL_TEXTURE_2D, m_Texture);	
@@ -24,7 +24,10 @@ std::size_t Texture::Finalize()
 	glBindTexture(GL_TEXTURE_2D, 0);
 
 	m_PNG.Release();
+}
 
+std::size_t Texture::Size()
+{
 	return 0;
 }
 

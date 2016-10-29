@@ -11,8 +11,9 @@ class Texture : public Resource
 
 protected:
 	Texture(std::shared_ptr<ResourceBundle::Block> block);
-	std::size_t Finalize() override;
+	void Finalize() override;
 	void Destroy() override;
+	std::size_t Size() override;
 
 public:
 	void Bind(GLenum textureUnit = GL_TEXTURE0, GLenum access = GL_READ_ONLY);

@@ -86,7 +86,7 @@ int main()
     ResourceManager::RegisterBundleFormat<STUFFBundle>();
 	ResourceManager::RegisterBundleFormat<FilesystemBundle>();
 	ResourceManager::RegisterBundle("Resources");
-	ResourceManager::Initialize();
+	ResourceManager::Initialize(10);
 
 	glfwSetErrorCallback(glfw_error_callback);
 	glfwInit();

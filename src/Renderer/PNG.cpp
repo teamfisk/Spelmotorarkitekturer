@@ -79,7 +79,7 @@ PNG::PNG(std::shared_ptr<ResourceBundle::Block> block)
 	png_destroy_read_struct(&png_ptr, &info_ptr, &info_end_ptr);
 }
 
-std::size_t PNG::Finalize()
+std::size_t PNG::Size()
 {
 	return m_DataSize;
 }

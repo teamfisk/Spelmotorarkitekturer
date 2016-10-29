@@ -23,7 +23,10 @@ GLenum CreateVAO(RawModelAssimp::Vertex someStruct)
 */
 Model::Model(std::shared_ptr<ResourceBundle::Block> block)
 {
-	m_RawModel = ResourceManager::Load<RawModelAssimp>(block->Path());	
+	m_RawModel = ResourceManager::Load<RawModelAssimp>(block->Path());
+	if (!m_RawModel.Valid()) {
+		throw Resource::FailedLoadingException("Internal model failed to load");
+	}
 	m_IndexCount = m_RawModel->m_Indices.size();
 					
 	if (m_RawModel->m_Indices.size() == 0) {
@@ -55,7 +58,7 @@ Model::Model(std::shared_ptr<ResourceBundle::Block> block)
 	indexType = GL_UNSIGNED_INT;	
 }
 
-std::size_t Model::Finalize()
+void Model::Finalize()
 {
 	glGenBuffers(1, &vbo);
 	glBindBuffer(GL_ARRAY_BUFFER, vbo);
@@ -97,8 +100,6 @@ std::size_t Model::Finalize()
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
 
 	m_RawModel.Release();
-
-	return 0;
 }
 
 void Model::Destroy()
@@ -110,6 +111,11 @@ void Model::Destroy()
 }
 
 Model::~Model() { }
+
+std::size_t Model::Size()
+{
+	return GetMemoryUsage();
+}
 
 GLenum Model::GetVAO() const
 {
