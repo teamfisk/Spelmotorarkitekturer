@@ -180,7 +180,12 @@ int main()
 	for (int i = 0; i < 6; i++)
 	{
 		entities.emplace_back(translate(glm::vec3(10 * i, 0, 0)) * planeMatrix, planeHandle, catTexHandle);
-	}		
+	}	
+
+	// Release these handles so they do not prevent the gc from collecting them.
+	teapotHandle.Release();
+	planeHandle.Release();
+	catTexHandle.Release();
 
 	double timeSinceLastEntitySpawn = 0;
 
