@@ -98,6 +98,7 @@ ResourceHandle<T> ResourceManager::Load(const std::string& path)
 
 	// Check the cache for the resource and create the resource instance if it doesn't exist in cache
     InstanceInfo& instance = instanceMap[path];
+    ResourceHandle<T> handle(instance.Handle, &instance.ReferenceCount);
 	if (*instance.Handle == nullptr) {
 		// Find the first bundle that serves our request
 		std::shared_ptr<ResourceBundle::Block> block = nullptr;
@@ -120,7 +121,7 @@ ResourceHandle<T> ResourceManager::Load(const std::string& path)
 		}
 	}
 
-	return ResourceHandle<T>(instance.Handle, &instance.ReferenceCount);
+	return handle;
 }
 
 template <typename T>

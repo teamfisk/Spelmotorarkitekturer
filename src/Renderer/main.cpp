@@ -191,7 +191,7 @@ int main()
 		lastTime = time;
 
 		ResourceManager::ProcessAsyncQueue();
-		//ResourceManager::Collect();
+		ResourceManager::Collect();
 
 		for(unsigned int i = 0; i < entities.size(); i++)
 		{
