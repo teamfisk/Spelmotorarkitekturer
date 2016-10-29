@@ -74,9 +74,9 @@ private:
 	static std::unordered_map<ResourceTypeHash_t, InstanceMap_t> m_Instances;
 
 	template <typename T>
-	static void loadSync(std::shared_ptr<ResourceBundle::Block> block, Resource** instanceHandle);
+	static void loadSync(std::shared_ptr<ResourceBundle::Block> block, InstanceInfo& instance);
 	template <typename T>
-	static void loadAsync(std::shared_ptr<ResourceBundle::Block> block, Resource** instanceHandle);
+	static void loadAsync(std::shared_ptr<ResourceBundle::Block> block, InstanceInfo& instance);
 
 	// The background loading thread
 };
@@ -108,9 +108,9 @@ ResourceHandle<T> ResourceManager::Load(const std::string& path)
 			// Only allow threaded loading on main thread
 			auto currentThread = std::this_thread::get_id();
 			if (currentThread == m_MainThreadID) {
-				loadAsync<T>(block, instance.Handle);
+				loadAsync<T>(block, instance);
 			} else {
-				loadSync<T>(block, instance.Handle);
+				loadSync<T>(block, instance);
 			}
 		} else {
 			LOG_ERROR("Failed to load resource \"%s\": Not found", path.c_str());
@@ -126,7 +126,7 @@ void ResourceManager::loadSync(std::shared_ptr<ResourceBundle::Block> block, Ins
     // Create the instance
     *instance.Handle = new T(block);
 	(*instance.Handle)->Finalize();
-	(*instanceHandle)->m_Finalized = true;
+	(*instance.Handle)->m_Finalized = true;
 }
 
 template <typename T>
