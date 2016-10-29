@@ -18,9 +18,11 @@ class Model :
 	friend class ResourceManager;
 public:
 	Model(std::shared_ptr<ResourceBundle::Block> block);
-	std::size_t Finalize() override;
+	void Finalize() override;
 	void Destroy() override;
 	virtual ~Model();
+
+	std::size_t Size() override;
 	
 	GLenum GetVAO() const;
 	GLenum GetVBO() const;	

@@ -24,7 +24,7 @@ public:
     std::size_t Length() const { return m_Length; }
 
 private:
-	std::size_t Finalize() override
+	std::size_t Size() override
 	{
 		return m_Length;
 	}

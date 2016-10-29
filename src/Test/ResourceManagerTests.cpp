@@ -7,7 +7,7 @@
 
 TEST_CASE("ResourceManager")
 {
-    ResourceManager::Initialize();
+    ResourceManager::Initialize(0);
     ResourceManager::RegisterBundleFormat<STUFFBundle>();
 	ResourceManager::RegisterBundleFormat<FilesystemBundle>();
 	ResourceManager::RegisterBundle("TestFiles/ResourceBundle/Resources.stuff");

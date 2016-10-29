@@ -10,7 +10,7 @@ class PNG : public Image, public Resource
 {
 public:
 	PNG(std::shared_ptr<ResourceBundle::Block> block);
-	std::size_t Finalize() override;
+	std::size_t Size() override;
 	~PNG();
 
 private:

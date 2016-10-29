@@ -1,6 +1,8 @@
 #include "ResourceManager.h"
 
 std::thread::id ResourceManager::m_MainThreadID = std::this_thread::get_id();
+std::size_t ResourceManager::m_MemoryLimit = 0;
+std::atomic_size_t ResourceManager::m_AllocatedMemory(0);
 
 std::queue<ResourceManager::AsyncLoadJob> ResourceManager::m_AsyncLoadQueue;
 std::mutex ResourceManager::m_AsyncLoadQueueMutex;
@@ -12,9 +14,11 @@ std::vector<std::function<ResourceBundle*(const std::string&)>> ResourceManager:
 std::list<ResourceBundle*> ResourceManager::m_Bundles;
 std::unordered_map<ResourceManager::ResourceTypeHash_t, ResourceManager::InstanceMap_t> ResourceManager::m_Instances;
 
-void ResourceManager::Initialize()
+void ResourceManager::Initialize(std::size_t memoryLimit)
 {
+	m_MemoryLimit = memoryLimit;
 	m_AsyncLoadThread = std::thread(ResourceManager::asyncLoadThreadFunction);
+	LOG_INFO("ResourceManager memory limit: %u bytes", m_MemoryLimit);
 }
 
 void ResourceManager::RegisterBundle(const std::string& path)
@@ -54,6 +58,8 @@ void ResourceManager::Collect()
 				res->Destroy();
 				delete res;
 				*instance.Handle = nullptr;
+				m_AllocatedMemory -= instance.MemoryUsage;
+				LOG_INFO("ResourceManager: Garbage collected resource \"%s\"", kv2.first.c_str());
 			}
 		}
 	}
@@ -69,15 +75,20 @@ void ResourceManager::ProcessAsyncQueue()
 		m_AsyncFinalizationQueueMutex.unlock();
 
 		// Finalize it
-		(*job.Handle)->Finalize();
-		(*job.Handle)->m_Finalized = true;
-        LOG_DEBUG("FINALIZE");
+		(*job.Instance->Handle)->Finalize();
+		(*job.Instance->Handle)->m_Finalized = true;
+
+		std::size_t allocationSize = job.Instance->MemoryUsage + (*job.Instance->Handle)->Size();
+		m_AllocatedMemory += allocationSize;
+		if (m_AllocatedMemory > m_MemoryLimit) {
+			LOG_WARNING("Asynchronous resource allocation of %i byte exceeded ResourceManager memory limit!", allocationSize);
+		}
 	}
 }
 
 void ResourceManager::asyncLoadThreadFunction()
 {
-	LOG_DEBUG("Started ResourceManager async load thread");
+	LOG_DEBUG("Started ResourceManager async load thread\n");
 	while (true) {
 		// Grab a job
         m_AsyncLoadQueueMutex.lock();

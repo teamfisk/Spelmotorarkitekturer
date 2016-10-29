@@ -39,3 +39,6 @@ target_link_libraries(Renderer
 	ResourceManager
     ${LIBRARIES}
 )
+if (UNIX)
+	target_link_libraries(Renderer pthread)
+endif(UNIX)

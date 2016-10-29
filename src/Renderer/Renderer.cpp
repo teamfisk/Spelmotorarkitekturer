@@ -5,6 +5,13 @@
 
 Renderer::Renderer()
 {
+	glGenSamplers(1, &linearSampler);
+	glSamplerParameteri(linearSampler, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+	glSamplerParameteri(linearSampler, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+	glSamplerParameteri(linearSampler, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+	glSamplerParameteri(linearSampler, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+	glSamplerParameteri(linearSampler, GL_TEXTURE_WRAP_S, GL_REPEAT);
+	glSamplerParameteri(linearSampler, GL_TEXTURE_WRAP_T, GL_REPEAT);
 }
 
 
@@ -17,9 +24,12 @@ Renderer::~Renderer()
 //	renderList.emplace_back(std::make_tuple(model, instancedata));
 //}
 
-void Renderer::Render(Model * model, const glm::mat4x4& worldMat, GLuint programHandle)
+void Renderer::Render(Model * model, const glm::mat4x4& worldMat, Texture* texture, GLuint programHandle)
 {	
-	glUniformMatrix4fv(glGetUniformLocation(programHandle, "world"), 1, GL_FALSE, glm::value_ptr(worldMat));
+	glUniformMatrix4fv(glGetUniformLocation(programHandle, "world"), 1, GL_FALSE, glm::value_ptr(worldMat));	
+	texture->Bind();
+	glBindSampler(0, linearSampler);
+	
 
 	glBindVertexArray(model->GetVAO());
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, model->GetIndexBuffer());
