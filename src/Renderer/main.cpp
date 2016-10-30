@@ -17,6 +17,7 @@
 #include "ResourceManager/FilesystemBundle.h"
 #include "CameraEndlessRunner.h"
 #include "Entity.h"
+#include "Allocator/PoolAllocator.h"
 
 using namespace std;
 
@@ -161,27 +162,27 @@ int main()
 	glClearColor(0.f, 0.0f, 0.3f, 1.f);
 	double lastTime = glfwGetTime();
 
-	std::vector<Entity> entities;
-	entities.emplace_back(translate(glm::vec3(0, 0, 0)), teapotHandle, catTexHandle);
-	entities.emplace_back(translate(glm::vec3(5, 0, 3)), teapotHandle, catTexHandle);
-	entities.emplace_back(translate(glm::vec3(9, 0, 0)), teapotHandle, catTexHandle);
-	entities.emplace_back(translate(glm::vec3(16, 0, 4)), teapotHandle, catTexHandle);
-	entities.emplace_back(translate(glm::vec3(22, 0, -2)), teapotHandle, catTexHandle);
-	entities.emplace_back(translate(glm::vec3(27, 0, 1)), teapotHandle, catTexHandle);
-	entities.emplace_back(translate(glm::vec3(32, 0, 4)), teapotHandle, catTexHandle);
-	entities.emplace_back(translate(glm::vec3(40, 0, -2)), teapotHandle, catTexHandle);
-	entities.emplace_back(translate(glm::vec3(45, 0, 1)), teapotHandle, catTexHandle);
+	PoolAllocator<Entity> poolAlloc(30);		
+	poolAlloc.Allocate(translate(glm::vec3(0, 0, 0)), teapotHandle, catTexHandle);
+	poolAlloc.Allocate(translate(glm::vec3(5, 0, 3)), teapotHandle, catTexHandle);
+	poolAlloc.Allocate(translate(glm::vec3(9, 0, 0)), teapotHandle, catTexHandle);
+	poolAlloc.Allocate(translate(glm::vec3(16, 0, 4)), teapotHandle, catTexHandle);
+	poolAlloc.Allocate(translate(glm::vec3(22, 0, -2)), teapotHandle, catTexHandle);
+	poolAlloc.Allocate(translate(glm::vec3(27, 0, 1)), teapotHandle, catTexHandle);
+	poolAlloc.Allocate(translate(glm::vec3(32, 0, 4)), teapotHandle, catTexHandle);
+	poolAlloc.Allocate(translate(glm::vec3(40, 0, -2)), teapotHandle, catTexHandle);
+	poolAlloc.Allocate(translate(glm::vec3(45, 0, 1)), teapotHandle, catTexHandle);
 	
 	// Planes
 	glm::mat4x4 planeMatrix = glm::rotate((float)M_PI_2, glm::vec3(1.0, 0.0, 0.0));
 	planeMatrix = glm::scale(planeMatrix, { 1, 1, 1 });
 
-	entities.emplace_back(translate(glm::vec3(-20, 0, 0)) * planeMatrix, planeHandle, catTexHandle);
-	entities.emplace_back(translate(glm::vec3(-10, 0, 0)) * planeMatrix, planeHandle, catTexHandle);
-	entities.emplace_back(translate(glm::vec3(0, 0, 0)) * planeMatrix, planeHandle, catTexHandle);
+	poolAlloc.Allocate(translate(glm::vec3(-20, 0, 0)) * planeMatrix, planeHandle, catTexHandle);
+	poolAlloc.Allocate(translate(glm::vec3(-10, 0, 0)) * planeMatrix, planeHandle, catTexHandle);
+	poolAlloc.Allocate(translate(glm::vec3(0, 0, 0)) * planeMatrix, planeHandle, catTexHandle);
 	for (int i = 0; i < 6; i++)
 	{
-		entities.emplace_back(translate(glm::vec3(10 * i, 0, 0)) * planeMatrix, planeHandle, catTexHandle);
+		poolAlloc.Allocate(translate(glm::vec3(10 * i, 0, 0)) * planeMatrix, planeHandle, catTexHandle);
 	}	
 
 	// Release these handles so they do not prevent the gc from collecting them.
@@ -200,18 +201,19 @@ int main()
 		ResourceManager::ProcessAsyncQueue();
 		ResourceManager::Collect();
 
-		for(unsigned int i = 0; i < entities.size(); i++)
-		{
-			float x = entities[i].worldMatrix[3][0];
+		
+		for(auto& entity : poolAlloc)
+		{			
+			float x = entity.worldMatrix[3][0];
 			float offset = 6; 
 			if (x + offset < camera.getPosition().x) // Trigger this slightly after the player has passed the entity.
 			{				
-				entities[i].worldMatrix[3][0] += ENTITY_MOVE_DIST_X;
+				entity.worldMatrix[3][0] += ENTITY_MOVE_DIST_X;
 
 				// Change models after some time. It's like a new level!!
 				if (glfwGetTime() > 10.0f)
 				{					
-					entities[i].textureHandle = ResourceManager::Load<Texture>("moss 5.png");
+					entity.textureHandle = ResourceManager::Load<Texture>("moss 5.png");
 				}
 			}			
 		}
@@ -223,7 +225,7 @@ int main()
 
 		//	auto mat = glm::mat4x4(1);
 		//	mat = translate(mat, camera.getPosition() + glm::vec3(25 + rand() % 5, -1, 0));
-		//	entities.emplace_back(mat, teapotHandle);			
+		//	poolAlloc.Allocate(mat, teapotHandle);			
 		//}		
 
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
@@ -234,10 +236,8 @@ int main()
 		glUniformMatrix4fv(glGetUniformLocation(programHandle, "projection"), 1, GL_FALSE, glm::value_ptr(camera.getProjectionMatrix()));
 		glUniformMatrix4fv(glGetUniformLocation(programHandle, "view"), 1, GL_FALSE, glm::value_ptr(camera.getViewMatrix()));	
 		
-		for (unsigned int i = 0; i < entities.size(); i++)
-		{
-			auto& entity = entities[i];
-			
+		for(auto& entity : poolAlloc)
+		{						
 			if (entity.modelHandle.Valid() && entity.textureHandle.Valid()) // Check that the handle is valid.
 			{
 				if (entity.modelHandle->Valid() && entity.textureHandle->Valid()) // Check that the resource the handle refers to is valid.
