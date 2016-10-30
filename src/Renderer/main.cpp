@@ -94,7 +94,7 @@ int main()
 {
     ResourceManager::RegisterBundleFormat<STUFFBundle>();
 	ResourceManager::RegisterBundleFormat<FilesystemBundle>();
-	ResourceManager::RegisterBundle("Resources");
+	ResourceManager::RegisterBundle("Resources.stuff");
 	ResourceManager::Initialize(10);
 
 	glfwSetErrorCallback(glfw_error_callback);
@@ -228,7 +228,7 @@ int main()
 
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-		camera.Update();				
+		camera.Update();
 
 		glUseProgram(programHandle);		
 		glUniformMatrix4fv(glGetUniformLocation(programHandle, "projection"), 1, GL_FALSE, glm::value_ptr(camera.getProjectionMatrix()));
