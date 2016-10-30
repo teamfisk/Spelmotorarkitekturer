@@ -1,4 +1,5 @@
 #include "ResourceManager.h"
+#include <iostream>
 
 std::thread::id ResourceManager::m_MainThreadID = std::this_thread::get_id();
 std::size_t ResourceManager::m_MemoryLimit = 0;
@@ -82,6 +83,21 @@ void ResourceManager::ProcessAsyncQueue()
 		m_AllocatedMemory += allocationSize;
 		if (m_AllocatedMemory > m_MemoryLimit) {
 			LOG_WARNING("Asynchronous resource allocation of %i byte exceeded ResourceManager memory limit!", allocationSize);
+		}
+	}
+}
+
+void ResourceManager::PrintResources()
+{
+	for (auto& kv : m_Instances) {
+		auto instanceMap = kv.second;
+		for (auto& kv2 : instanceMap) {
+			InstanceInfo& instance = kv2.second;
+			Resource* res = *instance.Handle;
+			if (res != nullptr)
+			{
+				std::cout << kv2.first << " refcount: " << instance.ReferenceCount << std::endl;				
+			}
 		}
 	}
 }

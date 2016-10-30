@@ -81,6 +81,15 @@ void APIENTRY OpenGLCallbackFunction(GLenum source, GLenum type, GLuint id, GLen
 	cout << "---------------------opengl-callback-end--------------" << endl;
 }
 
+void glfwKeyCallback(GLFWwindow* window, int key, int scancode, int action, int mods)
+{
+	if(key == GLFW_KEY_SPACE && action == GLFW_RELEASE)
+	{
+		ResourceManager::PrintResources();
+	}
+}
+
+
 int main()
 {
     ResourceManager::RegisterBundleFormat<STUFFBundle>();
@@ -100,7 +109,7 @@ int main()
 	if (!window) { glfwTerminate(); return -1; }
 
 	glfwMakeContextCurrent(window);
-	//glfwSetKeyCallback(window, glfwKeyCallback);
+	glfwSetKeyCallback(window, glfwKeyCallback);
 
 	glewInit();
 
@@ -146,13 +155,6 @@ int main()
 	//auto bunnyHandle = ResourceManager::Load<Model>("bunny.obj", 0);
 
 	// Load other models when needed during runtime, to minimize initial load time.
-
-	glm::mat4 worldMat = {
-		1, 0, 0, 0,
-		0, 1, 0, 0,
-		0, 0, 1, 0,
-		0, 0, 0, 1
-	};
 		
 	auto keyILastFrame = GLFW_RELEASE;
 
@@ -180,7 +182,12 @@ int main()
 	for (int i = 0; i < 6; i++)
 	{
 		entities.emplace_back(translate(glm::vec3(10 * i, 0, 0)) * planeMatrix, planeHandle, catTexHandle);
-	}		
+	}	
+
+	// Release these handles so they do not prevent the gc from collecting them.
+	teapotHandle.Release();
+	planeHandle.Release();
+	catTexHandle.Release();
 
 	double timeSinceLastEntitySpawn = 0;
 
@@ -221,15 +228,7 @@ int main()
 
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-		camera.Update();		
-		
-		auto keyICurrentFrame = glfwGetKey(window, GLFW_KEY_I);
-		if(keyICurrentFrame == GLFW_PRESS && keyILastFrame == GLFW_RELEASE)
-		{			
-			keyILastFrame = GLFW_PRESS;
-			worldMat = translate(worldMat, { 5, 0, 0 });
-		}
-		keyILastFrame = keyICurrentFrame;
+		camera.Update();				
 
 		glUseProgram(programHandle);		
 		glUniformMatrix4fv(glGetUniformLocation(programHandle, "projection"), 1, GL_FALSE, glm::value_ptr(camera.getProjectionMatrix()));
